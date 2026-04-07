@@ -1,0 +1,2373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Outseer | 3DS Interactive Simulator</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --navy: #08182e;
+  --navy-1: #0d2240;
+  --navy-2: #152f52;
+  --navy-3: #1c3d68;
+  --teal: #00c4bc;
+  --teal-d: #008f89;
+  --teal-glow: rgba(0,196,188,0.15);
+  --amber: #f59e0b;
+  --red: #ef4444;
+  --green: #22c55e;
+  --white: #f0f6ff;
+  --muted: #7a9bbf;
+  --border: rgba(0,196,188,0.15);
+  --card: rgba(13,34,64,0.7);
+  --font-h: 'Syne', sans-serif;
+  --font-m: 'IBM Plex Mono', monospace;
+  --font-b: 'DM Sans', sans-serif;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--navy);
+  color: var(--white);
+  font-family: var(--font-b);
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* GRID BACKGROUND */
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 0;
+  background-image:
+    linear-gradient(rgba(0,196,188,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,196,188,0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+}
+
+/* GLOW ORBS */
+.orb { position: fixed; border-radius: 50%; filter: blur(100px); pointer-events: none; z-index: 0; }
+.orb-1 { width: 500px; height: 500px; background: radial-gradient(circle, rgba(0,196,188,0.1), transparent 70%); top: -100px; right: -100px; }
+.orb-2 { width: 400px; height: 400px; background: radial-gradient(circle, rgba(0,100,200,0.08), transparent 70%); bottom: 10%; left: -100px; }
+
+/* NAV */
+nav {
+  position: sticky; top: 0; z-index: 200;
+  background: rgba(8,24,46,0.95);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 32px; height: 60px;
+}
+.nav-brand {
+  display: flex; align-items: center; gap: 10px;
+  font-family: var(--font-h); font-weight: 800; font-size: 1rem;
+  color: var(--white); text-decoration: none;
+}
+.nav-logo { width: 28px; height: 28px; background: linear-gradient(135deg, var(--teal), var(--teal-d)); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: 800; color: var(--navy); }
+.nav-pill {
+  background: rgba(0,196,188,0.1); border: 1px solid var(--teal);
+  border-radius: 100px; padding: 4px 14px;
+  font-size: 0.72rem; font-family: var(--font-m); color: var(--teal);
+}
+.nav-tabs { display: flex; gap: 4px; }
+.nav-tab { background: transparent; border: none; color: var(--muted); font-family: var(--font-b); font-size: 0.82rem; padding: 6px 14px; border-radius: 6px; cursor: pointer; transition: all 0.2s; }
+.nav-tab:hover { color: var(--white); background: rgba(255,255,255,0.05); }
+.nav-tab.active { color: var(--teal); background: rgba(0,196,188,0.08); }
+
+/* HERO STRIP */
+.hero-strip {
+  position: relative; z-index: 1;
+  padding: 48px 32px 32px;
+  border-bottom: 1px solid var(--border);
+}
+.hero-strip h1 {
+  font-family: var(--font-h); font-weight: 800;
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  line-height: 1.1; color: var(--white);
+}
+.hero-strip h1 em { font-style: normal; color: var(--teal); }
+.hero-strip p { color: var(--muted); margin-top: 12px; max-width: 580px; font-size: 0.95rem; }
+.hero-meta { display: flex; gap: 24px; margin-top: 24px; flex-wrap: wrap; }
+.hero-badge {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 8px 14px; font-size: 0.78rem; color: var(--muted);
+}
+.hero-badge strong { color: var(--teal); font-family: var(--font-m); }
+
+/* MAIN LAYOUT */
+.main { position: relative; z-index: 1; padding: 0; }
+
+/* SCENARIO SELECTOR */
+.scenario-bar {
+  display: flex; gap: 0; border-bottom: 1px solid var(--border);
+  overflow-x: auto; background: rgba(8,24,46,0.8);
+  position: sticky; top: 60px; z-index: 100;
+}
+.scenario-btn {
+  flex: 1; min-width: 200px;
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  padding: 16px 20px;
+  background: transparent; border: none; border-right: 1px solid var(--border);
+  color: var(--muted); font-family: var(--font-b); cursor: pointer;
+  transition: all 0.25s; position: relative;
+}
+.scenario-btn::after {
+  content: ''; position: absolute; bottom: 0; left: 0; right: 0;
+  height: 2px; background: var(--teal);
+  transform: scaleX(0); transition: transform 0.25s;
+}
+.scenario-btn:hover { background: rgba(0,196,188,0.04); color: var(--white); }
+.scenario-btn.active { color: var(--white); background: rgba(0,196,188,0.06); }
+.scenario-btn.active::after { transform: scaleX(1); }
+.scenario-btn-icon { font-size: 1.4rem; }
+.scenario-btn-title { font-size: 0.82rem; font-weight: 600; }
+.scenario-btn-sub { font-size: 0.7rem; color: var(--muted); }
+.scenario-btn.active .scenario-btn-sub { color: rgba(0,196,188,0.7); }
+
+/* TWO-COLUMN SIMULATOR */
+.sim-layout {
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  min-height: calc(100vh - 120px);
+}
+
+/* LEFT PANEL — CONTROLS */
+.sim-controls {
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  background: rgba(8,24,46,0.5);
+}
+.control-section {
+  border-bottom: 1px solid var(--border);
+  padding: 24px;
+}
+.control-section-title {
+  font-family: var(--font-h); font-size: 0.82rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.1em;
+  color: var(--teal); margin-bottom: 16px;
+  display: flex; align-items: center; gap: 8px;
+}
+.control-section-title span { font-size: 0.9rem; }
+
+/* RISK SCORE DISPLAY */
+.risk-score-display {
+  display: flex; align-items: center; gap: 16px;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 12px; padding: 16px 20px; margin-bottom: 20px;
+}
+.risk-score-num {
+  font-family: var(--font-m); font-size: 2.4rem; font-weight: 500;
+  line-height: 1; min-width: 64px; text-align: center;
+  transition: color 0.4s;
+}
+.risk-score-bar-wrap { flex: 1; }
+.risk-score-label { font-size: 0.72rem; color: var(--muted); margin-bottom: 6px; }
+.risk-score-bar {
+  height: 8px; background: rgba(255,255,255,0.08); border-radius: 4px; overflow: hidden;
+}
+.risk-score-fill {
+  height: 100%; border-radius: 4px;
+  transition: width 0.5s cubic-bezier(.4,0,.2,1), background 0.4s;
+}
+.risk-verdict {
+  font-size: 0.72rem; font-family: var(--font-m);
+  font-weight: 500; margin-top: 4px;
+}
+
+/* SLIDERS */
+.slider-row {
+  margin-bottom: 16px;
+}
+.slider-header {
+  display: flex; justify-content: space-between;
+  font-size: 0.78rem; margin-bottom: 6px;
+}
+.slider-label { color: var(--muted); }
+.slider-val { font-family: var(--font-m); color: var(--white); font-size: 0.75rem; }
+input[type=range] {
+  width: 100%; height: 4px;
+  -webkit-appearance: none; appearance: none;
+  background: rgba(255,255,255,0.1); border-radius: 2px; cursor: pointer;
+  outline: none;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px; height: 14px; border-radius: 50%;
+  background: var(--teal); border: 2px solid var(--navy);
+  cursor: pointer; transition: transform 0.15s;
+}
+input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.3); }
+input[type=range]::-moz-range-thumb {
+  width: 14px; height: 14px; border-radius: 50%;
+  background: var(--teal); border: 2px solid var(--navy); cursor: pointer;
+}
+
+/* TOGGLES */
+.toggle-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.toggle-row:last-child { border-bottom: none; }
+.toggle-label { font-size: 0.8rem; color: var(--muted); }
+.toggle-label strong { color: var(--white); display: block; font-size: 0.82rem; }
+.toggle {
+  width: 36px; height: 20px; border-radius: 10px;
+  background: rgba(255,255,255,0.1); border: none; cursor: pointer;
+  position: relative; transition: background 0.25s; flex-shrink: 0;
+}
+.toggle::after {
+  content: ''; position: absolute; top: 3px; left: 3px;
+  width: 14px; height: 14px; border-radius: 50%;
+  background: var(--white); transition: transform 0.25s, background 0.25s;
+}
+.toggle.on { background: var(--teal); }
+.toggle.on::after { transform: translateX(16px); background: var(--navy); }
+
+/* SELECT */
+.sim-select {
+  width: 100%; background: var(--card); border: 1px solid var(--border);
+  color: var(--white); font-family: var(--font-b); font-size: 0.82rem;
+  padding: 8px 12px; border-radius: 8px; cursor: pointer; outline: none;
+  transition: border-color 0.2s;
+}
+.sim-select:hover, .sim-select:focus { border-color: var(--teal); }
+
+/* RULE ENGINE */
+.rule-card {
+  background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+  padding: 14px 16px; margin-bottom: 10px;
+  display: flex; align-items: center; gap: 12px;
+  cursor: pointer; transition: all 0.2s;
+}
+.rule-card:hover { border-color: rgba(0,196,188,0.35); }
+.rule-card.triggered { border-color: var(--amber); background: rgba(245,158,11,0.08); }
+.rule-card.blocked { border-color: var(--red); background: rgba(239,68,68,0.08); }
+.rule-card.passed { border-color: var(--green); background: rgba(34,197,94,0.08); }
+.rule-icon { font-size: 1.1rem; flex-shrink: 0; }
+.rule-body { flex: 1; }
+.rule-name { font-size: 0.8rem; font-weight: 600; color: var(--white); }
+.rule-desc { font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
+.rule-badge {
+  font-size: 0.65rem; font-family: var(--font-m); font-weight: 500;
+  padding: 3px 8px; border-radius: 4px;
+}
+.rule-badge.pass { background: rgba(34,197,94,0.15); color: var(--green); }
+.rule-badge.fail { background: rgba(239,68,68,0.15); color: var(--red); }
+.rule-badge.warn { background: rgba(245,158,11,0.15); color: var(--amber); }
+.rule-badge.idle { background: rgba(255,255,255,0.06); color: var(--muted); }
+
+/* RIGHT PANEL — FLOW CANVAS */
+.sim-canvas {
+  overflow-y: auto;
+  padding: 32px;
+}
+
+/* FLOW HEADER */
+.flow-header {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  margin-bottom: 32px; flex-wrap: wrap; gap: 16px;
+}
+.flow-title { font-family: var(--font-h); font-size: 1.4rem; font-weight: 700; }
+.flow-subtitle { color: var(--muted); font-size: 0.85rem; margin-top: 4px; }
+.flow-decision-badge {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 18px; border-radius: 10px; border: 1px solid;
+  font-family: var(--font-m); font-size: 0.82rem; font-weight: 500;
+  transition: all 0.4s;
+}
+
+/* ANIMATED FLOW DIAGRAM */
+.flow-diagram {
+  position: relative;
+}
+.flow-lanes {
+  display: flex; gap: 0;
+  border: 1px solid var(--border); border-radius: 16px; overflow: hidden;
+  margin-bottom: 24px;
+}
+.flow-lane {
+  flex: 1; border-right: 1px solid var(--border);
+  padding: 0;
+}
+.flow-lane:last-child { border-right: none; }
+.lane-header {
+  background: rgba(255,255,255,0.03);
+  border-bottom: 1px solid var(--border);
+  padding: 10px 14px;
+  font-size: 0.7rem; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.08em;
+  color: var(--muted); text-align: center;
+}
+.lane-body {
+  padding: 20px 12px;
+  display: flex; flex-direction: column; align-items: center;
+  gap: 8px; min-height: 400px;
+}
+
+/* FLOW NODES */
+.fnode {
+  width: 100%; max-width: 140px;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 10px; padding: 10px 12px;
+  text-align: center; position: relative;
+  transition: all 0.4s; cursor: pointer;
+}
+.fnode:hover { border-color: rgba(0,196,188,0.4); transform: translateY(-1px); }
+.fnode.active {
+  border-color: var(--teal);
+  background: rgba(0,196,188,0.1);
+  box-shadow: 0 0 20px rgba(0,196,188,0.2);
+}
+.fnode.complete { border-color: var(--green); background: rgba(34,197,94,0.08); }
+.fnode.challenge { border-color: var(--amber); background: rgba(245,158,11,0.08); }
+.fnode.blocked { border-color: var(--red); background: rgba(239,68,68,0.08); }
+.fnode-icon { font-size: 1.4rem; margin-bottom: 4px; }
+.fnode-label { font-size: 0.72rem; font-weight: 600; color: var(--white); line-height: 1.3; }
+.fnode-sub { font-size: 0.65rem; color: var(--muted); margin-top: 3px; line-height: 1.4; }
+.fnode-pulse {
+  position: absolute; top: -4px; right: -4px;
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--teal);
+  box-shadow: 0 0 8px var(--teal);
+  animation: nodePulse 1.2s infinite;
+}
+@keyframes nodePulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.4); opacity: 0.6; }
+}
+
+/* CONNECTOR ARROWS */
+.connector {
+  display: flex; align-items: center; justify-content: center;
+  height: 28px; width: 100%;
+}
+.connector-line {
+  width: 2px; height: 100%;
+  background: var(--border);
+  position: relative; margin: 0 auto;
+  transition: background 0.4s;
+}
+.connector-line.active { background: var(--teal); }
+.connector-line.active::after {
+  content: '▼'; position: absolute; bottom: -8px; left: 50%;
+  transform: translateX(-50%);
+  color: var(--teal); font-size: 0.6rem;
+}
+
+/* MESSAGE PACKETS — animated dots */
+.packet {
+  position: absolute;
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--teal);
+  box-shadow: 0 0 8px var(--teal);
+  pointer-events: none; z-index: 10;
+  transition: none;
+}
+
+/* DETAIL PANEL */
+.detail-panel {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 14px; padding: 20px 24px;
+  margin-bottom: 24px;
+  transition: all 0.3s;
+}
+.detail-panel-title {
+  font-family: var(--font-h); font-size: 0.9rem; font-weight: 700;
+  color: var(--teal); margin-bottom: 8px;
+  display: flex; align-items: center; gap: 8px;
+}
+.detail-panel-body { font-size: 0.83rem; color: var(--muted); line-height: 1.7; }
+.detail-panel-body strong { color: var(--white); }
+
+/* SIGNAL MATRIX */
+.signal-matrix {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+  margin-top: 16px;
+}
+.signal-cell {
+  background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+  border-radius: 8px; padding: 10px 12px;
+  transition: border-color 0.3s;
+}
+.signal-cell.high { border-color: rgba(239,68,68,0.4); }
+.signal-cell.med { border-color: rgba(245,158,11,0.4); }
+.signal-cell.low { border-color: rgba(34,197,94,0.3); }
+.signal-cell-label { font-size: 0.68rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+.signal-cell-val { font-family: var(--font-m); font-size: 0.88rem; margin-top: 3px; }
+.signal-cell.high .signal-cell-val { color: var(--red); }
+.signal-cell.med .signal-cell-val { color: var(--amber); }
+.signal-cell.low .signal-cell-val { color: var(--green); }
+
+/* DECISION TRACE */
+.decision-trace {
+  background: rgba(0,0,0,0.3); border: 1px solid var(--border);
+  border-radius: 12px; padding: 16px 20px;
+  font-family: var(--font-m); font-size: 0.75rem;
+  line-height: 1.8; color: var(--muted);
+  margin-bottom: 24px; max-height: 200px; overflow-y: auto;
+}
+.trace-line { display: flex; gap: 10px; align-items: flex-start; }
+.trace-time { color: var(--teal-d); flex-shrink: 0; }
+.trace-pass { color: var(--green); }
+.trace-fail { color: var(--red); }
+.trace-warn { color: var(--amber); }
+.trace-info { color: var(--muted); }
+
+/* RUN BUTTON */
+.run-btn {
+  width: 100%;
+  background: linear-gradient(135deg, var(--teal), var(--teal-d));
+  border: none; border-radius: 10px;
+  color: var(--navy); font-family: var(--font-h); font-size: 0.9rem; font-weight: 700;
+  padding: 14px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  transition: opacity 0.2s, transform 0.15s;
+}
+.run-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+.run-btn:active { transform: translateY(0); }
+.run-btn.running { animation: btnPulse 0.8s infinite; }
+@keyframes btnPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.75; } }
+
+/* PASSKEY MOCK WIDGET */
+.passkey-widget {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 14px; padding: 24px; text-align: center;
+  margin-bottom: 16px; position: relative; overflow: hidden;
+}
+.passkey-widget::before {
+  content: ''; position: absolute; top: -40px; left: 50%; transform: translateX(-50%);
+  width: 200px; height: 200px;
+  background: radial-gradient(circle, rgba(0,196,188,0.1), transparent 70%);
+  pointer-events: none;
+}
+.passkey-icon { font-size: 2.5rem; margin-bottom: 12px; position: relative; }
+.passkey-title { font-family: var(--font-h); font-size: 1rem; font-weight: 700; margin-bottom: 6px; }
+.passkey-sub { font-size: 0.78rem; color: var(--muted); margin-bottom: 20px; }
+.passkey-btn {
+  background: var(--teal); color: var(--navy);
+  border: none; border-radius: 8px;
+  font-family: var(--font-h); font-size: 0.85rem; font-weight: 700;
+  padding: 12px 24px; cursor: pointer; transition: all 0.2s;
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.passkey-btn:hover { background: #00d4cc; transform: scale(1.02); }
+.passkey-btn.verifying { animation: btnPulse 0.6s infinite; }
+.passkey-result { margin-top: 14px; font-size: 0.8rem; font-family: var(--font-m); }
+
+/* AGENT IDENTITY CARD */
+.agent-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 14px; padding: 20px;
+  margin-bottom: 16px;
+}
+.agent-card-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+.agent-card-row:last-child { border-bottom: none; }
+.agent-card-key { font-size: 0.75rem; color: var(--muted); }
+.agent-card-val { font-size: 0.78rem; font-family: var(--font-m); color: var(--white); }
+.agent-card-val.valid { color: var(--green); }
+.agent-card-val.invalid { color: var(--red); }
+.agent-card-val.warn { color: var(--amber); }
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
+  .sim-layout { grid-template-columns: 1fr; }
+  .sim-controls { border-right: none; border-bottom: 1px solid var(--border); max-height: 50vh; }
+}
+@media (max-width: 600px) {
+  nav { padding: 0 16px; }
+  .sim-canvas { padding: 16px; }
+  .signal-matrix { grid-template-columns: repeat(2, 1fr); }
+  .flow-lanes { flex-direction: column; }
+}
+
+/* SCROLLBAR */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(0,196,188,0.2); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(0,196,188,0.4); }
+
+/* ══════════════════════════════════════
+   CHALLENGE POPUP MODAL
+══════════════════════════════════════ */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 9000;
+  background: rgba(4, 12, 24, 0.82);
+  backdrop-filter: blur(8px);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+.modal-overlay.open {
+  opacity: 1; pointer-events: all;
+}
+
+.modal-window {
+  width: 420px; max-width: calc(100vw - 32px);
+  background: linear-gradient(160deg, #0f2344 0%, #0a1c36 100%);
+  border: 1px solid rgba(0,196,188,0.25);
+  border-radius: 20px;
+  box-shadow: 0 40px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(0,196,188,0.08), inset 0 1px 0 rgba(255,255,255,0.05);
+  overflow: hidden;
+  transform: translateY(20px) scale(0.97);
+  transition: transform 0.35s cubic-bezier(.34,1.56,.64,1);
+}
+.modal-overlay.open .modal-window {
+  transform: translateY(0) scale(1);
+}
+
+/* Modal top bar */
+.modal-topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px;
+  background: rgba(0,196,188,0.06);
+  border-bottom: 1px solid rgba(0,196,188,0.12);
+}
+.modal-topbar-left { display: flex; align-items: center; gap: 10px; }
+.modal-topbar-logo {
+  width: 24px; height: 24px;
+  background: linear-gradient(135deg, var(--teal), var(--teal-d));
+  border-radius: 5px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.6rem; font-weight: 800; color: var(--navy);
+}
+.modal-topbar-title { font-family: var(--font-h); font-size: 0.82rem; font-weight: 700; color: var(--white); }
+.modal-topbar-sub { font-size: 0.68rem; color: var(--muted); margin-top: 1px; font-family: var(--font-m); }
+.modal-close {
+  width: 28px; height: 28px; border-radius: 8px;
+  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08);
+  color: var(--muted); cursor: pointer; font-size: 0.85rem;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s;
+}
+.modal-close:hover { background: rgba(239,68,68,0.15); border-color: rgba(239,68,68,0.3); color: var(--red); }
+
+/* Merchant banner */
+.modal-merchant {
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.modal-merchant-info { display: flex; align-items: center; gap: 12px; }
+.modal-merchant-icon {
+  width: 40px; height: 40px; border-radius: 10px;
+  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08);
+  display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
+}
+.modal-merchant-name { font-size: 0.85rem; font-weight: 600; color: var(--white); }
+.modal-merchant-desc { font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
+.modal-amount { text-align: right; }
+.modal-amount-num { font-family: var(--font-h); font-size: 1.3rem; font-weight: 800; color: var(--white); }
+.modal-amount-label { font-size: 0.68rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+
+/* Modal body */
+.modal-body { padding: 24px 20px; }
+
+/* Status bar in modal */
+.modal-status-bar {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 0.72rem; font-family: var(--font-m);
+  color: var(--muted); margin-bottom: 20px;
+  padding: 8px 12px;
+  background: rgba(255,255,255,0.03); border-radius: 6px;
+}
+.modal-status-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--amber); flex-shrink: 0;
+  animation: pulse 1.5s infinite;
+}
+.modal-status-dot.active { background: var(--teal); }
+.modal-status-dot.success { background: var(--green); animation: none; }
+.modal-status-dot.error { background: var(--red); animation: none; }
+
+/* ── OTP Screen ── */
+.otp-prompt { text-align: center; margin-bottom: 24px; }
+.otp-prompt-icon { font-size: 2.4rem; margin-bottom: 12px; }
+.otp-prompt-title { font-family: var(--font-h); font-size: 1rem; font-weight: 700; color: var(--white); margin-bottom: 6px; }
+.otp-prompt-sub { font-size: 0.8rem; color: var(--muted); line-height: 1.6; }
+.otp-prompt-phone { color: var(--white); font-weight: 600; }
+
+.otp-inputs { display: flex; gap: 8px; justify-content: center; margin-bottom: 20px; }
+.otp-input {
+  width: 44px; height: 52px;
+  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 10px; color: var(--white);
+  font-family: var(--font-m); font-size: 1.4rem; font-weight: 600;
+  text-align: center; outline: none;
+  transition: border-color 0.2s, background 0.2s;
+  caret-color: var(--teal);
+}
+.otp-input:focus { border-color: var(--teal); background: rgba(0,196,188,0.06); }
+.otp-input.filled { border-color: rgba(0,196,188,0.4); }
+.otp-input.error-shake { border-color: var(--red) !important; animation: shake 0.4s ease; }
+@keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-5px)} 75%{transform:translateX(5px)} }
+
+.otp-hint {
+  text-align: center; font-size: 0.75rem; color: var(--muted); margin-bottom: 20px;
+}
+.otp-hint a { color: var(--teal); cursor: pointer; text-decoration: none; }
+.otp-hint a:hover { text-decoration: underline; }
+
+/* ── Passkey Screen ── */
+.pk-screen { text-align: center; }
+.pk-screen-ring {
+  width: 100px; height: 100px; border-radius: 50%;
+  background: rgba(0,196,188,0.08);
+  border: 2px solid rgba(0,196,188,0.2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2.8rem; margin: 0 auto 20px;
+  position: relative; transition: all 0.4s;
+}
+.pk-screen-ring.scanning {
+  border-color: var(--teal);
+  box-shadow: 0 0 0 8px rgba(0,196,188,0.08), 0 0 0 16px rgba(0,196,188,0.04);
+  animation: ringPulse 1.2s infinite;
+}
+.pk-screen-ring.verified {
+  border-color: var(--green);
+  background: rgba(34,197,94,0.1);
+  box-shadow: 0 0 0 8px rgba(34,197,94,0.08);
+  animation: none;
+}
+.pk-screen-ring.failed {
+  border-color: var(--red);
+  background: rgba(239,68,68,0.1);
+  animation: none;
+}
+@keyframes ringPulse {
+  0%,100% { box-shadow: 0 0 0 8px rgba(0,196,188,0.08), 0 0 0 16px rgba(0,196,188,0.04); }
+  50% { box-shadow: 0 0 0 12px rgba(0,196,188,0.12), 0 0 0 24px rgba(0,196,188,0.06); }
+}
+.pk-screen-title { font-family: var(--font-h); font-size: 1rem; font-weight: 700; color: var(--white); margin-bottom: 8px; }
+.pk-screen-sub { font-size: 0.8rem; color: var(--muted); line-height: 1.6; margin-bottom: 24px; }
+.pk-platform-tabs { display: flex; gap: 6px; justify-content: center; margin-bottom: 20px; }
+.pk-platform-tab {
+  display: flex; align-items: center; gap: 6px;
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 8px; padding: 8px 14px;
+  font-size: 0.76rem; color: var(--muted); cursor: pointer; transition: all 0.2s;
+}
+.pk-platform-tab:hover, .pk-platform-tab.active {
+  background: rgba(0,196,188,0.08); border-color: rgba(0,196,188,0.25); color: var(--white);
+}
+
+/* ── Agentic Push Screen ── */
+.push-notification {
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px; padding: 16px;
+  margin-bottom: 20px;
+  display: flex; align-items: flex-start; gap: 12px;
+}
+.push-notif-icon { font-size: 1.6rem; flex-shrink: 0; }
+.push-notif-body {}
+.push-notif-app { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); margin-bottom: 4px; }
+.push-notif-title { font-size: 0.85rem; font-weight: 600; color: var(--white); margin-bottom: 4px; }
+.push-notif-msg { font-size: 0.78rem; color: var(--muted); line-height: 1.5; }
+.push-notif-time { font-size: 0.68rem; color: rgba(122,155,191,0.6); margin-top: 6px; }
+
+.push-txn-detail {
+  background: rgba(0,196,188,0.05); border: 1px solid rgba(0,196,188,0.15);
+  border-radius: 10px; padding: 12px 16px; margin-bottom: 20px;
+}
+.push-txn-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; }
+.push-txn-row:not(:last-child) { border-bottom: 1px solid rgba(255,255,255,0.04); }
+.push-txn-key { font-size: 0.73rem; color: var(--muted); }
+.push-txn-val { font-size: 0.77rem; font-family: var(--font-m); color: var(--white); }
+
+/* Shared modal action buttons */
+.modal-actions { display: flex; gap: 10px; }
+.modal-btn-primary {
+  flex: 1; padding: 13px;
+  background: linear-gradient(135deg, var(--teal), var(--teal-d));
+  border: none; border-radius: 10px;
+  color: var(--navy); font-family: var(--font-h); font-size: 0.88rem; font-weight: 700;
+  cursor: pointer; transition: opacity 0.2s, transform 0.15s;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.modal-btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+.modal-btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+.modal-btn-primary.success { background: linear-gradient(135deg, var(--green), #16a34a); color: white; }
+.modal-btn-primary.danger { background: linear-gradient(135deg, var(--red), #b91c1c); color: white; }
+.modal-btn-secondary {
+  padding: 13px 18px;
+  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px; color: var(--muted);
+  font-family: var(--font-b); font-size: 0.85rem;
+  cursor: pointer; transition: all 0.2s;
+}
+.modal-btn-secondary:hover { background: rgba(255,255,255,0.08); color: var(--white); }
+
+/* Progress bar in modal */
+.modal-progress { height: 3px; background: rgba(255,255,255,0.06); border-radius: 0 0 20px 20px; overflow: hidden; }
+.modal-progress-fill { height: 100%; background: var(--teal); width: 0%; transition: width 0.3s linear; }
+
+/* Nonce display */
+.nonce-display {
+  background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 8px; padding: 10px 14px; margin-bottom: 16px;
+  font-family: var(--font-m); font-size: 0.68rem; color: rgba(0,196,188,0.7);
+  word-break: break-all; line-height: 1.6;
+}
+.nonce-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); margin-bottom: 4px; }
+
+/* TABS inside panel */
+.inner-tabs { display: flex; gap: 4px; margin-bottom: 20px; }
+.inner-tab {
+  flex: 1; padding: 8px; text-align: center;
+  background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+  border-radius: 6px; color: var(--muted); font-size: 0.75rem; font-weight: 600;
+  cursor: pointer; transition: all 0.2s;
+}
+.inner-tab:hover { color: var(--white); }
+.inner-tab.active { background: rgba(0,196,188,0.1); border-color: var(--teal); color: var(--teal); }
+
+/* Section hidden/visible */
+.sim-section { display: none; }
+.sim-section.visible { display: block; }
+</style>
+</head>
+<body>
+
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-brand">
+    <div class="nav-logo">OS</div>
+    Outseer
+  </a>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="switchScenario(0,this)">3DS/SCA</button>
+    <button class="nav-tab" onclick="switchScenario(1,this)">Passkey</button>
+    <button class="nav-tab" onclick="switchScenario(2,this)">Agentic</button>
+  </div>
+  <div class="nav-pill">Live Simulator</div>
+</nav>
+
+<!-- HERO -->
+<div class="hero-strip">
+  <h1>3DS <em>Interactive</em> Simulator</h1>
+  <p>Manipulate risk signals and rule configurations in real time. Watch how Outseer's decisioning engine routes transactions through the 3DS protocol — frictionless, challenge, passkey, or agent-vetted.</p>
+  <div class="hero-meta">
+    <div class="hero-badge">Protocol <strong>EMV® 3DS 2.3</strong></div>
+    <div class="hero-badge">Engine <strong>Outseer ACS</strong></div>
+    <div class="hero-badge">Signals <strong>250+ factors</strong></div>
+    <div class="hero-badge">Latency <strong>&lt;80ms</strong></div>
+  </div>
+</div>
+
+<!-- SCENARIO BAR -->
+<div class="scenario-bar">
+  <button class="scenario-btn active" id="scn-0" onclick="switchScenario(0,this)">
+    <div class="scenario-btn-icon">🔐</div>
+    <div class="scenario-btn-title">Standard 3DS / SCA</div>
+    <div class="scenario-btn-sub">Frictionless or OTP challenge</div>
+  </button>
+  <button class="scenario-btn" id="scn-1" onclick="switchScenario(1,this)">
+    <div class="scenario-btn-icon">🔑</div>
+    <div class="scenario-btn-title">3DS + Passkey Auth</div>
+    <div class="scenario-btn-sub">FIDO2 biometric challenge</div>
+  </button>
+  <button class="scenario-btn" id="scn-2" onclick="switchScenario(2,this)">
+    <div class="scenario-btn-icon">🤖</div>
+    <div class="scenario-btn-title">Agentic Payment</div>
+    <div class="scenario-btn-sub">AI agent delegated auth</div>
+  </button>
+</div>
+
+<!-- MAIN SIMULATOR -->
+<div class="main">
+  <div class="sim-layout">
+
+    <!-- ═══ LEFT CONTROLS ═══ -->
+    <div class="sim-controls">
+
+      <!-- RISK SCORE -->
+      <div class="control-section">
+        <div class="control-section-title"><span>⚡</span> Risk Score Engine</div>
+        <div class="risk-score-display">
+          <div class="risk-score-num" id="riskNum">42</div>
+          <div class="risk-score-bar-wrap">
+            <div class="risk-score-label">Composite Risk Score (0–100)</div>
+            <div class="risk-score-bar"><div class="risk-score-fill" id="riskFill" style="width:42%;background:var(--amber)"></div></div>
+            <div class="risk-verdict" id="riskVerdict">⚡ MODERATE — Challenge likely</div>
+          </div>
+        </div>
+
+        <div class="slider-row">
+          <div class="slider-header"><span class="slider-label">📍 Device Trust Score</span><span class="slider-val" id="val-device">72</span></div>
+          <input type="range" min="0" max="100" value="72" oninput="updateSignal('device',this.value)"/>
+        </div>
+        <div class="slider-row">
+          <div class="slider-header"><span class="slider-label">🌍 Geo-Velocity Risk</span><span class="slider-val" id="val-geo">30</span></div>
+          <input type="range" min="0" max="100" value="30" oninput="updateSignal('geo',this.value)"/>
+        </div>
+        <div class="slider-row">
+          <div class="slider-header"><span class="slider-label">⚡ Transaction Velocity</span><span class="slider-val" id="val-velocity">45</span></div>
+          <input type="range" min="0" max="100" value="45" oninput="updateSignal('velocity',this.value)"/>
+        </div>
+        <div class="slider-row">
+          <div class="slider-header"><span class="slider-label">🧠 Behavioural Biometrics</span><span class="slider-val" id="val-behaviour">65</span></div>
+          <input type="range" min="0" max="100" value="65" oninput="updateSignal('behaviour',this.value)"/>
+        </div>
+        <div class="slider-row">
+          <div class="slider-header"><span class="slider-label">💳 Card History Anomaly</span><span class="slider-val" id="val-history">20</span></div>
+          <input type="range" min="0" max="100" value="20" oninput="updateSignal('history',this.value)"/>
+        </div>
+        <div class="slider-row">
+          <div class="slider-header"><span class="slider-label">💰 Transaction Amount Risk</span><span class="slider-val" id="val-amount">35</span></div>
+          <input type="range" min="0" max="100" value="35" oninput="updateSignal('amount',this.value)"/>
+        </div>
+      </div>
+
+      <!-- TRANSACTION CONTEXT -->
+      <div class="control-section">
+        <div class="control-section-title"><span>🧾</span> Transaction Context</div>
+        <div class="slider-row">
+          <div class="slider-header"><span class="slider-label">Amount (£)</span></div>
+          <select class="sim-select" id="sel-amount" onchange="updateContext()">
+            <option value="low">£0 – £30 (Low value)</option>
+            <option value="mid" selected>£31 – £250 (Mid value)</option>
+            <option value="high">£251 – £2,000 (High value)</option>
+            <option value="vhigh">£2,001+ (Very high)</option>
+          </select>
+        </div>
+        <div class="slider-row" style="margin-top:12px">
+          <div class="slider-header"><span class="slider-label">Merchant Category</span></div>
+          <select class="sim-select" id="sel-mcc" onchange="updateContext()">
+            <option value="retail">Retail (low risk)</option>
+            <option value="travel" selected>Travel &amp; Transport</option>
+            <option value="gambling">Gambling (high risk)</option>
+            <option value="crypto">Crypto / Digital Assets</option>
+            <option value="luxury">Luxury Goods</option>
+          </select>
+        </div>
+        <div class="slider-row" style="margin-top:12px">
+          <div class="slider-header"><span class="slider-label">Card Type</span></div>
+          <select class="sim-select" id="sel-card" onchange="updateContext()">
+            <option value="credit">Credit (Visa)</option>
+            <option value="debit" selected>Debit (Mastercard)</option>
+            <option value="prepaid">Prepaid / Virtual</option>
+            <option value="corporate">Corporate Card</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- RULE ENGINE -->
+      <div class="control-section">
+        <div class="control-section-title"><span>⚙️</span> Rule Engine</div>
+        <div id="rule-cards"></div>
+      </div>
+
+      <!-- AGENT IDENTITY (shown for agentic) -->
+      <div class="control-section sim-section" id="ctrl-agent">
+        <div class="control-section-title"><span>🤖</span> Agent Identity</div>
+        <div class="toggle-row">
+          <div class="toggle-label"><strong>Agent Registered</strong>Pre-authorised by cardholder</div>
+          <button class="toggle on" id="tog-agent-reg" onclick="toggleAgent('reg',this)"></button>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-label"><strong>Scope In Mandate</strong>Transaction within delegated scope</div>
+          <button class="toggle on" id="tog-agent-scope" onclick="toggleAgent('scope',this)"></button>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-label"><strong>Signature Valid</strong>Agent's delegated key assertion</div>
+          <button class="toggle on" id="tog-agent-sig" onclick="toggleAgent('sig',this)"></button>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-label"><strong>Spend Limit OK</strong>Within cardholder's pre-set limit</div>
+          <button class="toggle on" id="tog-agent-limit" onclick="toggleAgent('limit',this)"></button>
+        </div>
+      </div>
+
+      <!-- RUN -->
+      <div class="control-section" style="border-bottom:none">
+        <button class="run-btn" id="runBtn" onclick="runSimulation()">
+          <span>▶</span> Run Simulation
+        </button>
+      </div>
+
+    </div>
+
+    <!-- ═══ RIGHT CANVAS ═══ -->
+    <div class="sim-canvas" id="simCanvas">
+
+      <!-- FLOW HEADER -->
+      <div class="flow-header">
+        <div>
+          <div class="flow-title" id="flowTitle">Standard 3DS / SCA Flow</div>
+          <div class="flow-subtitle" id="flowSubtitle">EMV® 3DS 2.3 · Outseer ACS · Frictionless / Challenge decisioning</div>
+        </div>
+        <div class="flow-decision-badge" id="decisionBadge" style="border-color:var(--amber);color:var(--amber);background:rgba(245,158,11,0.08)">
+          <span>⚡</span> <span id="decisionText">Awaiting Simulation</span>
+        </div>
+      </div>
+
+      <!-- STANDARD 3DS FLOW -->
+      <div id="scene-0" class="sim-section visible">
+        <div class="flow-lanes" id="lanes-0">
+          <div class="flow-lane">
+            <div class="lane-header">Cardholder / Browser</div>
+            <div class="lane-body">
+              <div class="fnode" id="n0-0" onclick="expandNode('3ds-checkout')">
+                <div class="fnode-icon">🛒</div>
+                <div class="fnode-label">Checkout</div>
+                <div class="fnode-sub">Browser collects device data</div>
+              </div>
+              <div class="connector"><div class="connector-line" id="c0-0"></div></div>
+              <div class="fnode" id="n0-1">
+                <div class="fnode-icon">📤</div>
+                <div class="fnode-label">AReq Dispatch</div>
+                <div class="fnode-sub">3DS SDK packages payload</div>
+              </div>
+              <div class="connector"><div class="connector-line" id="c0-1"></div></div>
+              <div class="fnode" id="n0-result-frictionless" onclick="expandNode('3ds-frictionless')">
+                <div class="fnode-icon">✅</div>
+                <div class="fnode-label">Frictionless ✓</div>
+                <div class="fnode-sub">Payment approved, no challenge</div>
+              </div>
+              <div class="fnode" id="n0-result-challenge" onclick="expandNode('3ds-challenge')" style="display:none">
+                <div class="fnode-icon">📲</div>
+                <div class="fnode-label">OTP Challenge</div>
+                <div class="fnode-sub">Cardholder enters SMS code</div>
+              </div>
+              <div class="fnode" id="n0-result-deny" onclick="expandNode('3ds-deny')" style="display:none">
+                <div class="fnode-icon">🚫</div>
+                <div class="fnode-label">Denied</div>
+                <div class="fnode-sub">Transaction blocked by ACS</div>
+              </div>
+            </div>
+          </div>
+          <div class="flow-lane">
+            <div class="lane-header">3DS Server / DS</div>
+            <div class="lane-body">
+              <div class="fnode" id="n0-2" onclick="expandNode('3ds-server')">
+                <div class="fnode-icon">🔀</div>
+                <div class="fnode-label">Directory Server</div>
+                <div class="fnode-sub">Routes to issuer ACS</div>
+              </div>
+              <div class="connector"><div class="connector-line" id="c0-2"></div></div>
+              <div class="fnode" id="n0-3">
+                <div class="fnode-icon">📨</div>
+                <div class="fnode-label">AReq Forwarded</div>
+                <div class="fnode-sub">JSON payload to Outseer ACS</div>
+              </div>
+              <div class="connector"><div class="connector-line" id="c0-3"></div></div>
+              <div class="fnode" id="n0-4">
+                <div class="fnode-icon">📩</div>
+                <div class="fnode-label">ARes Returned</div>
+                <div class="fnode-sub">transStatus Y / C / N</div>
+              </div>
+            </div>
+          </div>
+          <div class="flow-lane">
+            <div class="lane-header">Outseer ACS + Risk Engine</div>
+            <div class="lane-body">
+              <div class="fnode" id="n0-5" onclick="expandNode('3ds-risk')">
+                <div class="fnode-icon">⚡</div>
+                <div class="fnode-label">Signal Ingestion</div>
+                <div class="fnode-sub">250+ factors collected</div>
+              </div>
+              <div class="connector"><div class="connector-line" id="c0-4"></div></div>
+              <div class="fnode" id="n0-6" onclick="expandNode('3ds-rules')">
+                <div class="fnode-icon">⚙️</div>
+                <div class="fnode-label">Rule Evaluation</div>
+                <div class="fnode-sub">Outseer rule engine fires</div>
+              </div>
+              <div class="connector"><div class="connector-line" id="c0-5"></div></div>
+              <div class="fnode" id="n0-7" onclick="expandNode('3ds-score')">
+                <div class="fnode-icon">🧠</div>
+                <div class="fnode-label">Risk Score → Decision</div>
+                <div class="fnode-sub">Frictionless / Challenge / Deny</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- DETAIL PANEL -->
+        <div class="detail-panel" id="detail-panel-0">
+          <div class="detail-panel-title">🔐 Standard 3DS Flow — Click any node to inspect it</div>
+          <div class="detail-panel-body">Use the controls on the left to adjust risk signals and rule configurations, then click <strong>Run Simulation</strong> to animate the full transaction flow. Click any node for step-by-step detail.</div>
+          <div class="signal-matrix" id="signal-matrix-0"></div>
+        </div>
+
+        <!-- DECISION TRACE -->
+        <div class="decision-trace" id="trace-0">
+          <div class="trace-line"><span class="trace-time">--:--:--.---</span><span class="trace-info">Awaiting simulation run...</span></div>
+        </div>
+      </div>
+
+      <!-- PASSKEY FLOW -->
+      <div id="scene-1" class="sim-section">
+        <div class="flow-lanes">
+          <div class="flow-lane">
+            <div class="lane-header">Cardholder Device</div>
+            <div class="lane-body">
+              <div class="fnode" id="n1-0" onclick="expandNode('pk-checkout')">
+                <div class="fnode-icon">🛒</div>
+                <div class="fnode-label">Checkout</div>
+                <div class="fnode-sub">Payment initiated</div>
+              </div>
+              <div class="connector"><div class="connector-line" id="c1-0"></div></div>
+              <div class="fnode" id="n1-challenge">
+                <div class="fnode-icon">⚠️</div>
+                <div class="fnode-label">Challenge Required</div>
+                <div class="fnode-sub">Risk threshold exceeded</div>
+              </div>
+              <div class="connector"><div class="connector-line" id="c1-1"></div></div>
+              <div class="fnode" id="n1-passkey" onclick="expandNode('pk-fido')">
+                <div class="fnode-icon">🔑</div>
+                <div class="fnode-label">Passkey Prompt</div>
+                <div class="fnode-sub">navigator.credentials.get()</div>
+              </div>
+              <div class="connector"><div class="connector-line" id="c1-2"></div></div>
+              <div class="fnode" id="n1-result" onclick="expandNode('pk-result')">
+                <div class="fnode-icon">✅</div>
+                <div class="fnode-label">Auth Complete</div>
+                <div class="fnode-sub">CRes Y issued</div>
+              </div>
+            </div>
+          </div>
+          <div class="flow-lane">
+            <div class="lane-header">FIDO2 Authenticator</div>
+            <div class="lane-body">
+              <div class="fnode" id="n1-enclave" onclick="expandNode('pk-enclave')">
+                <div class="fnode-icon">🔐</div>
+                <div class="fnode-label">Secure Enclave</div>
+                <div class="fnode-sub">Private key stored by OS</div>
+              </div>
+              <div class="connector"><div class="connector-line" id="c1-3"></div></div>
+              <div class="fnode" id="n1-bio">
+                <div class="fnode-icon">👆</div>
+                <div class="fnode-label">Biometric Match</div>
+                <div class="fnode-sub">Face ID / Touch ID / Hello</div>
+              </div>
+              <div class="connector"><div class="connector-line" id="c1-4"></div></div>
+              <div class="fnode" id="n1-assert" onclick="expandNode('pk-assert')">
+                <div class="fnode-icon">🖊️</div>
+                <div class="fnode-label">Assertion Signed</div>
+                <div class="fnode-sub">authData + sig generated</div>
+              </div>
+              <div class="connector"><div class="connector-line" id="c1-5"></div></div>
+              <div class="fnode" id="n1-sent">
+                <div class="fnode-icon">📤</div>
+                <div class="fnode-label">Assertion Sent</div>
+                <div class="fnode-sub">Packaged in CRes payload</div>
+              </div>
+            </div>
+          </div>
+          <div class="flow-lane">
+            <div class="lane-header">Outseer ACS</div>
+            <div class="lane-body">
+              <div class="fnode" id="n1-risk" onclick="expandNode('pk-risk')">
+                <div class="fnode-icon">⚡</div>
+                <div class="fnode-label">Risk Score</div>
+                <div class="fnode-sub">Challenge triggered at &gt;threshold</div>
+              </div>
+              <div class="connector"><div class="connector-line" id="c1-6"></div></div>
+              <div class="fnode" id="n1-creq">
+                <div class="fnode-icon">📨</div>
+                <div class="fnode-label">CReq Issued</div>
+                <div class="fnode-sub">Nonce + WebAuthn challenge</div>
+              </div>
+              <div class="connector"><div class="connector-line" id="c1-7"></div></div>
+              <div class="fnode" id="n1-verify" onclick="expandNode('pk-verify')">
+                <div class="fnode-icon">🔍</div>
+                <div class="fnode-label">Assertion Verified</div>
+                <div class="fnode-sub">Public key validation</div>
+              </div>
+              <div class="connector"><div class="connector-line" id="c1-8"></div></div>
+              <div class="fnode" id="n1-cres">
+                <div class="fnode-icon">📩</div>
+                <div class="fnode-label">CRes + AAV</div>
+                <div class="fnode-sub">Liability shift to issuer</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PASSKEY WIDGET DEMO -->
+        <div class="passkey-widget" id="passkeyWidget">
+          <div class="passkey-icon">🔑</div>
+          <div class="passkey-title">Step-Up Authentication Required</div>
+          <div class="passkey-sub">Outseer ACS is requesting biometric verification to complete this payment.</div>
+          <button class="passkey-btn" id="passkeyBtn" onclick="simulatePasskey()">
+            👆 Verify with Passkey
+          </button>
+          <div class="passkey-result" id="passkeyResult"></div>
+        </div>
+
+        <div class="detail-panel" id="detail-panel-1">
+          <div class="detail-panel-title">🔑 Passkey 3DS Flow — Click any node to inspect</div>
+          <div class="detail-panel-body">This flow triggers whenever Outseer's risk score exceeds the challenge threshold. Instead of an OTP, the ACS issues a WebAuthn challenge — the user's device biometric generates a cryptographic assertion. <strong>No shared secret. No phishing surface.</strong></div>
+          <div class="signal-matrix" id="signal-matrix-1"></div>
+        </div>
+        <div class="decision-trace" id="trace-1">
+          <div class="trace-line"><span class="trace-time">--:--:--.---</span><span class="trace-info">Awaiting simulation run...</span></div>
+        </div>
+      </div>
+
+      <!-- AGENTIC FLOW -->
+      <div id="scene-2" class="sim-section">
+        <div class="flow-lanes">
+          <div class="flow-lane">
+            <div class="lane-header">AI Payment Agent</div>
+            <div class="lane-body">
+              <div class="fnode" id="n2-0" onclick="expandNode('ag-mandate')">
+                <div class="fnode-icon">🤖</div>
+                <div class="fnode-label">Agent Mandate</div>
+                <div class="fnode-sub">User pre-authorised agent</div>
+              </div>
+              <div class="connector"><div class="connector-line" id="c2-0"></div></div>
+              <div class="fnode" id="n2-1" onclick="expandNode('ag-token')">
+                <div class="fnode-icon">🪪</div>
+                <div class="fnode-label">Delegated Token</div>
+                <div class="fnode-sub">Scoped auth credential</div>
+              </div>
+              <div class="connector"><div class="connector-line" id="c2-1"></div></div>
+              <div class="fnode" id="n2-pay">
+                <div class="fnode-icon">💳</div>
+                <div class="fnode-label">Payment Initiated</div>
+                <div class="fnode-sub">AReq with agent context</div>
+              </div>
+              <div class="connector"><div class="connector-line" id="c2-2"></div></div>
+              <div class="fnode" id="n2-result-ok" onclick="expandNode('ag-approved')">
+                <div class="fnode-icon">✅</div>
+                <div class="fnode-label">Approved</div>
+                <div class="fnode-sub">Agent purchase complete</div>
+              </div>
+              <div class="fnode" id="n2-result-escalate" onclick="expandNode('ag-escalate')" style="display:none">
+                <div class="fnode-icon">📲</div>
+                <div class="fnode-label">Escalated to User</div>
+                <div class="fnode-sub">Passkey push sent</div>
+              </div>
+              <div class="fnode" id="n2-result-block" onclick="expandNode('ag-blocked')" style="display:none">
+                <div class="fnode-icon">🚫</div>
+                <div class="fnode-label">Blocked</div>
+                <div class="fnode-sub">Agent identity failed</div>
+              </div>
+            </div>
+          </div>
+          <div class="flow-lane">
+            <div class="lane-header">Outseer Agent Vetting</div>
+            <div class="lane-body">
+              <div class="fnode" id="n2-reg" onclick="expandNode('ag-reg')">
+                <div class="fnode-icon">📋</div>
+                <div class="fnode-label">Registry Check</div>
+                <div class="fnode-sub">Agent in cardholder registry?</div>
+              </div>
+              <div class="connector"><div class="connector-line" id="c2-3"></div></div>
+              <div class="fnode" id="n2-scope" onclick="expandNode('ag-scope')">
+                <div class="fnode-icon">🎯</div>
+                <div class="fnode-label">Scope Validation</div>
+                <div class="fnode-sub">MCC + amount in mandate?</div>
+              </div>
+              <div class="connector"><div class="connector-line" id="c2-4"></div></div>
+              <div class="fnode" id="n2-sig" onclick="expandNode('ag-sig')">
+                <div class="fnode-icon">🔏</div>
+                <div class="fnode-label">Signature Verify</div>
+                <div class="fnode-sub">Delegated key assertion</div>
+              </div>
+              <div class="connector"><div class="connector-line" id="c2-5"></div></div>
+              <div class="fnode" id="n2-trust">
+                <div class="fnode-icon">⭐</div>
+                <div class="fnode-label">Trust Score</div>
+                <div class="fnode-sub">Agent integrity rating</div>
+              </div>
+            </div>
+          </div>
+          <div class="flow-lane">
+            <div class="lane-header">Outseer Risk + ACS</div>
+            <div class="lane-body">
+              <div class="fnode" id="n2-risk" onclick="expandNode('ag-risk')">
+                <div class="fnode-icon">⚡</div>
+                <div class="fnode-label">Composite Risk</div>
+                <div class="fnode-sub">User + Agent dual score</div>
+              </div>
+              <div class="connector"><div class="connector-line" id="c2-6"></div></div>
+              <div class="fnode" id="n2-rules">
+                <div class="fnode-icon">⚙️</div>
+                <div class="fnode-label">Rule Engine</div>
+                <div class="fnode-sub">Agent-specific rule set</div>
+              </div>
+              <div class="connector"><div class="connector-line" id="c2-7"></div></div>
+              <div class="fnode" id="n2-decide">
+                <div class="fnode-icon">🧠</div>
+                <div class="fnode-label">Decision</div>
+                <div class="fnode-sub">Approve / Escalate / Block</div>
+              </div>
+              <div class="connector"><div class="connector-line" id="c2-8"></div></div>
+              <div class="fnode" id="n2-ares">
+                <div class="fnode-icon">📩</div>
+                <div class="fnode-label">ARes Issued</div>
+                <div class="fnode-sub">AAV + liability transfer</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- AGENT IDENTITY CARD -->
+        <div class="agent-card" id="agentCard">
+          <div style="font-family:var(--font-h);font-size:0.85rem;font-weight:700;margin-bottom:12px;color:var(--teal)">🤖 Agent Identity Assertion</div>
+          <div class="agent-card-row"><span class="agent-card-key">Agent ID</span><span class="agent-card-val" id="ag-id">agt_shopping_7f2a9c</span></div>
+          <div class="agent-card-row"><span class="agent-card-key">Registered</span><span class="agent-card-val valid" id="ag-reg-val">✓ Yes — cardholder registry</span></div>
+          <div class="agent-card-row"><span class="agent-card-key">Scope</span><span class="agent-card-val valid" id="ag-scope-val">✓ Travel / £0–£500</span></div>
+          <div class="agent-card-row"><span class="agent-card-key">Signature</span><span class="agent-card-val valid" id="ag-sig-val">✓ Ed25519 — valid</span></div>
+          <div class="agent-card-row"><span class="agent-card-key">Spend Limit</span><span class="agent-card-val valid" id="ag-limit-val">✓ £147 / £500 limit</span></div>
+          <div class="agent-card-row"><span class="agent-card-key">Agent Trust Score</span><span class="agent-card-val" id="ag-trust-val" style="color:var(--green)">88 / 100</span></div>
+        </div>
+
+        <div class="detail-panel" id="detail-panel-2">
+          <div class="detail-panel-title">🤖 Agentic Payment Flow — Click any node to inspect</div>
+          <div class="detail-panel-body">When an AI agent initiates a payment, Outseer validates the agent's delegated authority before scoring the transaction risk. Toggle agent identity attributes on the left to simulate different trust scenarios — from full approval to passkey escalation or hard block.</div>
+          <div class="signal-matrix" id="signal-matrix-2"></div>
+        </div>
+        <div class="decision-trace" id="trace-2">
+          <div class="trace-line"><span class="trace-time">--:--:--.---</span><span class="trace-info">Awaiting simulation run...</span></div>
+        </div>
+      </div>
+
+    </div><!-- end sim-canvas -->
+  </div><!-- end sim-layout -->
+</div><!-- end main -->
+
+<!-- ══════════════════════════════════════════
+     MODAL 1 — Standard 3DS OTP Challenge
+══════════════════════════════════════════ -->
+<div class="modal-overlay" id="modal-otp">
+  <div class="modal-window">
+    <div class="modal-topbar">
+      <div class="modal-topbar-left">
+        <div class="modal-topbar-logo">OS</div>
+        <div>
+          <div class="modal-topbar-title">Outseer Secure Authentication</div>
+          <div class="modal-topbar-sub">ACS CReq · transStatus=C · Challenge Flow</div>
+        </div>
+      </div>
+      <button class="modal-close" onclick="closeModal('otp')">✕</button>
+    </div>
+    <div class="modal-merchant">
+      <div class="modal-merchant-info">
+        <div class="modal-merchant-icon" id="otp-merchant-icon">✈️</div>
+        <div>
+          <div class="modal-merchant-name" id="otp-merchant-name">British Airways</div>
+          <div class="modal-merchant-desc" id="otp-merchant-desc">Travel · Visa Debit · ****4821</div>
+        </div>
+      </div>
+      <div class="modal-amount">
+        <div class="modal-amount-num" id="otp-amount">£147.00</div>
+        <div class="modal-amount-label">Payment Amount</div>
+      </div>
+    </div>
+    <div class="modal-body">
+      <div class="modal-status-bar" id="otp-status-bar">
+        <div class="modal-status-dot" id="otp-dot"></div>
+        <span id="otp-status-text">CReq received — challenge issued by Outseer ACS</span>
+      </div>
+      <div class="otp-prompt" id="otp-screen-enter">
+        <div class="otp-prompt-icon">📱</div>
+        <div class="otp-prompt-title">Enter your one-time passcode</div>
+        <div class="otp-prompt-sub">We've sent a 6-digit code to your registered number ending in <span class="otp-prompt-phone">•••• 7392</span>. This code expires in <span id="otp-timer" style="color:var(--amber);font-weight:600;">2:00</span>.</div>
+      </div>
+      <div class="otp-inputs" id="otp-input-row">
+        <input class="otp-input" maxlength="1" type="text" inputmode="numeric" id="otp-0" oninput="otpNext(0,this)" onkeydown="otpBack(0,event)"/>
+        <input class="otp-input" maxlength="1" type="text" inputmode="numeric" id="otp-1" oninput="otpNext(1,this)" onkeydown="otpBack(1,event)"/>
+        <input class="otp-input" maxlength="1" type="text" inputmode="numeric" id="otp-2" oninput="otpNext(2,this)" onkeydown="otpBack(2,event)"/>
+        <input class="otp-input" maxlength="1" type="text" inputmode="numeric" id="otp-3" oninput="otpNext(3,this)" onkeydown="otpBack(3,event)"/>
+        <input class="otp-input" maxlength="1" type="text" inputmode="numeric" id="otp-4" oninput="otpNext(4,this)" onkeydown="otpBack(4,event)"/>
+        <input class="otp-input" maxlength="1" type="text" inputmode="numeric" id="otp-5" oninput="otpNext(5,this)" onkeydown="otpBack(5,event)"/>
+      </div>
+      <div class="otp-hint">Didn't receive it? <a onclick="resendOTP()">Resend code</a> &nbsp;·&nbsp; <a onclick="closeModal('otp')">Cancel payment</a></div>
+      <div id="otp-result-msg" style="text-align:center;font-size:0.8rem;margin-bottom:16px;min-height:20px;font-family:var(--font-m);"></div>
+      <div class="modal-actions">
+        <button class="modal-btn-secondary" onclick="closeModal('otp')">Cancel</button>
+        <button class="modal-btn-primary" id="otp-submit-btn" onclick="submitOTP()">Verify Code →</button>
+      </div>
+    </div>
+    <div class="modal-progress"><div class="modal-progress-fill" id="otp-progress"></div></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     MODAL 2 — Passkey FIDO2 Challenge
+══════════════════════════════════════════ -->
+<div class="modal-overlay" id="modal-passkey">
+  <div class="modal-window">
+    <div class="modal-topbar">
+      <div class="modal-topbar-left">
+        <div class="modal-topbar-logo">OS</div>
+        <div>
+          <div class="modal-topbar-title">Outseer Passkey Authentication</div>
+          <div class="modal-topbar-sub">FIDO2 WebAuthn · CReq · navigator.credentials.get()</div>
+        </div>
+      </div>
+      <button class="modal-close" onclick="closeModal('passkey')">✕</button>
+    </div>
+    <div class="modal-merchant">
+      <div class="modal-merchant-info">
+        <div class="modal-merchant-icon" id="pk-merchant-icon">✈️</div>
+        <div>
+          <div class="modal-merchant-name" id="pk-merchant-name">British Airways</div>
+          <div class="modal-merchant-desc" id="pk-merchant-desc">Travel · Visa Debit · ****4821</div>
+        </div>
+      </div>
+      <div class="modal-amount">
+        <div class="modal-amount-num" id="pk-amount">£147.00</div>
+        <div class="modal-amount-label">Payment Amount</div>
+      </div>
+    </div>
+    <div class="modal-body">
+      <div class="modal-status-bar" id="pk-status-bar">
+        <div class="modal-status-dot active" id="pk-dot"></div>
+        <span id="pk-status-text">CReq issued — WebAuthn challenge dispatched by Outseer ACS</span>
+      </div>
+      <div class="pk-screen">
+        <div class="pk-screen-ring" id="pk-ring">
+          <span id="pk-ring-icon">🔑</span>
+        </div>
+        <div class="pk-screen-title" id="pk-screen-title">Verify with Passkey</div>
+        <div class="pk-screen-sub" id="pk-screen-sub">Outseer ACS is requesting biometric confirmation. Use your device authenticator to authorise this payment — no password or OTP required.</div>
+        <div class="pk-platform-tabs">
+          <div class="pk-platform-tab active" id="pktab-face" onclick="selectPKPlatform('face',this)">😶 Face ID</div>
+          <div class="pk-platform-tab" id="pktab-touch" onclick="selectPKPlatform('touch',this)">👆 Touch ID</div>
+          <div class="pk-platform-tab" id="pktab-hello" onclick="selectPKPlatform('hello',this)">🪟 Windows Hello</div>
+        </div>
+        <div class="nonce-display">
+          <div class="nonce-label">ACS WebAuthn Challenge Nonce</div>
+          <span id="pk-nonce">a3f2b9c1e847d5f6a092bc34ef172890d3a7c5e1f8b204a9e6c3f72d01b45889</span>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="modal-btn-secondary" onclick="closeModal('passkey')">Cancel</button>
+        <button class="modal-btn-primary" id="pk-auth-btn" onclick="doPasskeyAuth()">
+          <span id="pk-btn-icon">😶</span> <span id="pk-btn-text">Authenticate</span>
+        </button>
+      </div>
+    </div>
+    <div class="modal-progress"><div class="modal-progress-fill" id="pk-progress"></div></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     MODAL 3 — Agentic Escalation / Push
+══════════════════════════════════════════ -->
+<div class="modal-overlay" id="modal-agent">
+  <div class="modal-window">
+    <div class="modal-topbar">
+      <div class="modal-topbar-left">
+        <div class="modal-topbar-logo">OS</div>
+        <div>
+          <div class="modal-topbar-title">Agent Payment — Step-Up Required</div>
+          <div class="modal-topbar-sub">Outseer ACS · Delegated auth escalation · CReq</div>
+        </div>
+      </div>
+      <button class="modal-close" onclick="closeModal('agent')">✕</button>
+    </div>
+    <div class="modal-body" style="padding-top:20px">
+      <div class="modal-status-bar" id="ag-status-bar">
+        <div class="modal-status-dot" id="ag-dot"></div>
+        <span id="ag-status-text">AI agent escalated — cardholder confirmation requested</span>
+      </div>
+      <div class="push-notification">
+        <div class="push-notif-icon">🤖</div>
+        <div class="push-notif-body">
+          <div class="push-notif-app">Outseer · Issuer Banking App</div>
+          <div class="push-notif-title">Your AI agent wants to make a payment</div>
+          <div class="push-notif-msg" id="ag-push-msg">Shopping Agent is attempting a purchase at <strong id="ag-push-merchant">British Airways</strong> on your behalf. Confirm with your passkey.</div>
+          <div class="push-notif-time">Just now · Tap to review</div>
+        </div>
+      </div>
+      <div class="push-txn-detail">
+        <div class="push-txn-row">
+          <span class="push-txn-key">Agent ID</span>
+          <span class="push-txn-val">agt_shopping_7f2a9c</span>
+        </div>
+        <div class="push-txn-row">
+          <span class="push-txn-key">Merchant</span>
+          <span class="push-txn-val" id="ag-txn-merchant">British Airways</span>
+        </div>
+        <div class="push-txn-row">
+          <span class="push-txn-key">Amount</span>
+          <span class="push-txn-val" id="ag-txn-amount">£147.00</span>
+        </div>
+        <div class="push-txn-row">
+          <span class="push-txn-key">Reason for escalation</span>
+          <span class="push-txn-val" id="ag-escalate-reason" style="color:var(--amber)">Scope mismatch / elevated risk</span>
+        </div>
+        <div class="push-txn-row">
+          <span class="push-txn-key">Mandate remaining</span>
+          <span class="push-txn-val" style="color:var(--green)">£353 of £500</span>
+        </div>
+      </div>
+      <div id="ag-pk-area">
+        <div class="pk-screen-ring" id="ag-pk-ring" style="width:72px;height:72px;font-size:2rem;margin:0 auto 16px;">🔑</div>
+        <div style="text-align:center;font-size:0.8rem;color:var(--muted);margin-bottom:16px;" id="ag-pk-sub">Verify your identity with passkey to approve or deny this agent purchase.</div>
+      </div>
+      <div class="modal-actions">
+        <button class="modal-btn-primary danger" id="ag-deny-btn" onclick="agentDecision('deny')" style="background:linear-gradient(135deg,var(--red),#b91c1c);color:white">🚫 Deny Agent</button>
+        <button class="modal-btn-primary" id="ag-approve-btn" onclick="agentDecision('approve')">🔑 Approve with Passkey</button>
+      </div>
+    </div>
+    <div class="modal-progress"><div class="modal-progress-fill" id="ag-progress"></div></div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+//  STATE  
+// ═══════════════════════════════════════════════
+const state = {
+  scenario: 0,
+  signals: { device: 72, geo: 30, velocity: 45, behaviour: 65, history: 20, amount: 35 },
+  context: { amount: 'mid', mcc: 'travel', card: 'debit' },
+  rules: {
+    velocity: { name: 'Velocity Limit', desc: 'Block >5 txns/hour on same card', icon: '⚡', enabled: true },
+    newDevice: { name: 'New Device Flag', desc: 'Challenge on first-seen device fingerprint', icon: '📱', enabled: true },
+    geoBlock: { name: 'Geo Velocity Block', desc: 'Block impossible travel >500km/hour', icon: '🌍', enabled: false },
+    highAmount: { name: 'High Value Challenge', desc: 'Always challenge >£500 transactions', icon: '💰', enabled: true },
+    mccRisk: { name: 'MCC Risk Override', desc: 'Elevate score for gambling/crypto MCCs', icon: '🎲', enabled: true },
+    cardAge: { name: 'New Card Trust', desc: 'Challenge cards issued <30 days ago', icon: '🆕', enabled: false },
+  },
+  agent: { reg: true, scope: true, sig: true, limit: true },
+  running: false,
+  riskScore: 42,
+};
+
+// ═══════════════════════════════════════════════
+//  RISK CALCULATION
+// ═══════════════════════════════════════════════
+function calcRisk() {
+  const s = state.signals;
+  const c = state.context;
+  const r = state.rules;
+
+  let score = 0;
+  // Invert device trust (high trust = low risk)
+  score += (100 - s.device) * 0.25;
+  score += s.geo * 0.20;
+  score += s.velocity * 0.18;
+  // Invert behaviour (high familiarity = low risk)
+  score += (100 - s.behaviour) * 0.15;
+  score += s.history * 0.12;
+  score += s.amount * 0.10;
+
+  // Context modifiers
+  const amountBonus = { low: -8, mid: 0, high: 15, vhigh: 28 };
+  const mccBonus = { retail: -5, travel: 5, gambling: 25, crypto: 30, luxury: 12 };
+  const cardBonus = { credit: 0, debit: -3, prepaid: 18, corporate: 8 };
+  score += (amountBonus[c.amount] || 0);
+  score += (mccBonus[c.mcc] || 0);
+  score += (cardBonus[c.card] || 0);
+
+  // Rule overrides
+  if (r.velocity.enabled && s.velocity > 70) score += 12;
+  if (r.mccRisk.enabled && (c.mcc === 'gambling' || c.mcc === 'crypto')) score += 15;
+  if (r.highAmount.enabled && (c.amount === 'high' || c.amount === 'vhigh')) score += 10;
+
+  // Agent penalty
+  if (state.scenario === 2) {
+    const a = state.agent;
+    if (!a.reg) score += 30;
+    if (!a.scope) score += 20;
+    if (!a.sig) score += 40;
+    if (!a.limit) score += 15;
+  }
+
+  score = Math.max(0, Math.min(100, Math.round(score)));
+  state.riskScore = score;
+  return score;
+}
+
+function riskColor(score) {
+  if (score < 30) return 'var(--green)';
+  if (score < 60) return 'var(--amber)';
+  return 'var(--red)';
+}
+
+function riskLabel(score) {
+  if (score < 30) return '✅ LOW — Frictionless approved';
+  if (score < 60) return '⚡ MODERATE — Challenge likely';
+  if (score < 80) return '⚠️ HIGH — Challenge required';
+  return '🚫 CRITICAL — Block / Deny';
+}
+
+function decision(score) {
+  const r = state.rules;
+  const c = state.context;
+  const a = state.agent;
+
+  if (state.scenario === 2) {
+    if (!a.sig) return 'BLOCK';
+    if (!a.reg) return 'BLOCK';
+    if (score >= 75) return 'BLOCK';
+    if (!a.scope || !a.limit || score >= 45) return 'ESCALATE';
+    return 'APPROVE';
+  }
+  if (r.geoBlock.enabled && state.signals.geo > 85) return 'BLOCK';
+  if (score < 30) return 'FRICTIONLESS';
+  if (score < 65) {
+    if (state.scenario === 1) return 'PASSKEY';
+    return 'CHALLENGE';
+  }
+  if (score < 85) {
+    if (state.scenario === 1) return 'PASSKEY';
+    return 'CHALLENGE';
+  }
+  return 'BLOCK';
+}
+
+function updateRiskDisplay() {
+  const score = calcRisk();
+  const col = riskColor(score);
+  document.getElementById('riskNum').textContent = score;
+  document.getElementById('riskNum').style.color = col;
+  document.getElementById('riskFill').style.width = score + '%';
+  document.getElementById('riskFill').style.background = col;
+  document.getElementById('riskVerdict').textContent = riskLabel(score);
+  document.getElementById('riskVerdict').style.color = col;
+  updateRuleCards();
+  updateSignalMatrices();
+}
+
+// ═══════════════════════════════════════════════
+//  SIGNAL UPDATES
+// ═══════════════════════════════════════════════
+function updateSignal(key, val) {
+  state.signals[key] = parseInt(val);
+  document.getElementById('val-' + key).textContent = val;
+  updateRiskDisplay();
+}
+
+function updateContext() {
+  state.context.amount = document.getElementById('sel-amount').value;
+  state.context.mcc = document.getElementById('sel-mcc').value;
+  state.context.card = document.getElementById('sel-card').value;
+  updateRiskDisplay();
+}
+
+function toggleAgent(key, btn) {
+  state.agent[key] = !state.agent[key];
+  btn.classList.toggle('on');
+  updateAgentCard();
+  updateRiskDisplay();
+}
+
+function updateAgentCard() {
+  const a = state.agent;
+  document.getElementById('ag-reg-val').textContent = a.reg ? '✓ Yes — cardholder registry' : '✗ Not registered';
+  document.getElementById('ag-reg-val').className = 'agent-card-val ' + (a.reg ? 'valid' : 'invalid');
+  document.getElementById('ag-scope-val').textContent = a.scope ? '✓ Travel / £0–£500' : '✗ Outside mandate';
+  document.getElementById('ag-scope-val').className = 'agent-card-val ' + (a.scope ? 'valid' : 'invalid');
+  document.getElementById('ag-sig-val').textContent = a.sig ? '✓ Ed25519 — valid' : '✗ Signature mismatch';
+  document.getElementById('ag-sig-val').className = 'agent-card-val ' + (a.sig ? 'valid' : 'invalid');
+  document.getElementById('ag-limit-val').textContent = a.limit ? '✓ £147 / £500 limit' : '✗ Exceeds spend limit';
+  document.getElementById('ag-limit-val').className = 'agent-card-val ' + (a.limit ? 'valid' : 'warn');
+  const trust = calcAgentTrust();
+  document.getElementById('ag-trust-val').textContent = trust + ' / 100';
+  document.getElementById('ag-trust-val').style.color = trust > 70 ? 'var(--green)' : trust > 40 ? 'var(--amber)' : 'var(--red)';
+}
+
+function calcAgentTrust() {
+  const a = state.agent;
+  let t = 100;
+  if (!a.reg) t -= 40;
+  if (!a.scope) t -= 25;
+  if (!a.sig) t -= 45;
+  if (!a.limit) t -= 20;
+  return Math.max(0, t);
+}
+
+// ═══════════════════════════════════════════════
+//  RULE ENGINE
+// ═══════════════════════════════════════════════
+function buildRuleCards() {
+  const container = document.getElementById('rule-cards');
+  container.innerHTML = '';
+  Object.entries(state.rules).forEach(([key, rule]) => {
+    const div = document.createElement('div');
+    div.className = 'rule-card';
+    div.id = 'rule-' + key;
+    div.innerHTML = `
+      <div class="rule-icon">${rule.icon}</div>
+      <div class="rule-body">
+        <div class="rule-name">${rule.name}</div>
+        <div class="rule-desc">${rule.desc}</div>
+      </div>
+      <div class="rule-badge idle" id="rbadge-${key}">—</div>
+      <button class="toggle ${rule.enabled ? 'on' : ''}" onclick="toggleRule('${key}',this)" style="flex-shrink:0"></button>
+    `;
+    container.appendChild(div);
+  });
+}
+
+function toggleRule(key, btn) {
+  state.rules[key].enabled = !state.rules[key].enabled;
+  btn.classList.toggle('on');
+  updateRiskDisplay();
+}
+
+function updateRuleCards() {
+  const s = state.signals;
+  const c = state.context;
+  const r = state.rules;
+
+  const evaluations = {
+    velocity: r.velocity.enabled && s.velocity > 70,
+    newDevice: r.newDevice.enabled && s.device < 40,
+    geoBlock: r.geoBlock.enabled && s.geo > 85,
+    highAmount: r.highAmount.enabled && (c.amount === 'high' || c.amount === 'vhigh'),
+    mccRisk: r.mccRisk.enabled && (c.mcc === 'gambling' || c.mcc === 'crypto'),
+    cardAge: r.cardAge.enabled,
+  };
+
+  Object.entries(evaluations).forEach(([key, fired]) => {
+    const card = document.getElementById('rule-' + key);
+    const badge = document.getElementById('rbadge-' + key);
+    if (!card) return;
+    card.className = 'rule-card';
+    if (!state.rules[key].enabled) {
+      badge.textContent = 'OFF';
+      badge.className = 'rule-badge idle';
+    } else if (fired) {
+      card.classList.add(key === 'geoBlock' ? 'blocked' : 'triggered');
+      badge.textContent = key === 'geoBlock' ? 'BLOCK' : 'FIRED';
+      badge.className = 'rule-badge ' + (key === 'geoBlock' ? 'fail' : 'warn');
+    } else {
+      card.classList.add('passed');
+      badge.textContent = 'PASS';
+      badge.className = 'rule-badge pass';
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════
+//  SIGNAL MATRICES
+// ═══════════════════════════════════════════════
+function updateSignalMatrices() {
+  const s = state.signals;
+  const cells = [
+    { label: 'Device Trust', val: s.device > 60 ? 'Trusted' : s.device > 30 ? 'Partial' : 'Unknown', level: s.device > 60 ? 'low' : s.device > 30 ? 'med' : 'high' },
+    { label: 'Geo Risk', val: s.geo < 30 ? 'Normal' : s.geo < 70 ? 'Elevated' : 'Critical', level: s.geo < 30 ? 'low' : s.geo < 70 ? 'med' : 'high' },
+    { label: 'Velocity', val: s.velocity < 30 ? 'Normal' : s.velocity < 65 ? 'Elevated' : 'Spike', level: s.velocity < 30 ? 'low' : s.velocity < 65 ? 'med' : 'high' },
+    { label: 'Behaviour', val: s.behaviour > 60 ? 'Familiar' : s.behaviour > 30 ? 'Mixed' : 'Anomaly', level: s.behaviour > 60 ? 'low' : s.behaviour > 30 ? 'med' : 'high' },
+    { label: 'Card History', val: s.history < 30 ? 'Clean' : s.history < 60 ? 'Flagged' : 'Risky', level: s.history < 30 ? 'low' : s.history < 60 ? 'med' : 'high' },
+    { label: 'Composite', val: state.riskScore, level: state.riskScore < 30 ? 'low' : state.riskScore < 65 ? 'med' : 'high' },
+  ];
+  [0,1,2].forEach(i => {
+    const m = document.getElementById('signal-matrix-' + i);
+    if (!m) return;
+    m.innerHTML = cells.map(c => `
+      <div class="signal-cell ${c.level}">
+        <div class="signal-cell-label">${c.label}</div>
+        <div class="signal-cell-val">${c.val}</div>
+      </div>
+    `).join('');
+  });
+}
+
+// ═══════════════════════════════════════════════
+//  SCENARIO SWITCH
+// ═══════════════════════════════════════════════
+function switchScenario(idx, el) {
+  state.scenario = idx;
+  document.querySelectorAll('.scenario-btn').forEach((b,i) => b.classList.toggle('active', i===idx));
+  document.querySelectorAll('.nav-tab').forEach((b,i) => b.classList.toggle('active', i===idx));
+  document.querySelectorAll('.sim-section[id^="scene-"]').forEach((s,i) => s.classList.toggle('visible', i===idx));
+
+  // Show/hide agent controls
+  document.getElementById('ctrl-agent').classList.toggle('visible', idx === 2);
+
+  const titles = [
+    ['Standard 3DS / SCA Flow', 'EMV® 3DS 2.3 · Outseer ACS · Frictionless / Challenge decisioning'],
+    ['3DS + Passkey Authentication', 'FIDO2 WebAuthn · Outseer ACS · Biometric step-up challenge'],
+    ['Agentic Payment Flow', 'AI Agent Vetting · Delegated Authority · Composite Risk Decisioning'],
+  ];
+  document.getElementById('flowTitle').textContent = titles[idx][0];
+  document.getElementById('flowSubtitle').textContent = titles[idx][1];
+  resetDecisionBadge();
+  updateRiskDisplay();
+}
+
+function resetDecisionBadge() {
+  const badge = document.getElementById('decisionBadge');
+  badge.style.borderColor = 'var(--amber)';
+  badge.style.color = 'var(--amber)';
+  badge.style.background = 'rgba(245,158,11,0.08)';
+  document.getElementById('decisionText').textContent = 'Awaiting Simulation';
+}
+
+// ═══════════════════════════════════════════════
+//  SIMULATION
+// ═══════════════════════════════════════════════
+async function runSimulation() {
+  if (state.running) return;
+  state.running = true;
+  const btn = document.getElementById('runBtn');
+  btn.classList.add('running');
+  btn.textContent = '⟳ Running...';
+
+  resetAllNodes();
+  const score = calcRisk();
+  const dec = decision(score);
+
+  const traceId = 'trace-' + state.scenario;
+  clearTrace(traceId);
+
+  await sleep(200);
+  addTrace(traceId, 'info', 'AReq received by Outseer 3DS Server');
+  await sleep(150);
+  addTrace(traceId, 'info', 'Device fingerprint + session data parsed');
+
+  if (state.scenario === 0) await runStandard3DS(dec, score, traceId);
+  else if (state.scenario === 1) await runPasskey3DS(dec, score, traceId);
+  else await runAgentic(dec, score, traceId);
+
+  // Only set badge immediately for non-challenge outcomes; challenge modals handle their own badge
+  if (dec === 'FRICTIONLESS' || dec === 'BLOCK' || dec === 'APPROVE') {
+    updateDecisionBadge(dec);
+  } else {
+    updateDecisionBadge(dec); // still show pending challenge state
+  }
+
+  state.running = false;
+  btn.classList.remove('running');
+  btn.innerHTML = '<span>▶</span> Run Simulation';
+}
+
+async function runStandard3DS(dec, score, traceId) {
+  await activateNode('n0-0'); addTrace(traceId, 'info', 'Cardholder checkout — device data collected');
+  await activateConnector('c0-0');
+  await activateNode('n0-1'); addTrace(traceId, 'info', 'AReq constructed — merchant data, SDK version, device info');
+  await activateConnector('c0-2');
+  await activateNode('n0-2'); addTrace(traceId, 'info', 'Directory Server validates BIN → Outseer ACS identified');
+  await activateConnector('c0-3');
+  await activateNode('n0-3'); addTrace(traceId, 'info', 'AReq forwarded to Outseer ACS');
+  await activateConnector('c0-4');
+  await activateNode('n0-5'); addTrace(traceId, 'info', `Risk engine ingesting ${Object.keys(state.signals).length * 40}+ signals`);
+  await sleep(300);
+  await activateConnector('c0-5');
+  await activateNode('n0-6'); addTrace(traceId, 'info', 'Rule engine evaluation — ' + Object.values(state.rules).filter(r=>r.enabled).length + ' rules active');
+
+  const firedRules = Object.entries(state.rules).filter(([k,r]) => r.enabled &&
+    ((k==='velocity' && state.signals.velocity > 70) ||
+     (k==='newDevice' && state.signals.device < 40) ||
+     (k==='geoBlock' && state.signals.geo > 85) ||
+     (k==='highAmount' && (state.context.amount==='high'||state.context.amount==='vhigh')) ||
+     (k==='mccRisk' && (state.context.mcc==='gambling'||state.context.mcc==='crypto'))));
+  firedRules.forEach(([k,r]) => addTrace(traceId, 'warn', `Rule FIRED: ${r.name}`));
+
+  await activateNode('n0-7', dec === 'FRICTIONLESS' ? 'complete' : dec === 'BLOCK' ? 'blocked' : 'challenge');
+  addTrace(traceId, 'info', `Risk score computed: ${score}/100`);
+
+  if (dec === 'FRICTIONLESS') {
+    await activateConnector('c0-1');
+    await activateNode('n0-4');
+    showResult('n0-result-frictionless', 'complete');
+    addTrace(traceId, 'pass', `ARes issued: transStatus=Y — Frictionless approved`);
+    addTrace(traceId, 'pass', 'Liability shift to issuer — AAV generated');
+  } else if (dec === 'BLOCK') {
+    await activateConnector('c0-1');
+    await activateNode('n0-4');
+    showResult('n0-result-deny', 'blocked');
+    addTrace(traceId, 'fail', `ARes issued: transStatus=N — Transaction denied`);
+  } else {
+    await activateNode('n0-4');
+    showResult('n0-result-challenge', 'challenge');
+    addTrace(traceId, 'warn', `ARes issued: transStatus=C — Challenge required`);
+    addTrace(traceId, 'warn', 'OTP dispatched to registered mobile number');
+    await sleep(400);
+    openModal('otp');
+  }
+}
+
+async function runPasskey3DS(dec, score, traceId) {
+  await activateNode('n1-0'); addTrace(traceId, 'info', 'Checkout initiated — 3DS SDK active');
+  await activateConnector('c1-6');
+  await activateNode('n1-risk'); addTrace(traceId, 'info', `Risk score: ${score}/100 — threshold check`);
+  await activateConnector('c1-7');
+  await activateNode('n1-creq');
+
+  if (dec === 'FRICTIONLESS') {
+    addTrace(traceId, 'pass', 'Score below challenge threshold — frictionless path');
+    await activateNode('n1-result', 'complete');
+    addTrace(traceId, 'pass', 'ARes transStatus=Y — no passkey required');
+    document.getElementById('passkeyWidget').style.opacity = '0.4';
+    document.getElementById('passkeyResult').textContent = '';
+  } else if (dec === 'BLOCK') {
+    addTrace(traceId, 'fail', `Score ${score}/100 — hard block triggered`);
+    await activateNode('n1-result', 'blocked');
+    addTrace(traceId, 'fail', 'ARes transStatus=N — denied');
+    document.getElementById('passkeyWidget').style.opacity = '0.4';
+  } else {
+    addTrace(traceId, 'warn', `Score ${score}/100 — FIDO2 challenge issued`);
+    document.getElementById('passkeyWidget').style.opacity = '1';
+    await activateConnector('c1-0');
+    await activateNode('n1-challenge', 'challenge');
+    await activateConnector('c1-1');
+    await activateNode('n1-passkey', 'active');
+    await activateConnector('c1-3');
+    await activateNode('n1-enclave');
+    addTrace(traceId, 'info', 'navigator.credentials.get() called with ACS nonce');
+    addTrace(traceId, 'warn', 'Awaiting biometric gesture from user...');
+    await sleep(400);
+    openModal('passkey');
+  }
+}
+
+async function runAgentic(dec, score, traceId) {
+  await activateNode('n2-0'); addTrace(traceId, 'info', 'AI agent initiating payment with delegated mandate');
+  await activateConnector('c2-0');
+  await activateNode('n2-1'); addTrace(traceId, 'info', 'Scoped auth token extracted from AReq extension fields');
+  await activateConnector('c2-1');
+  await activateNode('n2-pay');
+  await activateConnector('c2-3');
+  await activateNode('n2-reg', state.agent.reg ? 'active' : 'blocked');
+  addTrace(traceId, state.agent.reg ? 'pass' : 'fail', `Agent registry check: ${state.agent.reg ? 'FOUND' : 'NOT FOUND'}`);
+  await activateConnector('c2-4');
+  await activateNode('n2-scope', state.agent.scope ? 'active' : 'challenge');
+  addTrace(traceId, state.agent.scope ? 'pass' : 'warn', `Scope validation: ${state.agent.scope ? 'IN MANDATE' : 'OUTSIDE SCOPE'}`);
+  await activateConnector('c2-5');
+  await activateNode('n2-sig', state.agent.sig ? 'active' : 'blocked');
+  addTrace(traceId, state.agent.sig ? 'pass' : 'fail', `Signature: ${state.agent.sig ? 'VALID (Ed25519)' : 'INVALID — mismatch'}`);
+  await activateConnector('c2-6');
+  await activateNode('n2-risk'); addTrace(traceId, 'info', `Composite risk score: ${score}/100`);
+  await activateConnector('c2-7');
+  await activateNode('n2-rules');
+  await activateConnector('c2-8');
+  await activateNode('n2-decide', dec === 'APPROVE' ? 'complete' : dec === 'BLOCK' ? 'blocked' : 'challenge');
+  await activateNode('n2-ares');
+
+  if (dec === 'APPROVE') {
+    showResult('n2-result-ok', 'complete');
+    addTrace(traceId, 'pass', 'Agent purchase APPROVED — ARes transStatus=Y');
+    addTrace(traceId, 'pass', 'AAV issued, liability transferred to issuer');
+  } else if (dec === 'BLOCK') {
+    showResult('n2-result-block', 'blocked');
+    addTrace(traceId, 'fail', 'Agent BLOCKED — identity or signature failure');
+    addTrace(traceId, 'fail', 'ARes transStatus=N — transaction denied');
+  } else {
+    showResult('n2-result-escalate', 'challenge');
+    addTrace(traceId, 'warn', 'Escalating to cardholder — passkey push notification');
+    addTrace(traceId, 'warn', 'Awaiting biometric confirmation...');
+    await sleep(400);
+    openModal('agent');
+  }
+}
+
+// ═══════════════════════════════════════════════
+//  PASSKEY SIMULATION
+// ═══════════════════════════════════════════════
+async function simulatePasskey() {
+  const btn = document.getElementById('passkeyBtn');
+  const result = document.getElementById('passkeyResult');
+  const traceId = 'trace-1';
+  btn.classList.add('verifying');
+  btn.textContent = '⟳ Verifying biometric...';
+  result.style.color = 'var(--amber)';
+  result.textContent = 'Requesting biometric gesture...';
+  await sleep(800);
+  result.textContent = 'Secure enclave responding...';
+  await sleep(600);
+  result.textContent = 'Generating assertion signature...';
+  await sleep(500);
+
+  const n = document.getElementById('n1-bio');
+  if (n) { n.classList.remove('active','challenge','blocked','complete'); n.classList.add('complete'); }
+  await activateConnector('c1-4');
+  const na = document.getElementById('n1-assert');
+  if (na) { na.classList.remove('active','challenge','blocked','complete'); na.classList.add('complete'); }
+  await activateConnector('c1-5');
+  const ns = document.getElementById('n1-sent');
+  if (ns) { ns.classList.remove('active','challenge','blocked','complete'); ns.classList.add('complete'); }
+  await activateConnector('c1-8');
+  const nv = document.getElementById('n1-verify');
+  if (nv) { nv.classList.remove('active','challenge','blocked','complete'); nv.classList.add('complete'); }
+
+  addTrace(traceId, 'pass', 'Biometric matched — Ed25519 assertion generated');
+  addTrace(traceId, 'pass', 'Outseer ACS: assertion signature verified against stored public key');
+
+  const nr = document.getElementById('n1-result');
+  if (nr) { nr.classList.remove('active','challenge','blocked','complete'); nr.classList.add('complete'); }
+  const ncr = document.getElementById('n1-cres');
+  if (ncr) { ncr.classList.remove('active','challenge','blocked','complete'); ncr.classList.add('complete'); }
+
+  addTrace(traceId, 'pass', 'CRes issued: transStatus=Y — passkey auth complete');
+  addTrace(traceId, 'pass', 'AAV generated — liability shift confirmed');
+
+  btn.classList.remove('verifying');
+  btn.style.background = 'var(--green)';
+  btn.style.color = 'white';
+  btn.textContent = '✓ Verified';
+  result.style.color = 'var(--green)';
+  result.textContent = '✓ Authentication successful — payment authorised';
+  updateDecisionBadge('PASSKEY_OK');
+}
+
+// ═══════════════════════════════════════════════
+//  NODE EXPAND
+// ═══════════════════════════════════════════════
+const nodeDetails = {
+  '3ds-checkout': ['🛒 Checkout — Signal Collection', 'The merchant\'s 3DS SDK captures <strong>device fingerprint</strong> (user-agent, IP, screen, timezone), <strong>browser info</strong>, and session behaviour. This data enriches the AReq payload. Outseer\'s JS tag adds behavioural biometrics — typing cadence, mouse dynamics — in the background.'],
+  '3ds-risk': ['⚡ Signal Ingestion — 250+ Factors', 'Outseer\'s risk engine processes: device fingerprint match, geo-velocity (travel impossible between locations?), transaction velocity on card + device, behavioural biometrics, consortium fraud data from other Outseer-connected issuers, and card history anomalies. All computed in &lt;80ms.'],
+  '3ds-rules': ['⚙️ Rule Engine Evaluation', 'The <strong>rule engine</strong> fires a prioritised chain of conditions against the live context. Each rule can <em>block</em>, <em>challenge</em>, or <em>allow</em>. The strictest triggered rule wins. Rules are issuer-configurable — geo blocks, MCC overrides, velocity caps. The rule result is fed into the final risk score.'],
+  '3ds-score': ['🧠 Risk Score → Decision', 'The composite score (0–100) is mapped to a decision threshold. Issuers configure their own thresholds. Below 30: <strong class="trace-pass">Frictionless</strong>. 30–65: <strong class="trace-warn">Challenge</strong>. Above 65 or block rule: <strong class="trace-fail">Deny</strong>. The ACS issues ARes with transStatus Y/C/N accordingly.'],
+  '3ds-frictionless': ['✅ Frictionless Auth', 'The ACS issues <strong>transStatus = "Y"</strong> in the ARes. No cardholder interaction is required. The Mastercard/Visa DS relays the ARes back to the 3DS Server, which decodes the <strong>Authentication Value (AAV/CAVV)</strong> and passes it in the downstream authorisation to the acquirer. <strong>Issuer liability applies.</strong>'],
+  '3ds-challenge': ['📲 Challenge Issued', 'The ACS issues <strong>transStatus = "C"</strong>. The cardholder browser is redirected to the ACS challenge UI. For standard 3DS, an OTP is dispatched via SMS. The cardholder enters the code; the ACS validates and issues CRes with transStatus Y or N.'],
+  '3ds-deny': ['🚫 Transaction Denied', 'The ACS issues <strong>transStatus = "N"</strong> — the transaction is blocked. This can result from a hard block rule (e.g. geo impossibility) or a risk score above the issuer\'s denial threshold. The merchant must abort the payment. No liability shift occurs.'],
+  '3ds-server': ['🔀 Directory Server Routing', 'The card scheme DS (<strong>Mastercard SecureCode, Visa Secure</strong>) receives the AReq, validates the BIN against its issuer registry, identifies the correct ACS URL (Outseer ACS), and forwards the message. The DS also enforces message format compliance to EMV® 3DS 2.3 spec.'],
+  'pk-checkout': ['🛒 Checkout — Passkey Flow Entry', 'Same as standard 3DS entry — merchant SDK collects device and behavioural data. If Outseer ACS has the cardholder registered for passkey authentication, the risk score will route high-risk transactions to a FIDO2 challenge rather than OTP.'],
+  'pk-fido': ['🔑 FIDO2 Passkey Prompt', 'The ACS challenge page calls <code>navigator.credentials.get()</code> with the ACS nonce as the WebAuthn challenge. The platform authenticator (Face ID, Touch ID, Windows Hello) prompts the user. <strong>No OTP. No redirect. No shared secret.</strong> The private key never leaves the device.'],
+  'pk-enclave': ['🔐 Secure Enclave', 'The FIDO2 private key is generated and stored in the device\'s <strong>Trusted Execution Environment</strong> (Apple Secure Enclave, Android StrongBox, Windows TPM). It is <em>never exported</em>. Biometric match locally unlocks signing — the private key performs the assertion, but is not sent anywhere.'],
+  'pk-assert': ['🖊️ Assertion Generation', 'On biometric success, the authenticator signs: <strong>authenticatorData</strong> (RP ID hash, flags, counter, AAGUID) + <strong>clientDataHash</strong> (ACS nonce + origin) using the private key. The resulting signature + public key credential ID are returned to the ACS in the challenge response.'],
+  'pk-verify': ['🔍 Assertion Verification', 'Outseer ACS verifies: (1) RP ID matches the ACS origin, (2) the nonce in clientDataHash matches what was issued, (3) the signature verifies against the stored public key. If all pass — authentication succeeds. This is <strong>phishing-resistant</strong>: a fake site cannot produce a valid signature.'],
+  'pk-result': ['✅ CRes Issued — Auth Complete', 'Outseer ACS issues CRes with <strong>transStatus = "Y"</strong>. An Authentication Value (AAV) is generated and included. The 3DS Server returns this to the merchant. The merchant submits the AAV in the authorisation — <strong>full liability shift</strong> to the issuer confirmed.'],
+  'pk-risk': ['⚡ Challenge Threshold Evaluation', 'When risk score exceeds the passkey challenge threshold (configurable per issuer), the ACS selects the FIDO2 path. If the cardholder has a registered passkey for the ACS RP, a WebAuthn challenge is issued. If not, fallback to OTP or decoupled auth.'],
+  'ag-mandate': ['🤖 Agent Mandate', 'The AI agent operates under a <strong>delegated mandate</strong> set by the cardholder — a scoped token specifying allowed merchant categories (MCC), maximum transaction amount, and time window. The cardholder grants this via their issuer app using their own passkey.'],
+  'ag-token': ['🪪 Delegated Token', 'The agent\'s token is a <strong>signed JWT</strong> containing: agent public key fingerprint, cardholder account reference, delegation scope (MCC list, spend cap, expiry). This is embedded in the EMV® 3DS AReq <em>extensible merchant data</em> field.'],
+  'ag-reg': ['📋 Agent Registry Check', 'Outseer maintains a per-cardholder registry of pre-approved agent identities. The AReq agent token is checked against this registry. If the agent\'s public key fingerprint is <em>not found</em>, the transaction is <strong>immediately blocked</strong> regardless of risk score.'],
+  'ag-scope': ['🎯 Scope Validation', 'Outseer checks that: (1) the merchant MCC is within the mandate\'s allowed category list, (2) the transaction amount is below the mandate\'s spend cap, and (3) the mandate has not expired. Scope failures escalate to <strong>cardholder passkey confirmation</strong>.'],
+  'ag-sig': ['🔏 Signature Verification', 'The agent\'s Ed25519 assertion signature over the transaction nonce is verified against its registered public key. A <strong>signature failure</strong> is treated as a hard block — it indicates a compromised or impersonated agent and is logged for fraud investigation.'],
+  'ag-risk': ['⚡ Composite Risk — Dual Score', 'For agentic transactions, Outseer computes <em>two</em> risk scores: (1) the <strong>cardholder profile score</strong> (standard 250+ signals), and (2) the <strong>agent integrity score</strong> (registry status, scope compliance, behavioural history). Both feed the final ACS decision.'],
+  'ag-approved': ['✅ Agent Purchase Approved', 'Both the agent vetting and composite risk score are within thresholds. The ACS issues <strong>transStatus = "Y"</strong> in the ARes. The AI agent receives approval and completes the purchase — no cardholder interaction required. AAV issued, liability shifted.'],
+  'ag-escalate': ['📲 Escalated to Cardholder', 'One or more agent checks are borderline (scope mismatch, risk elevated but not critical). Outseer sends a <strong>silent passkey push</strong> to the cardholder\'s registered device. A single biometric tap confirms or rejects the transaction without requiring the cardholder to re-enter any details.'],
+  'ag-blocked': ['🚫 Agent Blocked', 'A hard failure — agent not registered, signature invalid, or risk score critical. The transaction is blocked and the event is flagged for fraud investigation. The cardholder is notified through their issuer app. The agent token is placed on a watchlist.'],
+};
+
+function expandNode(key) {
+  const details = nodeDetails[key];
+  if (!details) return;
+  const panel = document.getElementById('detail-panel-' + state.scenario);
+  panel.innerHTML = `<div class="detail-panel-title">${details[0]}</div><div class="detail-panel-body">${details[1]}</div><div class="signal-matrix" id="signal-matrix-${state.scenario}"></div>`;
+  updateSignalMatrices();
+  panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+// ═══════════════════════════════════════════════
+//  HELPERS
+// ═══════════════════════════════════════════════
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+async function activateNode(id, state2 = 'active') {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.classList.remove('active','complete','challenge','blocked');
+  el.classList.add(state2);
+  // Add pulse
+  const p = document.createElement('div');
+  p.className = 'fnode-pulse';
+  el.appendChild(p);
+  await sleep(400);
+  el.removeChild(p);
+}
+
+async function activateConnector(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.classList.add('active');
+  await sleep(200);
+}
+
+function resetAllNodes() {
+  document.querySelectorAll('.fnode').forEach(n => {
+    n.classList.remove('active','complete','challenge','blocked');
+  });
+  document.querySelectorAll('.connector-line').forEach(c => c.classList.remove('active'));
+  // Reset passkey btn
+  const pb = document.getElementById('passkeyBtn');
+  if (pb) { pb.style.background = ''; pb.style.color = ''; pb.textContent = '👆 Verify with Passkey'; pb.classList.remove('verifying'); }
+  const pr = document.getElementById('passkeyResult');
+  if (pr) pr.textContent = '';
+  const pw = document.getElementById('passkeyWidget');
+  if (pw) pw.style.opacity = '';
+  // Hide result nodes
+  ['n0-result-challenge','n0-result-deny','n2-result-escalate','n2-result-block'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+  document.getElementById('n0-result-frictionless').style.display = '';
+  document.getElementById('n2-result-ok').style.display = '';
+}
+
+function showResult(id, cls) {
+  ['n0-result-frictionless','n0-result-challenge','n0-result-deny'].forEach(x => {
+    const el = document.getElementById(x);
+    if (el) el.style.display = x === id ? '' : 'none';
+  });
+  ['n2-result-ok','n2-result-escalate','n2-result-block'].forEach(x => {
+    const el = document.getElementById(x);
+    if (el) el.style.display = x === id ? '' : 'none';
+  });
+  const el = document.getElementById(id);
+  if (el) { el.classList.remove('active','complete','challenge','blocked'); el.classList.add(cls); }
+}
+
+function updateDecisionBadge(dec) {
+  const badge = document.getElementById('decisionBadge');
+  const text = document.getElementById('decisionText');
+  const configs = {
+    FRICTIONLESS: { color: 'var(--green)', bg: 'rgba(34,197,94,0.08)', text: '✅ Frictionless Approved', border: 'var(--green)' },
+    CHALLENGE: { color: 'var(--amber)', bg: 'rgba(245,158,11,0.08)', text: '⚠️ Challenge Issued', border: 'var(--amber)' },
+    PASSKEY: { color: 'var(--teal)', bg: 'rgba(0,196,188,0.08)', text: '🔑 Passkey Challenge', border: 'var(--teal)' },
+    PASSKEY_OK: { color: 'var(--green)', bg: 'rgba(34,197,94,0.08)', text: '✅ Passkey Verified', border: 'var(--green)' },
+    BLOCK: { color: 'var(--red)', bg: 'rgba(239,68,68,0.08)', text: '🚫 Transaction Blocked', border: 'var(--red)' },
+    APPROVE: { color: 'var(--green)', bg: 'rgba(34,197,94,0.08)', text: '✅ Agent Approved', border: 'var(--green)' },
+    ESCALATE: { color: 'var(--amber)', bg: 'rgba(245,158,11,0.08)', text: '📲 Escalated to User', border: 'var(--amber)' },
+  };
+  const cfg = configs[dec] || configs.CHALLENGE;
+  badge.style.color = cfg.color;
+  badge.style.background = cfg.bg;
+  badge.style.borderColor = cfg.border;
+  text.textContent = cfg.text;
+}
+
+// ═══════════════════════════════════════════════
+//  TRACE LOG
+// ═══════════════════════════════════════════════
+function clearTrace(id) {
+  document.getElementById(id).innerHTML = '';
+}
+
+function addTrace(id, type, msg) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const now = new Date();
+  const ts = now.toTimeString().slice(0,8) + '.' + String(now.getMilliseconds()).padStart(3,'0');
+  const line = document.createElement('div');
+  line.className = 'trace-line';
+  line.innerHTML = `<span class="trace-time">${ts}</span><span class="trace-${type}">${msg}</span>`;
+  el.appendChild(line);
+  el.scrollTop = el.scrollHeight;
+}
+
+// ═══════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════
+buildRuleCards();
+updateRiskDisplay();
+updateAgentCard();
+
+// ═══════════════════════════════════════════════
+//  MODAL SYSTEM
+// ═══════════════════════════════════════════════
+const merchantData = {
+  low:   { retail: { icon:'🛍️', name:'ASOS Online', desc:'Retail · Visa Debit · ****4821' },   travel: { icon:'🚌', name:'National Rail', desc:'Travel · Visa Debit · ****4821' },   gambling: { icon:'🎰', name:'Betway Casino', desc:'Gambling · Mastercard · ****4821' }, crypto: { icon:'₿', name:'Coinbase UK', desc:'Crypto · Visa Debit · ****4821' },   luxury: { icon:'🧴', name:'Selfridges', desc:'Luxury · Visa Debit · ****4821' }   },
+  mid:   { retail: { icon:'📦', name:'Amazon UK', desc:'Retail · Mastercard Debit · ****4821' }, travel: { icon:'✈️', name:'British Airways', desc:'Travel · Visa Debit · ****4821' }, gambling: { icon:'🎲', name:'PokerStars', desc:'Gambling · Mastercard · ****4821' },   crypto: { icon:'🪙', name:'Binance UK', desc:'Crypto · Visa Debit · ****4821' },   luxury: { icon:'⌚', name:'Watches of Switzerland', desc:'Luxury · Visa Credit · ****4821' } },
+  high:  { retail: { icon:'🖥️', name:'Apple Store', desc:'Electronics · Visa Credit · ****4821' }, travel: { icon:'🏨', name:'Marriott Hotels', desc:'Hotels · Amex · ****4821' }, gambling: { icon:'🏟️', name:'William Hill', desc:'Gambling · Mastercard · ****4821' }, crypto: { icon:'💎', name:'Kraken Exchange', desc:'Crypto · Visa Credit · ****4821' }, luxury: { icon:'💍', name:'Cartier', desc:'Luxury · Amex · ****4821' }           },
+  vhigh: { retail: { icon:'🏠', name:'IKEA Business', desc:'Retail · Corporate Card · ****4821' }, travel: { icon:'🛩️', name:'NetJets Charter', desc:'Aviation · Amex Platinum · ****4821' }, gambling: { icon:'🎪', name:'Hard Rock Casino', desc:'Gambling · Corporate · ****4821' }, crypto: { icon:'🏦', name:'Gemini Institutional', desc:'Crypto · Wire · ****4821' }, luxury: { icon:'🚗', name:'Aston Martin', desc:'Automotive · Amex · ****4821' } }
+};
+
+const amountValues = { low: '£18.50', mid: '£147.00', high: '£789.00', vhigh: '£3,450.00' };
+
+function getMerchant() {
+  const amt = state.context.amount || 'mid';
+  const mcc = state.context.mcc || 'travel';
+  return merchantData[amt]?.[mcc] || merchantData.mid.travel;
+}
+
+function openModal(type) {
+  const m = getMerchant();
+  const amt = amountValues[state.context.amount] || '£147.00';
+  if (type === 'otp') {
+    document.getElementById('otp-merchant-icon').textContent = m.icon;
+    document.getElementById('otp-merchant-name').textContent = m.name;
+    document.getElementById('otp-merchant-desc').textContent = m.desc;
+    document.getElementById('otp-amount').textContent = amt;
+    resetOTP();
+    startOTPTimer();
+  } else if (type === 'passkey') {
+    document.getElementById('pk-merchant-icon').textContent = m.icon;
+    document.getElementById('pk-merchant-name').textContent = m.name;
+    document.getElementById('pk-merchant-desc').textContent = m.desc;
+    document.getElementById('pk-amount').textContent = amt;
+    resetPasskeyModal();
+  } else if (type === 'agent') {
+    document.getElementById('ag-push-merchant').textContent = m.name;
+    document.getElementById('ag-txn-merchant').textContent = m.name;
+    document.getElementById('ag-txn-amount').textContent = amt;
+    const reason = !state.agent.scope ? 'MCC outside delegated mandate' :
+                   !state.agent.limit ? 'Exceeds pre-set spend limit' :
+                   `Elevated risk score (${state.riskScore}/100)`;
+    document.getElementById('ag-escalate-reason').textContent = reason;
+    resetAgentModal();
+  }
+  document.getElementById('modal-' + type).classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal(type) {
+  document.getElementById('modal-' + type).classList.remove('open');
+  document.body.style.overflow = '';
+  if (type === 'otp') clearInterval(state._otpTimer);
+}
+
+// Close on overlay click
+['otp','passkey','agent'].forEach(t => {
+  document.getElementById('modal-' + t).addEventListener('click', function(e) {
+    if (e.target === this) closeModal(t);
+  });
+});
+
+// ── OTP MODAL ──
+let _otpCorrect = '483921'; // simulated correct code
+
+function resetOTP() {
+  for (let i = 0; i < 6; i++) {
+    const el = document.getElementById('otp-' + i);
+    el.value = ''; el.className = 'otp-input'; el.disabled = false;
+  }
+  document.getElementById('otp-0').focus();
+  document.getElementById('otp-result-msg').textContent = '';
+  document.getElementById('otp-result-msg').style.color = '';
+  document.getElementById('otp-submit-btn').disabled = false;
+  document.getElementById('otp-submit-btn').className = 'modal-btn-primary';
+  document.getElementById('otp-submit-btn').textContent = 'Verify Code →';
+  document.getElementById('otp-dot').className = 'modal-status-dot';
+  document.getElementById('otp-status-text').textContent = 'CReq received — challenge issued by Outseer ACS';
+  document.getElementById('otp-progress').style.width = '0%';
+}
+
+function otpNext(idx, el) {
+  el.value = el.value.replace(/\D/g,'');
+  if (el.value) {
+    el.classList.add('filled');
+    if (idx < 5) document.getElementById('otp-' + (idx+1)).focus();
+    else submitOTP();
+  } else {
+    el.classList.remove('filled');
+  }
+}
+
+function otpBack(idx, e) {
+  if (e.key === 'Backspace' && !document.getElementById('otp-'+idx).value && idx > 0) {
+    document.getElementById('otp-' + (idx-1)).focus();
+  }
+}
+
+function getOTPValue() {
+  return [0,1,2,3,4,5].map(i => document.getElementById('otp-'+i).value).join('');
+}
+
+let _otpTimerInterval = null;
+function startOTPTimer() {
+  let remaining = 120;
+  clearInterval(_otpTimerInterval);
+  _otpTimerInterval = setInterval(() => {
+    remaining--;
+    const m = Math.floor(remaining/60), s = String(remaining%60).padStart(2,'0');
+    const el = document.getElementById('otp-timer');
+    if (el) { el.textContent = `${m}:${s}`; el.style.color = remaining < 30 ? 'var(--red)' : 'var(--amber)'; }
+    if (remaining <= 0) { clearInterval(_otpTimerInterval); expireOTP(); }
+  }, 1000);
+}
+
+function expireOTP() {
+  for (let i = 0; i < 6; i++) { const el = document.getElementById('otp-'+i); if(el) el.disabled = true; }
+  document.getElementById('otp-result-msg').textContent = '⏱ Code expired. Request a new one.';
+  document.getElementById('otp-result-msg').style.color = 'var(--red)';
+}
+
+function resendOTP() {
+  _otpCorrect = String(Math.floor(100000 + Math.random()*900000));
+  resetOTP();
+  startOTPTimer();
+  document.getElementById('otp-status-text').textContent = 'New code dispatched — check your phone';
+  document.getElementById('otp-result-msg').textContent = '✓ New code sent';
+  document.getElementById('otp-result-msg').style.color = 'var(--teal)';
+}
+
+async function submitOTP() {
+  const val = getOTPValue();
+  if (val.length < 6) {
+    document.getElementById('otp-result-msg').textContent = 'Please enter all 6 digits';
+    document.getElementById('otp-result-msg').style.color = 'var(--amber)';
+    return;
+  }
+  const btn = document.getElementById('otp-submit-btn');
+  btn.disabled = true; btn.textContent = '⟳ Verifying...';
+  document.getElementById('otp-progress').style.width = '60%';
+  document.getElementById('otp-status-text').textContent = 'Sending CRes to Outseer ACS...';
+  await sleep(900);
+  document.getElementById('otp-progress').style.width = '100%';
+
+  if (val === _otpCorrect || val === '123456') {
+    // SUCCESS
+    btn.className = 'modal-btn-primary success'; btn.textContent = '✓ Verified';
+    document.getElementById('otp-result-msg').textContent = '✅ OTP verified — CRes transStatus=Y issued';
+    document.getElementById('otp-result-msg').style.color = 'var(--green)';
+    document.getElementById('otp-dot').className = 'modal-status-dot success';
+    document.getElementById('otp-status-text').textContent = 'Authentication complete — payment authorised';
+    clearInterval(_otpTimerInterval);
+    addTrace('trace-0', 'pass', 'OTP verified — CRes transStatus=Y issued by Outseer ACS');
+    addTrace('trace-0', 'pass', 'AAV generated — liability shift to issuer confirmed');
+    updateDecisionBadge('FRICTIONLESS');
+    showResult('n0-result-challenge', 'complete');
+    await sleep(1800); closeModal('otp');
+  } else {
+    // FAIL
+    btn.disabled = false; btn.textContent = 'Verify Code →';
+    btn.className = 'modal-btn-primary';
+    document.getElementById('otp-result-msg').textContent = '✗ Incorrect code — please try again';
+    document.getElementById('otp-result-msg').style.color = 'var(--red)';
+    document.getElementById('otp-dot').className = 'modal-status-dot error';
+    document.getElementById('otp-progress').style.width = '0%';
+    for (let i = 0; i < 6; i++) {
+      const el = document.getElementById('otp-' + i);
+      el.classList.add('error-shake');
+      setTimeout(() => el.classList.remove('error-shake'), 500);
+    }
+    addTrace('trace-0', 'fail', 'OTP mismatch — challenge failed');
+  }
+}
+
+// ── PASSKEY MODAL ──
+let _pkPlatform = 'face';
+const pkPlatformConfig = {
+  face:  { icon: '😶', label: 'Authenticate with Face ID',  scanning: 'Scanning face…',       success: '✓ Face recognised',   fail: 'Face not recognised' },
+  touch: { icon: '👆', label: 'Authenticate with Touch ID', scanning: 'Reading fingerprint…', success: '✓ Fingerprint matched', fail: 'Fingerprint not matched' },
+  hello: { icon: '🪟', label: 'Authenticate with Windows Hello', scanning: 'Verifying…',    success: '✓ Hello verified',     fail: 'Verification failed' },
+};
+
+function resetPasskeyModal() {
+  _pkPlatform = 'face';
+  selectPKPlatform('face', document.getElementById('pktab-face'));
+  document.getElementById('pk-ring').className = 'pk-screen-ring';
+  document.getElementById('pk-ring-icon').textContent = '🔑';
+  document.getElementById('pk-screen-title').textContent = 'Verify with Passkey';
+  document.getElementById('pk-screen-sub').textContent = 'Outseer ACS is requesting biometric confirmation. Use your device authenticator to authorise this payment — no password or OTP required.';
+  document.getElementById('pk-auth-btn').disabled = false;
+  document.getElementById('pk-auth-btn').className = 'modal-btn-primary';
+  document.getElementById('pk-btn-text').textContent = 'Authenticate';
+  document.getElementById('pk-dot').className = 'modal-status-dot active';
+  document.getElementById('pk-status-text').textContent = 'CReq issued — WebAuthn challenge dispatched by Outseer ACS';
+  document.getElementById('pk-progress').style.width = '0%';
+  // Regenerate nonce
+  const nonce = Array.from({length:64}, () => '0123456789abcdef'[Math.floor(Math.random()*16)]).join('');
+  document.getElementById('pk-nonce').textContent = nonce;
+  // Sync btn icon
+  document.getElementById('pk-btn-icon').textContent = pkPlatformConfig['face'].icon;
+  document.getElementById('pk-btn-text').textContent = 'Authenticate';
+}
+
+function selectPKPlatform(type, tab) {
+  _pkPlatform = type;
+  document.querySelectorAll('.pk-platform-tab').forEach(t => t.classList.remove('active'));
+  tab.classList.add('active');
+  const cfg = pkPlatformConfig[type];
+  document.getElementById('pk-btn-icon').textContent = cfg.icon;
+}
+
+async function doPasskeyAuth() {
+  const btn = document.getElementById('pk-auth-btn');
+  const cfg = pkPlatformConfig[_pkPlatform];
+  btn.disabled = true;
+  document.getElementById('pk-ring').className = 'pk-screen-ring scanning';
+  document.getElementById('pk-ring-icon').textContent = cfg.icon;
+  document.getElementById('pk-screen-title').textContent = cfg.scanning;
+  document.getElementById('pk-screen-sub').textContent = 'Communicating with secure enclave…';
+  document.getElementById('pk-status-text').textContent = 'navigator.credentials.get() called — awaiting gesture';
+  document.getElementById('pk-progress').style.width = '35%';
+  await sleep(700);
+  document.getElementById('pk-screen-sub').textContent = 'Signing authenticatorData + clientDataHash…';
+  document.getElementById('pk-status-text').textContent = 'Assertion signature being generated in TEE…';
+  document.getElementById('pk-progress').style.width = '70%';
+  await sleep(800);
+  document.getElementById('pk-status-text').textContent = 'Sending assertion to Outseer ACS for verification…';
+  document.getElementById('pk-progress').style.width = '90%';
+  await sleep(500);
+  document.getElementById('pk-progress').style.width = '100%';
+
+  // Always succeeds in demo
+  document.getElementById('pk-ring').className = 'pk-screen-ring verified';
+  document.getElementById('pk-ring-icon').textContent = '✓';
+  document.getElementById('pk-screen-title').textContent = cfg.success;
+  document.getElementById('pk-screen-sub').textContent = 'Assertion verified — CRes transStatus=Y issued. Payment authorised.';
+  document.getElementById('pk-dot').className = 'modal-status-dot success';
+  document.getElementById('pk-status-text').textContent = 'Passkey verified — authentication complete';
+  btn.className = 'modal-btn-primary success'; btn.disabled = false;
+  document.getElementById('pk-btn-icon').textContent = '✓';
+  document.getElementById('pk-btn-text').textContent = 'Authentication Complete';
+
+  // Propagate to flow
+  const traceId = 'trace-1';
+  addTrace(traceId, 'pass', `${cfg.success} — Ed25519 assertion verified by Outseer ACS`);
+  addTrace(traceId, 'pass', 'CRes transStatus=Y — AAV issued, liability shift confirmed');
+  updateDecisionBadge('PASSKEY_OK');
+  // Mark remaining nodes complete
+  ['n1-bio','n1-assert','n1-sent','n1-verify','n1-result','n1-cres'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.classList.remove('active','challenge','blocked'); el.classList.add('complete'); }
+  });
+  ['c1-4','c1-5','c1-7','c1-8'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.add('active');
+  });
+  // Reset the inline passkey widget too
+  const pb = document.getElementById('passkeyBtn');
+  if (pb) { pb.style.background = 'var(--green)'; pb.style.color = 'white'; pb.textContent = '✓ Verified'; }
+  const pr = document.getElementById('passkeyResult');
+  if (pr) { pr.style.color = 'var(--green)'; pr.textContent = '✓ Authentication successful — payment authorised'; }
+
+  await sleep(2000); closeModal('passkey');
+}
+
+// ── AGENT MODAL ──
+function resetAgentModal() {
+  document.getElementById('ag-pk-ring').className = 'pk-screen-ring';
+  document.getElementById('ag-pk-ring').textContent = '';
+  document.getElementById('ag-pk-ring').innerHTML = '🔑';
+  document.getElementById('ag-pk-sub').textContent = 'Verify your identity with passkey to approve or deny this agent purchase.';
+  document.getElementById('ag-approve-btn').disabled = false;
+  document.getElementById('ag-approve-btn').className = 'modal-btn-primary';
+  document.getElementById('ag-approve-btn').innerHTML = '🔑 Approve with Passkey';
+  document.getElementById('ag-deny-btn').disabled = false;
+  document.getElementById('ag-dot').className = 'modal-status-dot';
+  document.getElementById('ag-status-text').textContent = 'AI agent escalated — cardholder confirmation requested';
+  document.getElementById('ag-progress').style.width = '0%';
+}
+
+async function agentDecision(choice) {
+  const approveBtn = document.getElementById('ag-approve-btn');
+  const denyBtn = document.getElementById('ag-deny-btn');
+  approveBtn.disabled = true; denyBtn.disabled = true;
+  const traceId = 'trace-2';
+
+  if (choice === 'approve') {
+    document.getElementById('ag-pk-ring').className = 'pk-screen-ring scanning';
+    document.getElementById('ag-pk-sub').textContent = 'Generating passkey assertion for agent approval…';
+    document.getElementById('ag-status-text').textContent = 'Cardholder biometric in progress…';
+    document.getElementById('ag-progress').style.width = '50%';
+    await sleep(1200);
+    document.getElementById('ag-pk-ring').className = 'pk-screen-ring verified';
+    document.getElementById('ag-pk-ring').innerHTML = '✓';
+    document.getElementById('ag-pk-sub').textContent = 'Passkey verified — agent purchase approved by cardholder.';
+    document.getElementById('ag-dot').className = 'modal-status-dot success';
+    document.getElementById('ag-status-text').textContent = 'Cardholder approved — CRes transStatus=Y issued';
+    document.getElementById('ag-progress').style.width = '100%';
+    approveBtn.className = 'modal-btn-primary success'; approveBtn.disabled = false;
+    approveBtn.innerHTML = '✓ Approved';
+    addTrace(traceId, 'pass', 'Cardholder passkey confirmed agent purchase');
+    addTrace(traceId, 'pass', 'CRes transStatus=Y — AAV issued, agent purchase authorised');
+    updateDecisionBadge('APPROVE');
+    showResult('n2-result-escalate', 'complete');
+    await sleep(2000); closeModal('agent');
+  } else {
+    document.getElementById('ag-pk-ring').className = 'pk-screen-ring failed';
+    document.getElementById('ag-pk-ring').innerHTML = '🚫';
+    document.getElementById('ag-pk-sub').textContent = 'Agent purchase denied by cardholder.';
+    document.getElementById('ag-dot').className = 'modal-status-dot error';
+    document.getElementById('ag-status-text').textContent = 'Cardholder denied — CRes transStatus=N';
+    document.getElementById('ag-progress').style.width = '100%';
+    denyBtn.disabled = false; denyBtn.style.opacity = '0.7';
+    addTrace(traceId, 'fail', 'Cardholder denied agent purchase');
+    addTrace(traceId, 'fail', 'CRes transStatus=N — agent transaction blocked');
+    updateDecisionBadge('BLOCK');
+    showResult('n2-result-block', 'blocked');
+    await sleep(2000); closeModal('agent');
+  }
+}
+</script>
+</body>
+</html>
