@@ -85,6 +85,39 @@ strong{color:var(--ink);font-weight:600}
 .cert-progress{font-size:0.8rem;color:var(--ink3)}
 .progress-bar{height:3px;background:var(--border);border-radius:2px;margin-top:12px;overflow:hidden}
 .progress-fill{height:100%;background:var(--rust);transition:width 0.3s}
+.cert-view-btn{background:var(--rust);color:#fff;border:none;padding:10px 16px;border-radius:8px;font-weight:600;font-family:var(--sans);font-size:0.85rem;cursor:pointer;margin-top:12px;width:100%;touch-action:manipulation}
+.cert-view-btn:active{opacity:0.9}
+.cert-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:none;align-items:center;justify-content:center;z-index:1000;padding:16px;animation:fadeIn 0.3s}
+.cert-modal-overlay.open{display:flex}
+.cert-modal{background:#fff;border-radius:16px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;position:relative;animation:slideUp 0.3s}
+@keyframes slideUp{from{transform:translateY(40px);opacity:0};to{transform:translateY(0);opacity:1}}
+.cert-close{position:absolute;top:16px;right:16px;background:var(--cream2);border:none;width:36px;height:36px;border-radius:8px;cursor:pointer;font-size:1.2rem;display:flex;align-items:center;justify-content:center;z-index:10;touch-action:manipulation}
+.cert-close:active{opacity:0.8}
+.cert-display{padding:32px 24px;text-align:center;background:linear-gradient(135deg,var(--ink),#3d2015);color:#f5ede0;border-radius:16px;margin:16px}
+.cert-seal{font-size:3rem;margin-bottom:16px}
+.cert-title{font-family:var(--serif);font-size:1.2rem;font-weight:500;margin-bottom:8px}
+.cert-subtitle{font-size:0.85rem;color:#c8b8a8;margin-bottom:24px}
+.cert-line{height:2px;background:var(--gold);width:60px;margin:16px auto}
+.cert-recipient{font-family:var(--serif);font-size:1.4rem;font-weight:300;color:#fdf8f2;margin:24px 0;min-height:40px}
+.cert-awarded{font-size:0.85rem;color:#c8b8a8;margin:16px 0}
+.cert-date{font-size:0.8rem;color:#a89878;margin-top:20px}
+.cert-id{font-family:monospace;font-size:0.7rem;color:#8a7060;margin-top:12px;word-break:break-all}
+.cert-actions{padding:20px;display:flex;flex-direction:column;gap:10px}
+.cert-btn{padding:12px;border-radius:8px;border:none;font-weight:600;font-family:var(--sans);font-size:0.9rem;cursor:pointer;touch-action:manipulation;min-height:44px}
+.cert-btn-print{background:var(--rust);color:#fff}
+.cert-btn-print:active{opacity:0.9}
+.cert-btn-close{background:var(--cream2);color:var(--ink);border:1.5px solid var(--border)}
+.cert-btn-close:active{opacity:0.9}
+.cert-name-input{width:100%;padding:12px;border:1.5px solid var(--border);border-radius:8px;font-family:var(--serif);font-size:1.2rem;text-align:center;margin-bottom:16px;color:var(--ink)}
+.cert-name-input:focus{outline:none;border-color:var(--rust);background:#f5e6df}
+@media print{
+  body{background:#fff;padding:0;margin:0}
+  .bottomnav,.topbar,.cert-modal-overlay,.cert-actions,.cert-close{display:none !important}
+  .cert-display{background:#fff;color:var(--ink);border:none;margin:0;padding:40px 32px}
+  .cert-seal{font-size:4rem}
+  .cert-title{color:var(--ink)}
+  .cert-recipient{color:var(--ink2)}
+}
 @supports (padding: max(0px)) {
   body { padding-bottom: max(80px, env(safe-area-inset-bottom)); }
   .bottomnav { padding-bottom: env(safe-area-inset-bottom); }
@@ -344,24 +377,59 @@ strong{color:var(--ink);font-weight:600}
           <div class="cert-name">Chapter 1: The Basics</div>
           <div class="cert-progress" id="prog-ch1">0 / 3 lessons</div>
           <div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div>
+          <button class="cert-view-btn" id="btn-cert-ch1" style="display:none" onclick="showCertificate('ch1')">View Certificate →</button>
         </div>
         <div class="cert-card" id="cert-ch2">
           <div class="cert-emoji">💳</div>
           <div class="cert-name">Chapter 2: Your Card</div>
           <div class="cert-progress" id="prog-ch2">0 / 3 lessons</div>
           <div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div>
+          <button class="cert-view-btn" id="btn-cert-ch2" style="display:none" onclick="showCertificate('ch2')">View Certificate →</button>
         </div>
         <div class="cert-card" id="cert-all">
           <div class="cert-emoji">🎓</div>
           <div class="cert-name">Payments 101 Complete</div>
           <div class="cert-progress" id="prog-all">0 / 6 lessons</div>
           <div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div>
+          <button class="cert-view-btn" id="btn-cert-all" style="display:none" onclick="showCertificate('all')">View Certificate →</button>
         </div>
       </div>
     </div>
 
   </div>
 
+</div>
+
+<!-- CERTIFICATE MODAL -->
+<div class="cert-modal-overlay" id="cert-modal">
+  <div class="cert-modal">
+    <button class="cert-close" onclick="closeCertificate()">✕</button>
+    
+    <div style="padding:24px">
+      <div style="margin-bottom:16px">
+        <label style="display:block;font-size:0.85rem;color:var(--ink3);margin-bottom:6px;text-transform:uppercase;font-weight:600">Your Name</label>
+        <input class="cert-name-input" type="text" id="cert-name-input" placeholder="Enter your name" value="">
+      </div>
+    </div>
+
+    <div class="cert-display" id="cert-display-area">
+      <div class="cert-seal">🏆</div>
+      <div class="cert-title" id="cert-title-text">Certificate of Completion</div>
+      <div class="cert-subtitle" id="cert-subtitle-text">Payments 101</div>
+      <div class="cert-line"></div>
+      <div style="margin:20px 0;font-size:0.9rem;color:#c8b8a8">This certifies that</div>
+      <div class="cert-recipient" id="cert-name-display" contenteditable="true">Your Name Here</div>
+      <div class="cert-awarded" id="cert-awarded-text">has successfully completed all lessons in Payments 101</div>
+      <div class="cert-line"></div>
+      <div class="cert-date" id="cert-date-display"></div>
+      <div class="cert-id" id="cert-id-display"></div>
+    </div>
+
+    <div class="cert-actions">
+      <button class="cert-btn cert-btn-print" onclick="printCertificate()">🖨️ Print Certificate</button>
+      <button class="cert-btn cert-btn-close" onclick="closeCertificate()">Close</button>
+    </div>
+  </div>
 </div>
 
 <!-- BOTTOM NAVIGATION -->
@@ -478,9 +546,18 @@ function updateCertProgress() {
   document.getElementById('cert-ch2').querySelector('.progress-fill').style.width = (ch2 / 3 * 100) + '%';
   document.getElementById('cert-all').querySelector('.progress-fill').style.width = (all / 6 * 100) + '%';
   
-  if (ch1 === 3) document.getElementById('cert-ch1').classList.add('earned');
-  if (ch2 === 3) document.getElementById('cert-ch2').classList.add('earned');
-  if (all === 6) document.getElementById('cert-all').classList.add('earned');
+  if (ch1 === 3) {
+    document.getElementById('cert-ch1').classList.add('earned');
+    document.getElementById('btn-cert-ch1').style.display = 'block';
+  }
+  if (ch2 === 3) {
+    document.getElementById('cert-ch2').classList.add('earned');
+    document.getElementById('btn-cert-ch2').style.display = 'block';
+  }
+  if (all === 6) {
+    document.getElementById('cert-all').classList.add('earned');
+    document.getElementById('btn-cert-all').style.display = 'block';
+  }
   
   document.getElementById('stat-certs').textContent = (ch1 === 3 ? 1 : 0) + (ch2 === 3 ? 1 : 0) + (all === 6 ? 1 : 0);
 }
@@ -491,6 +568,57 @@ function updateHome() {
 
 function updateCerts() {
   updateCertProgress();
+}
+
+function showCertificate(type) {
+  const modal = document.getElementById('cert-modal');
+  const nameInput = document.getElementById('cert-name-input');
+  const nameDisplay = document.getElementById('cert-name-display');
+  const titleText = document.getElementById('cert-title-text');
+  const subtitleText = document.getElementById('cert-subtitle-text');
+  const awardedText = document.getElementById('cert-awarded-text');
+  const dateDisplay = document.getElementById('cert-date-display');
+  const idDisplay = document.getElementById('cert-id-display');
+  
+  // Set certificate details based on type
+  const certData = {
+    ch1: { title: 'Certificate of Completion', subtitle: 'Chapter 1: The Basics', awarded: 'has successfully completed Chapter 1: The Basics (Lessons 1-3) in Payments 101' },
+    ch2: { title: 'Certificate of Completion', subtitle: 'Chapter 2: Your Card', awarded: 'has successfully completed Chapter 2: Your Card (Lessons 4-6) in Payments 101' },
+    all: { title: 'Certificate of Completion', subtitle: 'Payments 101 Master', awarded: 'has successfully completed all 6 lessons and earned the Master Certificate in Payments 101' }
+  };
+  
+  const data = certData[type] || certData.all;
+  titleText.textContent = data.title;
+  subtitleText.textContent = data.subtitle;
+  awardedText.textContent = data.awarded;
+  
+  // Get name from localStorage or use default
+  const savedName = localStorage.getItem('p101-cert-name') || 'Your Name';
+  nameInput.value = savedName;
+  nameDisplay.textContent = savedName;
+  nameInput.oninput = function() {
+    nameDisplay.textContent = this.value || 'Your Name';
+    localStorage.setItem('p101-cert-name', this.value);
+  };
+  
+  // Set date and ID
+  const today = new Date();
+  const dateStr = today.toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' });
+  dateDisplay.textContent = 'Awarded: ' + dateStr;
+  
+  const certId = 'P101-' + type.toUpperCase() + '-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+  idDisplay.textContent = certId;
+  
+  modal.classList.add('open');
+  nameInput.focus();
+}
+
+function closeCertificate() {
+  document.getElementById('cert-modal').classList.remove('open');
+}
+
+function printCertificate() {
+  window.print();
 }
 
 updateProgress();
