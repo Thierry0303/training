@@ -98,7 +98,7 @@ nav {
 .scenario-btn.active .scenario-btn-sub { color: rgba(0,196,188,0.7); }
 
 /* LAYOUT */
-.sim-layout { display: grid; grid-template-columns: 380px 1fr; min-height: calc(100vh - 180px); }
+.sim-layout { display: grid; grid-template-columns: 380px 1fr; min-height: auto; }
 
 /* CONTROLS */
 .sim-controls { border-right: 1px solid var(--border); overflow-y: auto; background: rgba(8,24,46,0.5); -webkit-overflow-scrolling: touch; }
@@ -153,7 +153,7 @@ input[type=range]::-moz-range-thumb { width: 13px; height: 13px; border-radius: 
 .rule-badge.idle { background: rgba(255,255,255,0.06); color: var(--muted); }
 
 /* CANVAS */
-.sim-canvas { overflow-y: auto; padding: 28px; -webkit-overflow-scrolling: touch; }
+.sim-canvas { overflow-y: auto; padding: 28px; -webkit-overflow-scrolling: touch; min-height: 100vh; }
 
 /* ANALYTICS DASHBOARD */
 .analytics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-bottom: 24px; }
@@ -323,7 +323,7 @@ input[type=range]::-moz-range-thumb { width: 13px; height: 13px; border-radius: 
   .sim-controls-header { display: block; }
   .control-section { padding: 14px; }
   
-  .sim-canvas { padding: 14px 12px; max-height: 60vh; }
+  .sim-canvas { padding: 14px 12px; overflow-y: auto; }
   .analytics-grid { grid-template-columns: repeat(2, 1fr); }
   
   .flow-lanes { flex-direction: column; margin-bottom: 14px; }
@@ -945,9 +945,51 @@ async function runSimulation() {
   const traceId = `trace-${state.scenario}`;
   
   document.getElementById(traceId).innerHTML = '';
-  addTrace(traceId, 'info', `Txn initiated · Risk: ${score}/100`);
-  await sleep(300);
-  addTrace(traceId, 'info', `Rules evaluated · Decision: ${dec}`);
+  
+  // VISUAL FLOW ANIMATION (only for 3DS scenario)
+  if (state.scenario === 0) {
+    const lanes = document.querySelectorAll('#lanes-0 .lane-body');
+    const nodeSequence = [
+      { lane: 0, idx: 0 }, { lane: 0, idx: 1 },
+      { lane: 1, idx: 0 }, { lane: 1, idx: 1 }, { lane: 1, idx: 2 },
+      { lane: 2, idx: 0 }, { lane: 2, idx: 1 }, { lane: 2, idx: 2 },
+    ];
+    
+    // Reset all nodes
+    document.querySelectorAll('#lanes-0 .fnode').forEach(n => {
+      n.classList.remove('active', 'complete');
+    });
+    document.querySelectorAll('#lanes-0 .connector-line').forEach(c => {
+      c.classList.remove('active');
+    });
+    
+    // Animate through nodes
+    for (let i = 0; i < nodeSequence.length; i++) {
+      const seq = nodeSequence[i];
+      const laneNodes = lanes[seq.lane].querySelectorAll('.fnode');
+      const node = laneNodes[seq.idx];
+      
+      if (node) {
+        node.classList.add('active');
+        await sleep(280);
+        node.classList.remove('active');
+        node.classList.add('complete');
+      }
+      
+      // Activate connector
+      const connectors = lanes[seq.lane].querySelectorAll('.connector-line');
+      if (connectors[seq.idx]) {
+        connectors[seq.idx].classList.add('active');
+      }
+      
+      addTrace(traceId, 'info', `Step ${i+1} › Processing...`);
+      await sleep(180);
+    }
+  }
+  
+  addTrace(traceId, 'info', `Risk: ${score}/100`);
+  await sleep(250);
+  addTrace(traceId, 'info', `Decision: ${dec}`);
   
   if (dec === 'APPROVED') {
     addTrace(traceId, 'pass', 'ARes Y · Approved');
