@@ -1,1302 +1,1289 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
-<title>Payments 101 — Complete Course</title>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@300;500;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<title>3DS Interactive Simulator</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-:root{
-  --cream:#fdf8f2;
-  --cream2:#f5ede0;
-  --ink:#1c1410;
-  --ink2:#3d2f24;
-  --ink3:#6b5744;
-  --rust:#c4522a;
-  --teal:#1a6b6b;
-  --gold:#b8860b;
-  --green:#2d6a4f;
-  --border:#e8d9c7;
-  --sans:'DM Sans',sans-serif;
-  --serif:'Fraunces',Georgia,serif
+:root {
+  --navy: #08182e;
+  --navy-1: #0d2240;
+  --navy-2: #152f52;
+  --navy-3: #1c3d68;
+  --teal: #00c4bc;
+  --teal-d: #008f89;
+  --teal-glow: rgba(0,196,188,0.15);
+  --amber: #f59e0b;
+  --red: #ef4444;
+  --green: #22c55e;
+  --white: #f0f6ff;
+  --muted: #7a9bbf;
+  --border: rgba(0,196,188,0.15);
+  --card: rgba(13,34,64,0.7);
+  --font-h: 'Syne', sans-serif;
+  --font-m: 'IBM Plex Mono', monospace;
+  --font-b: 'DM Sans', sans-serif;
 }
-html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
-body{font-family:var(--sans);background:var(--cream);color:var(--ink);font-size:16px;line-height:1.65;padding-bottom:100px}
-.app{width:100%;min-height:100vh}
-.topbar{position:fixed;top:0;left:0;right:0;background:var(--ink);color:#f5ede0;padding:14px 16px;z-index:200;display:flex;justify-content:space-between;align-items:center;height:56px}
-.topbar-title{font-family:var(--serif);font-size:1.1rem;font-weight:500}
-.topbar-progress{font-size:0.75rem;color:#c8b8a8;background:rgba(255,255,255,0.08);padding:4px 10px;border-radius:12px}
-.content{padding:16px;padding-top:72px;max-width:100%;margin:0 auto}
-.lesson{display:none}
-.lesson.active{display:block;animation:fadeIn 0.3s}
-@keyframes fadeIn{from{opacity:0;transform:translateY(8px)};to{opacity:1;transform:translateY(0)}}
-.hero{background:linear-gradient(135deg,var(--ink),#3d2015);border-radius:12px;padding:24px;color:#f5ede0;margin-bottom:24px}
-.hero h1{font-family:var(--serif);font-size:1.8rem;font-weight:300;line-height:1.2;margin-bottom:12px}
-.hero p{font-size:0.9rem;line-height:1.6;color:#c8b8a8;margin-bottom:20px}
-.hero-btn{background:var(--rust);color:#fff;border:none;padding:14px 24px;border-radius:8px;font-weight:600;cursor:pointer;font-family:var(--sans);font-size:0.95rem;width:100%;touch-action:manipulation}
-.hero-btn:active{opacity:0.9}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:24px}
-.stat{background:#fff;border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center}
-.stat-val{font-family:var(--serif);font-size:1.8rem;color:var(--rust);font-weight:500}
-.stat-label{font-size:0.7rem;color:var(--ink3);margin-top:4px;text-transform:uppercase;letter-spacing:0.5px}
-.chapter-grid{display:grid;grid-template-columns:1fr;gap:12px;margin:20px 0}
-.chapter-card{background:#fff;border:1.5px solid var(--border);border-radius:12px;padding:14px;cursor:pointer;transition:all 0.2s;user-select:none}
-.chapter-card:active{opacity:0.9}
-.chapter-card.c1 {border-top:3px solid var(--rust)}
-.chapter-card.c2 {border-top:3px solid var(--teal)}
-.chapter-card.c3 {border-top:3px solid var(--gold)}
-.chapter-emoji{font-size:1.6rem;margin-bottom:8px}
-.chapter-num{font-size:0.7rem;color:var(--ink3);text-transform:uppercase;letter-spacing:0.5px;font-weight:600}
-.chapter-title{font-family:var(--serif);font-size:1rem;font-weight:500;color:var(--ink);margin:6px 0}
-.chapter-desc{font-size:0.8rem;color:var(--ink3);line-height:1.4}
-.chapter-meta{font-size:0.7rem;color:var(--ink3);margin-top:8px}
-.chapter-progress-bar{height:3px;background:var(--border);border-radius:2px;margin-top:8px;overflow:hidden}
-.chapter-progress-fill{height:100%;background:var(--rust);transition:width 0.3s}
-
-h2{font-family:var(--serif);font-size:1.6rem;font-weight:300;margin-bottom:12px;margin-top:0;line-height:1.2}
-.lesson-eyebrow{font-size:0.75rem;color:var(--teal);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px}
-.lesson-lead{color:var(--ink3);font-size:0.95rem;line-height:1.6}
-h3{font-family:var(--serif);font-size:1.1rem;font-weight:400;margin-top:18px;margin-bottom:8px;color:var(--ink2)}
-p{margin-bottom:12px;color:var(--ink2);line-height:1.7}
-strong{color:var(--ink);font-weight:600}
-.box{border-left:3px solid var(--rust);background:var(--cream2);padding:12px;border-radius:6px;margin:16px 0;font-size:0.9rem}
-.quiz{background:#fff;border:1.5px solid var(--border);border-radius:12px;padding:20px;margin-top:24px;margin-bottom:20px}
-.quiz-title{font-family:var(--serif);font-size:1rem;color:var(--ink);margin-bottom:3px;font-weight:500}
-.quiz-subtitle{font-size:0.75rem;color:var(--ink3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:14px}
-.question{font-family:var(--serif);font-size:1.2rem;font-weight:400;color:var(--ink);margin-bottom:16px;line-height:1.3}
-.options{display:flex;flex-direction:column;gap:10px;margin-bottom:12px}
-.option{background:var(--cream);border:1.5px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;font-size:0.95rem;transition:all 0.2s;display:flex;gap:12px;align-items:flex-start;touch-action:manipulation;user-select:none;min-height:56px}
-.option:active{transform:scale(0.98)}
-.option:hover{border-color:var(--rust);background:#f5e6df}
-.option.selected{border-color:var(--rust);background:rgba(196,82,42,0.08)}
-.option.correct{border-color:var(--green);background:#d8f3dc;color:var(--green)}
-.option.wrong{border-color:#dc2626;background:#fef2f2;color:#991b1b}
-.option-letter{font-weight:700;color:var(--rust);min-width:24px;font-size:1rem}
-.option-text{flex:1}
-.feedback{display:none;padding:12px;border-radius:8px;margin-bottom:16px;font-size:0.9rem;margin-top:8px}
-.feedback.show{display:block}
-.feedback.correct{background:#d8f3dc;color:var(--green);border:1px solid #a7f3d0}
-.feedback.wrong{background:#fef2f2;color:#991b1b;border:1px solid #fecaca}
-.button-group{display:flex;flex-direction:column;gap:10px;margin-top:20px;margin-bottom:40px}
-.btn{border:none;padding:14px;border-radius:8px;font-weight:600;font-family:var(--sans);font-size:0.95rem;cursor:pointer;touch-action:manipulation;min-height:48px;display:flex;align-items:center;justify-content:center}
-.btn-prev{background:var(--cream2);color:var(--ink);border:1.5px solid var(--border)}
-.btn-prev:active{opacity:0.9}
-.btn-next{background:var(--rust);color:#fff}
-.btn-next:disabled{opacity:0.5;cursor:not-allowed}
-.btn-next:active:not(:disabled){opacity:0.9}
-
-.cert-grid{display:grid;grid-template-columns:1fr;gap:12px;margin:20px 0}
-.cert-card{background:#fff;border:1.5px solid var(--border);border-radius:12px;padding:16px;text-align:center}
-.cert-card.earned{border-color:var(--green);background:#d8f3dc}
-.cert-emoji{font-size:2rem;margin-bottom:8px}
-.cert-name{font-family:var(--serif);font-size:0.95rem;font-weight:500;color:var(--ink);margin-bottom:4px}
-.cert-progress{font-size:0.8rem;color:var(--ink3)}
-.progress-bar{height:3px;background:var(--border);border-radius:2px;margin-top:12px;overflow:hidden}
-.progress-fill{height:100%;background:var(--rust);transition:width 0.3s}
-
-.bottomnav{position:fixed;bottom:0;left:0;right:0;height:90px;background:#fff;border-top:1px solid var(--border);display:flex;justify-content:flex-start;align-items:flex-start;padding-top:10px;z-index:300;overflow-x:auto;overflow-y:hidden;padding-left:8px;padding-right:8px}
-.bottomnav::-webkit-scrollbar{height:3px}
-.bottomnav::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
-.nav-item{display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 12px;color:var(--ink3);cursor:pointer;transition:all 0.2s;text-decoration:none;font-size:0.7rem;user-select:none;touch-action:manipulation;min-width:70px;flex-shrink:0}
-.nav-item:active{opacity:0.7}
-.nav-item.active{color:var(--rust)}
-.nav-item-icon{font-size:1.4rem}
-.nav-item-label{font-weight:500;text-align:center;line-height:1.2}
-.nav-item.done .nav-item-icon::after{content:'✓';font-size:0.7rem;position:relative;left:-10px;top:-8px;color:var(--green);font-weight:700}
-.nav-section-label{font-size:0.65rem;color:#999;padding:0 10px;margin:6px 0;text-transform:uppercase;font-weight:600;letter-spacing:0.4px}
-
-.completion-banner{background:linear-gradient(135deg,#0d2d1a,#1a5c38);color:#d8f3dc;border-radius:12px;padding:24px;text-align:center;margin:20px 0;display:none}
-.completion-banner.show{display:block}
-.completion-emoji{font-size:3rem;margin-bottom:12px}
-.completion-banner h3{font-family:var(--serif);font-size:1.3rem;color:#d8f3dc;margin-bottom:8px}
-.completion-banner p{font-size:0.9rem;color:#a7d9b8}
-
-@supports (padding: max(0px)) {
-  body { padding-bottom: max(100px, env(safe-area-inset-bottom)); }
-  .bottomnav { padding-bottom: env(safe-area-inset-bottom); }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--navy);
+  color: var(--white);
+  font-family: var(--font-b);
+  overflow-x: hidden;
+  min-height: 100vh;
 }
+
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 0;
+  background-image: linear-gradient(rgba(0,196,188,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,196,188,0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+}
+
+.orb { position: fixed; border-radius: 50%; filter: blur(100px); pointer-events: none; z-index: 0; }
+.orb-1 { width: 500px; height: 500px; background: radial-gradient(circle, rgba(0,196,188,0.1), transparent 70%); top: -100px; right: -100px; }
+.orb-2 { width: 400px; height: 400px; background: radial-gradient(circle, rgba(0,100,200,0.08), transparent 70%); bottom: 10%; left: -100px; }
+
+nav {
+  position: sticky; top: 0; z-index: 200;
+  background: rgba(8,24,46,0.95);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 16px; height: 56px;
+}
+.nav-brand {
+  display: flex; align-items: center; gap: 8px;
+  font-family: var(--font-h); font-weight: 800; font-size: 0.9rem;
+  color: var(--white); text-decoration: none;
+}
+.nav-logo { width: 24px; height: 24px; background: linear-gradient(135deg, var(--teal), var(--teal-d)); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.55rem; font-weight: 800; color: var(--navy); }
+.nav-pill {
+  background: rgba(0,196,188,0.1); border: 1px solid var(--teal);
+  border-radius: 100px; padding: 4px 12px;
+  font-size: 0.65rem; font-family: var(--font-m); color: var(--teal);
+}
+
+.hero-strip {
+  position: relative; z-index: 1;
+  padding: 32px 16px 24px;
+  border-bottom: 1px solid var(--border);
+}
+.hero-strip h1 {
+  font-family: var(--font-h); font-weight: 800;
+  font-size: clamp(1.4rem, 5vw, 2.4rem);
+  line-height: 1.1; color: var(--white);
+}
+.hero-strip h1 em { font-style: normal; color: var(--teal); }
+.hero-strip p { color: var(--muted); margin-top: 8px; font-size: 0.9rem; line-height: 1.5; }
+.hero-meta { display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
+.hero-badge {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--card); border: 1px solid var(--border); border-radius: 6px;
+  padding: 6px 10px; font-size: 0.7rem; color: var(--muted);
+}
+.hero-badge strong { color: var(--teal); font-family: var(--font-m); }
+
+.main { position: relative; z-index: 1; padding: 0; }
+
+.scenario-bar {
+  display: flex; gap: 0; border-bottom: 1px solid var(--border);
+  overflow-x: auto; background: rgba(8,24,46,0.8);
+  position: sticky; top: 56px; z-index: 100;
+}
+.scenario-btn {
+  flex: 1; min-width: 140px;
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  padding: 12px 10px;
+  background: transparent; border: none; border-right: 1px solid var(--border);
+  color: var(--muted); font-family: var(--font-b); cursor: pointer;
+  transition: all 0.25s; position: relative; font-size: 0.75rem;
+}
+.scenario-btn::after {
+  content: ''; position: absolute; bottom: 0; left: 0; right: 0;
+  height: 2px; background: var(--teal);
+  transform: scaleX(0); transition: transform 0.25s;
+}
+.scenario-btn:hover { background: rgba(0,196,188,0.04); color: var(--white); }
+.scenario-btn.active { color: var(--white); background: rgba(0,196,188,0.06); }
+.scenario-btn.active::after { transform: scaleX(1); }
+.scenario-btn-icon { font-size: 1.2rem; }
+.scenario-btn-title { font-size: 0.7rem; font-weight: 600; line-height: 1.2; }
+.scenario-btn-sub { font-size: 0.6rem; color: var(--muted); }
+
+.sim-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  min-height: auto;
+}
+
+.sim-controls {
+  border-right: none;
+  overflow-y: auto;
+  background: rgba(8,24,46,0.5);
+  max-height: 45vh;
+  border-bottom: 1px solid var(--border);
+}
+
+.control-section {
+  border-bottom: 1px solid var(--border);
+  padding: 16px;
+}
+.control-section-title {
+  font-family: var(--font-h); font-size: 0.75rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.1em;
+  color: var(--teal); margin-bottom: 12px;
+  display: flex; align-items: center; gap: 6px;
+}
+
+.risk-score-display {
+  display: flex; align-items: center; gap: 12px;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 10px; padding: 12px; margin-bottom: 16px;
+}
+.risk-score-num {
+  font-family: var(--font-m); font-size: 2rem; font-weight: 500;
+  line-height: 1; min-width: 56px; text-align: center;
+  transition: color 0.4s;
+}
+.risk-score-bar-wrap { flex: 1; }
+.risk-score-label { font-size: 0.65rem; color: var(--muted); margin-bottom: 4px; }
+.risk-score-bar {
+  height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden;
+}
+.risk-score-fill {
+  height: 100%; border-radius: 3px;
+  transition: width 0.5s cubic-bezier(.4,0,.2,1), background 0.4s;
+}
+.risk-verdict {
+  font-size: 0.65rem; font-family: var(--font-m);
+  font-weight: 500; margin-top: 3px;
+}
+
+.slider-row {
+  margin-bottom: 12px;
+}
+.slider-header {
+  display: flex; justify-content: space-between;
+  font-size: 0.7rem; margin-bottom: 4px;
+}
+.slider-label { color: var(--muted); }
+.slider-val { font-family: var(--font-m); color: var(--white); font-size: 0.7rem; }
+input[type=range] {
+  width: 100%; height: 4px;
+  -webkit-appearance: none; appearance: none;
+  background: rgba(255,255,255,0.1); border-radius: 2px; cursor: pointer;
+  outline: none;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px; height: 12px; border-radius: 50%;
+  background: var(--teal); border: 2px solid var(--navy);
+  cursor: pointer; transition: transform 0.15s;
+}
+input[type=range]::-webkit-slider-thumb:active { transform: scale(1.2); }
+
+.toggle-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
+  font-size: 0.75rem;
+}
+.toggle-row:last-child { border-bottom: none; }
+.toggle-label { color: var(--muted); }
+.toggle-label strong { color: var(--white); display: block; font-size: 0.75rem; }
+.toggle {
+  width: 32px; height: 18px; border-radius: 9px;
+  background: rgba(255,255,255,0.1); border: none; cursor: pointer;
+  position: relative; transition: background 0.25s; flex-shrink: 0;
+}
+.toggle::after {
+  content: ''; position: absolute; top: 2px; left: 2px;
+  width: 12px; height: 12px; border-radius: 50%;
+  background: var(--white); transition: transform 0.25s;
+}
+.toggle.on { background: var(--teal); }
+.toggle.on::after { transform: translateX(14px); }
+
+.sim-select {
+  width: 100%; background: var(--card); border: 1px solid var(--border);
+  color: var(--white); font-family: var(--font-b); font-size: 0.75rem;
+  padding: 6px 10px; border-radius: 6px; cursor: pointer; outline: none;
+}
+
+.rule-card {
+  background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 10px; margin-bottom: 8px;
+  display: flex; align-items: center; gap: 10px;
+  cursor: pointer; transition: all 0.2s; font-size: 0.75rem;
+}
+.rule-card:hover { border-color: rgba(0,196,188,0.35); }
+.rule-icon { font-size: 1rem; flex-shrink: 0; }
+.rule-name { font-size: 0.75rem; font-weight: 600; color: var(--white); }
+.rule-desc { font-size: 0.65rem; color: var(--muted); margin-top: 1px; }
+
+.sim-canvas {
+  overflow-y: auto;
+  padding: 20px 16px;
+  min-height: calc(100vh - 56px);
+}
+
+.flow-header {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  margin-bottom: 20px; flex-wrap: wrap; gap: 12px;
+  flex-direction: column;
+}
+.flow-title { font-family: var(--font-h); font-size: 1.1rem; font-weight: 700; }
+.flow-subtitle { color: var(--muted); font-size: 0.75rem; margin-top: 3px; }
+.flow-decision-badge {
+  display: flex; align-items: center; gap: 6px;
+  padding: 8px 14px; border-radius: 8px; border: 1px solid;
+  font-family: var(--font-m); font-size: 0.75rem; font-weight: 500;
+  transition: all 0.4s;
+  width: 100%;
+  justify-content: center;
+}
+
+.flow-lanes {
+  display: flex; flex-direction: column; gap: 0;
+  border: 1px solid var(--border); border-radius: 12px; overflow: hidden;
+  margin-bottom: 16px;
+}
+.flow-lane {
+  flex: 1; border-bottom: 1px solid var(--border);
+  padding: 0;
+}
+.flow-lane:last-child { border-bottom: none; }
+.lane-header {
+  background: rgba(255,255,255,0.03);
+  border-bottom: 1px solid var(--border);
+  padding: 8px 10px;
+  font-size: 0.65rem; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.08em;
+  color: var(--muted); text-align: center;
+}
+.lane-body {
+  padding: 12px 8px;
+  display: flex; flex-direction: column; align-items: center;
+  gap: 6px; min-height: 200px;
+}
+
+.fnode {
+  width: 100%; max-width: 120px;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 8px; padding: 8px 10px;
+  text-align: center; position: relative;
+  transition: all 0.4s; cursor: pointer; font-size: 0.7rem;
+}
+.fnode:hover { border-color: rgba(0,196,188,0.4); }
+.fnode.active {
+  border-color: var(--teal);
+  background: rgba(0,196,188,0.1);
+  box-shadow: 0 0 16px rgba(0,196,188,0.2);
+}
+.fnode.complete { border-color: var(--green); background: rgba(34,197,94,0.08); }
+.fnode.blocked { border-color: var(--red); background: rgba(239,68,68,0.08); }
+.fnode-icon { font-size: 1.2rem; margin-bottom: 2px; }
+.fnode-label { font-size: 0.65rem; font-weight: 600; color: var(--white); line-height: 1.2; }
+.fnode-sub { font-size: 0.6rem; color: var(--muted); margin-top: 2px; line-height: 1.3; }
+
+.connector {
+  display: flex; align-items: center; justify-content: center;
+  height: 20px; width: 100%;
+}
+.connector-line {
+  width: 2px; height: 100%;
+  background: var(--border);
+  position: relative; margin: 0 auto;
+  transition: background 0.4s;
+}
+.connector-line.active { background: var(--teal); }
+
+.detail-panel {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 10px; padding: 14px;
+  margin-bottom: 16px;
+  transition: all 0.3s; font-size: 0.8rem;
+}
+.detail-panel-title {
+  font-family: var(--font-h); font-size: 0.8rem; font-weight: 700;
+  color: var(--teal); margin-bottom: 6px;
+  display: flex; align-items: center; gap: 6px;
+}
+.detail-panel-body { font-size: 0.75rem; color: var(--muted); line-height: 1.6; }
+.detail-panel-body strong { color: var(--white); }
+
+.signal-matrix {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;
+  margin-top: 12px;
+}
+.signal-cell {
+  background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+  border-radius: 6px; padding: 8px;
+  transition: border-color 0.3s; font-size: 0.7rem;
+}
+.signal-cell-label { font-size: 0.6rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+.signal-cell-val { font-family: var(--font-m); font-size: 0.75rem; margin-top: 2px; }
+
+.decision-trace {
+  background: rgba(0,0,0,0.3); border: 1px solid var(--border);
+  border-radius: 10px; padding: 12px;
+  font-family: var(--font-m); font-size: 0.65rem;
+  line-height: 1.6; color: var(--muted);
+  margin-bottom: 16px; max-height: 150px; overflow-y: auto;
+}
+.trace-line { display: flex; gap: 8px; align-items: flex-start; margin-bottom: 4px; }
+.trace-time { color: var(--teal-d); flex-shrink: 0; }
+.trace-pass { color: var(--green); }
+.trace-fail { color: var(--red); }
+.trace-warn { color: var(--amber); }
+.trace-info { color: var(--muted); }
+
+.run-btn {
+  width: 100%;
+  background: linear-gradient(135deg, var(--teal), var(--teal-d));
+  border: none; border-radius: 8px;
+  color: var(--navy); font-family: var(--font-h); font-size: 0.85rem; font-weight: 700;
+  padding: 12px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  transition: opacity 0.2s;
+}
+.run-btn:active { opacity: 0.85; }
+
+.passkey-widget {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 12px; padding: 18px; text-align: center;
+  margin-bottom: 14px;
+}
+.passkey-icon { font-size: 2rem; margin-bottom: 10px; }
+.passkey-title { font-family: var(--font-h); font-size: 0.9rem; font-weight: 700; margin-bottom: 5px; }
+.passkey-sub { font-size: 0.7rem; color: var(--muted); margin-bottom: 14px; }
+.passkey-btn {
+  background: var(--teal); color: var(--navy);
+  border: none; border-radius: 8px;
+  font-family: var(--font-h); font-size: 0.8rem; font-weight: 700;
+  padding: 10px 16px; cursor: pointer; transition: all 0.2s;
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.passkey-btn:active { opacity: 0.85; }
+
+.agent-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 12px; padding: 14px;
+  margin-bottom: 12px; font-size: 0.75rem;
+}
+.agent-card-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+.agent-card-row:last-child { border-bottom: none; }
+.agent-card-key { font-size: 0.7rem; color: var(--muted); }
+.agent-card-val { font-size: 0.7rem; font-family: var(--font-m); color: var(--white); }
+.agent-card-val.valid { color: var(--green); }
+.agent-card-val.invalid { color: var(--red); }
+
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 9000;
+  background: rgba(4, 12, 24, 0.82);
+  backdrop-filter: blur(8px);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.3s ease;
+  padding: 16px;
+}
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+
+.modal-window {
+  width: 100%; max-width: 400px;
+  background: linear-gradient(160deg, #0f2344 0%, #0a1c36 100%);
+  border: 1px solid rgba(0,196,188,0.25);
+  border-radius: 16px;
+  box-shadow: 0 40px 80px rgba(0,0,0,0.6);
+  overflow: hidden;
+  transform: translateY(20px) scale(0.97);
+  transition: transform 0.35s cubic-bezier(.34,1.56,.64,1);
+}
+.modal-overlay.open .modal-window { transform: translateY(0) scale(1); }
+
+.modal-topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 14px;
+  background: rgba(0,196,188,0.06);
+  border-bottom: 1px solid rgba(0,196,188,0.12);
+}
+.modal-topbar-logo {
+  width: 20px; height: 20px;
+  background: linear-gradient(135deg, var(--teal), var(--teal-d));
+  border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.5rem; font-weight: 800; color: var(--navy);
+}
+.modal-topbar-title { font-family: var(--font-h); font-size: 0.75rem; font-weight: 700; color: var(--white); margin-left: 8px; }
+.modal-topbar-sub { font-size: 0.6rem; color: var(--muted); font-family: var(--font-m); }
+.modal-close {
+  width: 24px; height: 24px; border-radius: 6px;
+  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08);
+  color: var(--muted); cursor: pointer; font-size: 0.75rem;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s;
+}
+
+.modal-merchant {
+  padding: 12px 14px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.modal-merchant-info { display: flex; align-items: center; gap: 10px; }
+.modal-merchant-icon {
+  width: 36px; height: 36px; border-radius: 8px;
+  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08);
+  display: flex; align-items: center; justify-content: center; font-size: 1.1rem;
+}
+.modal-merchant-name { font-size: 0.8rem; font-weight: 600; color: var(--white); }
+.modal-merchant-desc { font-size: 0.65rem; color: var(--muted); margin-top: 1px; }
+.modal-amount { text-align: right; }
+.modal-amount-num { font-family: var(--font-h); font-size: 1.1rem; font-weight: 800; color: var(--white); }
+.modal-amount-label { font-size: 0.6rem; color: var(--muted); text-transform: uppercase; }
+
+.modal-body { padding: 16px; }
+
+.otp-prompt { text-align: center; margin-bottom: 16px; }
+.otp-prompt-icon { font-size: 2rem; margin-bottom: 10px; }
+.otp-prompt-title { font-family: var(--font-h); font-size: 0.9rem; font-weight: 700; color: var(--white); margin-bottom: 5px; }
+.otp-prompt-sub { font-size: 0.75rem; color: var(--muted); line-height: 1.5; }
+.otp-prompt-phone { color: var(--white); font-weight: 600; }
+
+.otp-inputs { display: flex; gap: 6px; justify-content: center; margin-bottom: 16px; }
+.otp-input {
+  width: 38px; height: 46px;
+  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 8px; color: var(--white);
+  font-family: var(--font-m); font-size: 1.2rem; font-weight: 600;
+  text-align: center; outline: none;
+  transition: border-color 0.2s;
+}
+.otp-input:focus { border-color: var(--teal); background: rgba(0,196,188,0.06); }
+
+.modal-actions { display: flex; gap: 8px; }
+.modal-btn-primary {
+  flex: 1; padding: 11px;
+  background: linear-gradient(135deg, var(--teal), var(--teal-d));
+  border: none; border-radius: 8px;
+  color: var(--navy); font-family: var(--font-h); font-size: 0.8rem; font-weight: 700;
+  cursor: pointer; transition: opacity 0.2s;
+  display: flex; align-items: center; justify-content: center; gap: 5px;
+}
+.modal-btn-primary:active { opacity: 0.85; }
+.modal-btn-secondary {
+  padding: 11px 14px;
+  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px; color: var(--muted);
+  font-family: var(--font-b); font-size: 0.8rem;
+  cursor: pointer; transition: all 0.2s;
+}
+
+.sim-section { display: none; }
+.sim-section.visible { display: block; }
+
+@media (min-width: 900px) {
+  .sim-layout { grid-template-columns: 320px 1fr; }
+  .sim-controls { border-right: 1px solid var(--border); border-bottom: none; max-height: none; }
+  nav { padding: 0 32px; height: 60px; }
+  .nav-brand { font-size: 1rem; }
+  .nav-logo { width: 28px; height: 28px; }
+  .hero-strip { padding: 48px 32px 32px; }
+  .hero-strip h1 { font-size: clamp(1.8rem, 4vw, 3rem); }
+  .hero-meta { gap: 24px; }
+  .scenario-btn { min-width: 200px; padding: 16px 20px; font-size: 0.82rem; }
+  .scenario-btn-icon { font-size: 1.4rem; }
+  .scenario-btn-title { font-size: 0.82rem; }
+  .sim-controls { max-height: calc(100vh - 120px); }
+  .flow-lanes { flex-direction: row; }
+  .lane-body { min-height: 400px; }
+  .fnode { max-width: 140px; }
+  .signal-matrix { grid-template-columns: repeat(3, 1fr); }
+  .sim-canvas { padding: 32px; }
+  .flow-header { flex-direction: row; }
+  .flow-decision-badge { width: auto; }
+  .modal-window { width: 420px; }
+}
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(0,196,188,0.2); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(0,196,188,0.4); }
 </style>
 </head>
 <body>
 
-<div class="app">
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
 
-  <header class="topbar">
-    <div class="topbar-title">💳 Payments 101</div>
-    <div class="topbar-progress" id="topbar-progress">0 / 34</div>
-  </header>
+<nav>
+  <a href="https://thierry0303.github.io/training/" class="nav-brand">
+    <div class="nav-logo">3DS</div>
+    3DS Simulator
+  </a>
+  <div class="nav-pill">Interactive</div>
+</nav>
 
-  <div class="content">
-
-    <!-- HOME -->
-    <div class="lesson active" id="lesson-home">
-      <div class="hero">
-        <h1>You tap your card</h1>
-        <p>Learn how card payments really work — from the moment you tap to when money lands in the bank. 34 lessons across 3 modules: beginner to advanced.</p>
-        <button class="hero-btn" onclick="goTo('1-1')">Start Learning →</button>
-      </div>
-      <div class="stats">
-        <div class="stat">
-          <div class="stat-val" id="stat-done">0</div>
-          <div class="stat-label">Completed</div>
-        </div>
-        <div class="stat">
-          <div class="stat-val">34</div>
-          <div class="stat-label">Total</div>
-        </div>
-        <div class="stat">
-          <div class="stat-val" id="stat-certs">0</div>
-          <div class="stat-label">Certificates</div>
-        </div>
-      </div>
-
-      <h3 style="margin-top:32px">What you'll learn</h3>
-      <div class="chapter-grid">
-        <div class="chapter-card c1" onclick="goTo('1-1')">
-          <div class="chapter-emoji">🏪</div>
-          <div class="chapter-num">Module 1 · Chapter 1</div>
-          <div class="chapter-title">The Basics</div>
-          <div class="chapter-desc">What happens when you tap, who's involved, when money moves.</div>
-          <div class="chapter-meta">3 lessons · ~15 min</div>
-        </div>
-        <div class="chapter-card c1" onclick="goTo('2-1')">
-          <div class="chapter-emoji">💳</div>
-          <div class="chapter-num">Module 1 · Chapter 2</div>
-          <div class="chapter-title">Your Card</div>
-          <div class="chapter-desc">What those 16 numbers mean, chip vs tap, why cards get declined.</div>
-          <div class="chapter-meta">3 lessons · ~15 min</div>
-        </div>
-        <div class="chapter-card c1" onclick="goTo('3-1')">
-          <div class="chapter-emoji">🔒</div>
-          <div class="chapter-num">Module 1 · Chapter 3–5</div>
-          <div class="chapter-title">Safety, Fraud & Economics</div>
-          <div class="chapter-desc">Online protection, how fraud happens, what cards cost, when shops get paid.</div>
-          <div class="chapter-meta">6 lessons · ~30 min</div>
-        </div>
-        <div class="chapter-card c2" onclick="goTo('6-1')">
-          <div class="chapter-emoji">⚡</div>
-          <div class="chapter-num">Module 2 · Intermediate</div>
-          <div class="chapter-title">How It Really Works</div>
-          <div class="chapter-desc">3DS deep dive, tokenisation, fraud scoring, disputes, merchant risk.</div>
-          <div class="chapter-meta">12 lessons · ~60 min</div>
-        </div>
-        <div class="chapter-card c3" onclick="goTo('11-1')">
-          <div class="chapter-emoji">🏆</div>
-          <div class="chapter-num">Module 3 · Advanced</div>
-          <div class="chapter-title">Expert Level</div>
-          <div class="chapter-desc">ISO 8583, technical 3DS flows, network tokenisation, ML, scheme rules.</div>
-          <div class="chapter-meta">10 lessons · ~50 min</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- BEGINNER LESSONS 1-1 to 5-2 (12 lessons) -->
-    <div class="lesson" id="lesson-1-1">
-      <div class="lesson-eyebrow">Module 1 · Chapter 1 · Lesson 1</div>
-      <h2>What happens when you tap?</h2>
-      <p class="lesson-lead">When you tap your card, it crosses the globe and comes back in 2 seconds. Here's the complete journey.</p>
-      <h3>It starts with a question</h3>
-      <p>The moment your card touches the reader, the terminal asks your bank: <strong>"This person wants to spend £49.99. Do you allow it?"</strong></p>
-      <h3>The message travels through four places</h3>
-      <p>Your tap → Shop's bank → Visa/Mastercard network → Your bank → Back again.</p>
-      <div class="box"><strong>Key point:</strong> Visa and Mastercard don't hold your money. They route the question — your bank gives the answer.</div>
-      <div class="quiz">
-        <div class="quiz-title">Quick Check</div>
-        <div class="quiz-subtitle">Understanding the flow</div>
-        <div class="question">When your card is approved, who makes the decision?</div>
-        <div class="options" id="options-1-1">
-          <div class="option" onclick="answer('1-1', 0, 2)"><span class="option-letter">A</span><span class="option-text">The shop's till</span></div>
-          <div class="option" onclick="answer('1-1', 1, 2)"><span class="option-letter">B</span><span class="option-text">Visa or Mastercard</span></div>
-          <div class="option" onclick="answer('1-1', 2, 2)"><span class="option-letter">C</span><span class="option-text">Your bank</span></div>
-          <div class="option" onclick="answer('1-1', 3, 2)"><span class="option-letter">D</span><span class="option-text">The government</span></div>
-        </div>
-        <div class="feedback" id="feedback-1-1"></div>
-      </div>
-      <div class="button-group">
-        <button class="btn btn-prev" onclick="goTo('home')">← Home</button>
-        <button class="btn btn-next" id="btn-next-1-1" disabled onclick="goTo('1-2')">Next →</button>
-      </div>
-    </div>
-
-    <div class="lesson" id="lesson-1-2">
-      <div class="lesson-eyebrow">Module 1 · Chapter 1 · Lesson 2</div>
-      <h2>Four people in every payment</h2>
-      <p class="lesson-lead">Every card payment has four parties: you, the merchant, the acquirer, and the issuer.</p>
-      <h3>Who they are</h3>
-      <p><strong>You (cardholder):</strong> The person paying</p>
-      <p><strong>Merchant:</strong> The business (shop, airline, website)</p>
-      <p><strong>Acquirer:</strong> Merchant's bank (Stripe, Barclays)</p>
-      <p><strong>Issuer:</strong> Your bank (Monzo, HSBC, Chase)</p>
-      <div class="box"><strong>Why four?</strong> Each bank verifies independently. The network connects everyone and ensures trust.</div>
-      <div class="quiz">
-        <div class="quiz-title">Quick Check</div>
-        <div class="quiz-subtitle">Understanding the parties</div>
-        <div class="question">Your friend uses Monzo. Which is the issuer?</div>
-        <div class="options" id="options-1-2">
-          <div class="option" onclick="answer('1-2', 0, 1)"><span class="option-letter">A</span><span class="option-text">The shop's bank</span></div>
-          <div class="option" onclick="answer('1-2', 1, 1)"><span class="option-letter">B</span><span class="option-text">Monzo</span></div>
-          <div class="option" onclick="answer('1-2', 2, 1)"><span class="option-letter">C</span><span class="option-text">Mastercard</span></div>
-          <div class="option" onclick="answer('1-2', 3, 1)"><span class="option-letter">D</span><span class="option-text">The processor</span></div>
-        </div>
-        <div class="feedback" id="feedback-1-2"></div>
-      </div>
-      <div class="button-group">
-        <button class="btn btn-prev" onclick="goTo('1-1')">← Previous</button>
-        <button class="btn btn-next" id="btn-next-1-2" disabled onclick="goTo('1-3')">Next →</button>
-      </div>
-    </div>
-
-    <div class="lesson" id="lesson-1-3">
-      <div class="lesson-eyebrow">Module 1 · Chapter 1 · Lesson 3</div>
-      <h2>Does money move instantly?</h2>
-      <p class="lesson-lead">Approval is instant. Money moving is 1–2 days later.</p>
-      <h3>Approval vs Settlement</h3>
-      <p>Approval: your bank puts a <strong>hold</strong> on your money. <strong>Settlement:</strong> the actual money movement (hours or days later).</p>
-      <h3>The timeline</h3>
-      <p><strong>Tap:</strong> Approved instantly. <strong>End of day:</strong> Shop batches transactions. <strong>Next 1–2 days:</strong> Money actually moves.</p>
-      <div class="box"><strong>Why wait?</strong> Batching trillions of payments is efficient. Processing them one-by-one would be slow.</div>
-      <div class="quiz">
-        <div class="quiz-title">Quick Check</div>
-        <div class="quiz-subtitle">Understanding settlement</div>
-        <div class="question">You buy a jumper Saturday. When does the shop get paid?</div>
-        <div class="options" id="options-1-3">
-          <div class="option" onclick="answer('1-3', 0, 2)"><span class="option-letter">A</span><span class="option-text">Immediately</span></div>
-          <div class="option" onclick="answer('1-3', 1, 2)"><span class="option-letter">B</span><span class="option-text">Midnight</span></div>
-          <div class="option" onclick="answer('1-3', 2, 2)"><span class="option-letter">C</span><span class="option-text">Monday or Tuesday</span></div>
-          <div class="option" onclick="answer('1-3', 3, 2)"><span class="option-letter">D</span><span class="option-text">End of month</span></div>
-        </div>
-        <div class="feedback" id="feedback-1-3"></div>
-      </div>
-      <div class="button-group">
-        <button class="btn btn-prev" onclick="goTo('1-2')">← Previous</button>
-        <button class="btn btn-next" id="btn-next-1-3" disabled onclick="goTo('2-1')">Next →</button>
-      </div>
-    </div>
-
-    <div class="lesson" id="lesson-2-1">
-      <div class="lesson-eyebrow">Module 1 · Chapter 2 · Lesson 4</div>
-      <h2>What those 16 numbers mean</h2>
-      <p class="lesson-lead">Every digit tells the network something essential.</p>
-      <h3>Breaking it down</h3>
-      <p>Card: <strong style="font-family:monospace">4532 0151 1283 0366</strong></p>
-      <p><strong>1st digit (4):</strong> Network. 4 = Visa, 5 = Mastercard.</p>
-      <p><strong>1st–6th digits:</strong> Bank code. Which bank issued it.</p>
-      <p><strong>7th–15th:</strong> Your account number.</p>
-      <p><strong>16th:</strong> Check digit. Catches typos.</p>
-      <div class="box"><strong>Why structure?</strong> First 6 digits are the bank identifier. Terminal uses these to route correctly.</div>
-      <div class="quiz">
-        <div class="quiz-title">Quick Check</div>
-        <div class="quiz-subtitle">Understanding card numbers</div>
-        <div class="question">Card starts "5412...". Which network?</div>
-        <div class="options" id="options-2-1">
-          <div class="option" onclick="answer('2-1', 0, 1)"><span class="option-letter">A</span><span class="option-text">Visa</span></div>
-          <div class="option" onclick="answer('2-1', 1, 1)"><span class="option-letter">B</span><span class="option-text">Mastercard</span></div>
-          <div class="option" onclick="answer('2-1', 2, 1)"><span class="option-letter">C</span><span class="option-text">Amex</span></div>
-          <div class="option" onclick="answer('2-1', 3, 1)"><span class="option-letter">D</span><span class="option-text">Unknown</span></div>
-        </div>
-        <div class="feedback" id="feedback-2-1"></div>
-      </div>
-      <div class="button-group">
-        <button class="btn btn-prev" onclick="goTo('1-3')">← Previous</button>
-        <button class="btn btn-next" id="btn-next-2-1" disabled onclick="goTo('2-2')">Next →</button>
-      </div>
-    </div>
-
-    <div class="lesson" id="lesson-2-2">
-      <div class="lesson-eyebrow">Module 1 · Chapter 2 · Lesson 5</div>
-      <h2>Chip vs swipe vs tap</h2>
-      <p class="lesson-lead">Three ways to pay. Very different security.</p>
-      <h3>Magnetic stripe (swipe)</h3>
-      <p>Same data every time. Copy it once = unlimited use. Security: <strong>low</strong>.</p>
-      <h3>Chip (insert)</h3>
-      <p>Generates unique code per transaction. Captured code is useless. Security: <strong>very high</strong>.</p>
-      <h3>Contactless (tap)</h3>
-      <p>Radio waves, unique code per tap. Capped at £100 — above that, need PIN. Security: <strong>very high</strong>.</p>
-      <div class="quiz">
-        <div class="quiz-title">Quick Check</div>
-        <div class="quiz-subtitle">Understanding security</div>
-        <div class="question">Why is chip more secure?</div>
-        <div class="options" id="options-2-2">
-          <div class="option" onclick="answer('2-2', 0, 1)"><span class="option-letter">A</span><span class="option-text">External database</span></div>
-          <div class="option" onclick="answer('2-2', 1, 1)"><span class="option-letter">B</span><span class="option-text">Unique one-time code</span></div>
-          <div class="option" onclick="answer('2-2', 2, 1)"><span class="option-letter">C</span><span class="option-text">Fingerprint encrypted</span></div>
-          <div class="option" onclick="answer('2-2', 3, 1)"><span class="option-letter">D</span><span class="option-text">No data stored</span></div>
-        </div>
-        <div class="feedback" id="feedback-2-2"></div>
-      </div>
-      <div class="button-group">
-        <button class="btn btn-prev" onclick="goTo('2-1')">← Previous</button>
-        <button class="btn btn-next" id="btn-next-2-2" disabled onclick="goTo('2-3')">Next →</button>
-      </div>
-    </div>
-
-    <div class="lesson" id="lesson-2-3">
-      <div class="lesson-eyebrow">Module 1 · Chapter 2 · Lesson 6</div>
-      <h2>Why cards get declined</h2>
-      <p class="lesson-lead">Almost never the shop's fault. Your bank said no.</p>
-      <h3>Common reasons</h3>
-      <p><strong>Not enough funds:</strong> Balance too low. <strong>Card expired:</strong> Date passed. <strong>Fraud flag:</strong> Unusual activity. <strong>Daily limit:</strong> Already spent max. <strong>Wrong PIN:</strong> Too many tries.</p>
-      <div class="box"><strong>What to do:</strong> Check your app. Try another card. Call your bank if unsure.</div>
-      <div class="quiz">
-        <div class="quiz-title">Quick Check</div>
-        <div class="quiz-subtitle">Understanding declines</div>
-        <div class="question">Card declined. Balance OK, not expired. Most likely?</div>
-        <div class="options" id="options-2-3">
-          <div class="option" onclick="answer('2-3', 0, 1)"><span class="option-letter">A</span><span class="option-text">Shop reader broken</span></div>
-          <div class="option" onclick="answer('2-3', 1, 1)"><span class="option-letter">B</span><span class="option-text">Bank flagged activity</span></div>
-          <div class="option" onclick="answer('2-3', 2, 1)"><span class="option-letter">C</span><span class="option-text">Visa network down</span></div>
-          <div class="option" onclick="answer('2-3', 3, 1)"><span class="option-letter">D</span><span class="option-text">Update banking app</span></div>
-        </div>
-        <div class="feedback" id="feedback-2-3"></div>
-      </div>
-      <div class="button-group">
-        <button class="btn btn-prev" onclick="goTo('2-2')">← Previous</button>
-        <button class="btn btn-next" id="btn-next-2-3" disabled onclick="goTo('3-1')">Next →</button>
-      </div>
-    </div>
-
-    <div class="lesson" id="lesson-3-1">
-      <div class="lesson-eyebrow">Module 1 · Chapter 3 · Lesson 7</div>
-      <h2>Online payments need extra protection</h2>
-      <p class="lesson-lead">In-store you prove it's you with your PIN. Online, only the number is needed.</p>
-      <h3>The problem</h3>
-      <p>Anyone with your card number, expiry, and CVV can buy online pretending to be you. This is why online fraud is 10× more common than in-store.</p>
-      <h3>The solution: 3-D Secure</h3>
-      <p>When you shop online, the website asks your bank: <strong>"Is this really your customer?"</strong> Your bank then asks you to prove it via text code or app.</p>
-      <div class="box"><strong>In Europe this is law:</strong> PSD2 regulations require Strong Customer Authentication (SCA) for online payments. This is why you see verification steps.</div>
-      <div class="quiz">
-        <div class="quiz-title">Quick Check</div>
-        <div class="quiz-subtitle">Understanding online risk</div>
-        <div class="question">Why is online fraud easier?</div>
-        <div class="options" id="options-3-1">
-          <div class="option" onclick="answer('3-1', 0, 2)"><span class="option-letter">A</span><span class="option-text">No Visa/Mastercard</span></div>
-          <div class="option" onclick="answer('3-1', 1, 2)"><span class="option-letter">B</span><span class="option-text">Auto-approved</span></div>
-          <div class="option" onclick="answer('3-1', 2, 2)"><span class="option-letter">C</span><span class="option-text">No PIN or presence needed</span></div>
-          <div class="option" onclick="answer('3-1', 3, 2)"><span class="option-letter">D</span><span class="option-text">Banks don't monitor</span></div>
-        </div>
-        <div class="feedback" id="feedback-3-1"></div>
-      </div>
-      <div class="button-group">
-        <button class="btn btn-prev" onclick="goTo('2-3')">← Previous</button>
-        <button class="btn btn-next" id="btn-next-3-1" disabled onclick="goTo('3-2')">Next →</button>
-      </div>
-    </div>
-
-    <div class="lesson" id="lesson-3-2">
-      <div class="lesson-eyebrow">Module 1 · Chapter 3 · Lesson 8</div>
-      <h2>That verification text explained</h2>
-      <p class="lesson-lead">The OTP (one-time password) proves you're the real cardholder.</p>
-      <h3>What it does</h3>
-      <p>Your bank texts you a code. You enter it. This proves you have your phone — and therefore are likely the real cardholder, not a fraudster.</p>
-      <h3>Why you don't always get one</h3>
-      <p>Your bank scores each transaction for risk. Low-risk ones (familiar site, familiar amount, familiar device) are approved "frictionlessly" — no interruption. High-risk ones require the code.</p>
-      <div class="box"><strong>Critical:</strong> Never share your OTP with anyone. Your real bank will never ask for it by phone.</div>
-      <div class="quiz">
-        <div class="quiz-title">Quick Check</div>
-        <div class="quiz-subtitle">Understanding OTP</div>
-        <div class="question">Someone calls claiming to be your bank asking for your OTP. What do you do?</div>
-        <div class="options" id="options-3-2">
-          <div class="option" onclick="answer('3-2', 0, 1)"><span class="option-letter">A</span><span class="option-text">Give them the code</span></div>
-          <div class="option" onclick="answer('3-2', 1, 1)"><span class="option-letter">B</span><span class="option-text">Hang up — real banks never ask</span></div>
-          <div class="option" onclick="answer('3-2', 2, 1)"><span class="option-letter">C</span><span class="option-text">Give last 3 digits</span></div>
-          <div class="option" onclick="answer('3-2', 3, 1)"><span class="option-letter">D</span><span class="option-text">Ask for email first</span></div>
-        </div>
-        <div class="feedback" id="feedback-3-2"></div>
-      </div>
-      <div class="button-group">
-        <button class="btn btn-prev" onclick="goTo('3-1')">← Previous</button>
-        <button class="btn btn-next" id="btn-next-3-2" disabled onclick="goTo('4-1')">Next →</button>
-      </div>
-    </div>
-
-    <div class="lesson" id="lesson-4-1">
-      <div class="lesson-eyebrow">Module 1 · Chapter 4 · Lesson 9</div>
-      <h2>How card fraud actually happens</h2>
-      <p class="lesson-lead">Understanding how fraudsters operate is the best defence.</p>
-      <h3>Main methods</h3>
-      <p><strong>Phishing:</strong> Fake email with link to fake site. <strong>Data breach:</strong> Hacked website leaks your card. <strong>ATM skimming:</strong> Hidden reader + camera captures PIN. <strong>Social engineering:</strong> Phone call convinces you to share details.</p>
-      <div class="box"><strong>Red flags on a call:</strong> "Account will be closed today." "Move money to safe account." "Give me your PIN." "Download this app." Real banks never do these.</div>
-      <div class="quiz">
-        <div class="quiz-title">Quick Check</div>
-        <div class="quiz-subtitle">Spotting scams</div>
-        <div class="question">Email: "Amazon account compromised. Click here to verify." What do you do?</div>
-        <div class="options" id="options-4-1">
-          <div class="option" onclick="answer('4-1', 0, 2)"><span class="option-letter">A</span><span class="option-text">Click and verify</span></div>
-          <div class="option" onclick="answer('4-1', 1, 2)"><span class="option-letter">B</span><span class="option-text">Forward to friend</span></div>
-          <div class="option" onclick="answer('4-1', 2, 2)"><span class="option-letter">C</span><span class="option-text">Go to Amazon directly by typing address</span></div>
-          <div class="option" onclick="answer('4-1', 3, 2)"><span class="option-letter">D</span><span class="option-text">Reply asking for info</span></div>
-        </div>
-        <div class="feedback" id="feedback-4-1"></div>
-      </div>
-      <div class="button-group">
-        <button class="btn btn-prev" onclick="goTo('3-2')">← Previous</button>
-        <button class="btn btn-next" id="btn-next-4-1" disabled onclick="goTo('4-2')">Next →</button>
-      </div>
-    </div>
-
-    <div class="lesson" id="lesson-4-2">
-      <div class="lesson-eyebrow">Module 1 · Chapter 4 · Lesson 10</div>
-      <h2>Chargebacks — getting money back</h2>
-      <p class="lesson-lead">Your right to dispute a payment and get refunded.</p>
-      <h3>What is a chargeback?</h3>
-      <p>Your bank forcibly reverses a payment on your behalf. You dispute it, your bank investigates, and if legitimate, they take the money back from the merchant and return it to you.</p>
-      <h3>When you can use it</h3>
-      <p>Goods never arrived. Goods different from description. Charged twice. Subscription charged after cancellation. Fraud. Business closed.</p>
-      <div class="box"><strong>Section 75 (UK):</strong> On credit cards for purchases £100–£30,000, your card company is equally liable with the merchant. Even stronger than chargeback.</div>
-      <div class="quiz">
-        <div class="quiz-title">Quick Check</div>
-        <div class="quiz-subtitle">Understanding chargebacks</div>
-        <div class="question">Paid £250 for concert tickets on credit card. Event cancelled, company gone. Best action?</div>
-        <div class="options" id="options-4-2">
-          <div class="option" onclick="answer('4-2', 0, 2)"><span class="option-letter">A</span><span class="option-text">Money's lost</span></div>
-          <div class="option" onclick="answer('4-2', 1, 2)"><span class="option-letter">B</span><span class="option-text">Wait for administrator</span></div>
-          <div class="option" onclick="answer('4-2', 2, 2)"><span class="option-letter">C</span><span class="option-text">Contact credit card company — Section 75 protection</span></div>
-          <div class="option" onclick="answer('4-2', 3, 2)"><span class="option-letter">D</span><span class="option-text">Call Visa directly</span></div>
-        </div>
-        <div class="feedback" id="feedback-4-2"></div>
-      </div>
-      <div class="button-group">
-        <button class="btn btn-prev" onclick="goTo('4-1')">← Previous</button>
-        <button class="btn btn-next" id="btn-next-4-2" disabled onclick="goTo('5-1')">Next →</button>
-      </div>
-    </div>
-
-    <div class="lesson" id="lesson-5-1">
-      <div class="lesson-eyebrow">Module 1 · Chapter 5 · Lesson 11</div>
-      <h2>What accepting cards costs shops</h2>
-      <p class="lesson-lead">Merchants don't keep 100% of your payment. A slice goes to the bank and networks.</p>
-      <h3>The fee breakdown</h3>
-      <p>You pay £100. Merchant receives ~£98–£99 (depending on card type). The difference is split: your bank (interchange, funds their cashback), Visa/Mastercard (network fee), merchant's bank (acquiring fee).</p>
-      <div class="box"><strong>Premium cards cost more:</strong> A travel rewards card has higher fees than a basic debit card. Merchants effectively subsidise your air miles.</div>
-      <div class="quiz">
-        <div class="quiz-title">Quick Check</div>
-        <div class="quiz-subtitle">Understanding fees</div>
-        <div class="question">You pay £200 on rewards card. Airline receives less. Where does difference go?</div>
-        <div class="options" id="options-5-1">
-          <div class="option" onclick="answer('5-1', 0, 2)"><span class="option-letter">A</span><span class="option-text">Government tax</span></div>
-          <div class="option" onclick="answer('5-1', 1, 2)"><span class="option-letter">B</span><span class="option-text">Stays in card reader</span></div>
-          <div class="option" onclick="answer('5-1', 2, 2)"><span class="option-letter">C</span><span class="option-text">Banks and networks (to fund your rewards)</span></div>
-          <div class="option" onclick="answer('5-1', 3, 2)"><span class="option-letter">D</span><span class="option-text">Airline keeps full amount</span></div>
-        </div>
-        <div class="feedback" id="feedback-5-1"></div>
-      </div>
-      <div class="button-group">
-        <button class="btn btn-prev" onclick="goTo('4-2')">← Previous</button>
-        <button class="btn btn-next" id="btn-next-5-1" disabled onclick="goTo('5-2')">Next →</button>
-      </div>
-    </div>
-
-    <div class="lesson" id="lesson-5-2">
-      <div class="lesson-eyebrow">Module 1 · Chapter 5 · Lesson 12</div>
-      <h2>When shops actually get paid</h2>
-      <p class="lesson-lead">You tap Saturday. Shop thinks they're paid. Money arrives Monday–Tuesday.</p>
-      <h3>The gap</h3>
-      <p>Approval is instant. Payment (settlement) is 1–2 working days later. Shop must plan cash flow around this.</p>
-      <h3>Why the wait?</h3>
-      <p>End of day: shop batches all transactions. Overnight: banks calculate. T+1 or T+2: money actually moves.</p>
-      <div class="box"><strong>New businesses wait longer:</strong> Payment processors hold a "reserve" (5–15%) for weeks/months in case of chargebacks. Working capital squeeze is real.</div>
-      <div class="quiz">
-        <div class="quiz-title">Quick Check</div>
-        <div class="quiz-subtitle">Understanding settlement</div>
-        <div class="question">Florist takes £500 card payments Friday. Needs money Saturday for wholesale flowers. Realistic expectation?</div>
-        <div class="options" id="options-5-2">
-          <div class="option" onclick="answer('5-2', 0, 2)"><span class="option-letter">A</span><span class="option-text">Money by Friday midnight</span></div>
-          <div class="option" onclick="answer('5-2', 1, 2)"><span class="option-letter">B</span><span class="option-text">Instantly as each card taps</span></div>
-          <div class="option" onclick="answer('5-2', 2, 2)"><span class="option-letter">C</span><span class="option-text">Monday at earliest — plan ahead</span></div>
-          <div class="option" onclick="answer('5-2', 3, 2)"><span class="option-letter">D</span><span class="option-text">Call Visa to release early</span></div>
-        </div>
-        <div class="feedback" id="feedback-5-2"></div>
-      </div>
-      <div class="completion-banner" id="banner-beginner">
-        <div class="completion-emoji">🎓</div>
-        <h3>Beginner Module Complete!</h3>
-        <p>You've mastered the fundamentals. Ready for intermediate? Start Chapter 6.</p>
-      </div>
-      <div class="button-group">
-        <button class="btn btn-prev" onclick="goTo('5-1')">← Previous</button>
-        <button class="btn btn-next" id="btn-next-5-2" disabled onclick="goTo('6-1')">Next: Intermediate →</button>
-      </div>
-    </div>
-
-    <!-- INTERMEDIATE LESSONS 6-1 to 10-3 (12 lessons) -->
-    <div class="lesson" id="lesson-6-1">
-      <div class="lesson-eyebrow">Module 2 · Chapter 6 · Lesson 13</div>
-      <h2>How 3DS decides when to ask for proof</h2>
-      <p class="lesson-lead">3DS isn't one-size-fits-all. It intelligently scores risk and decides: interrupt the customer or approve silently?</p>
-      <h3>Risk scoring</h3>
-      <p>Your bank's system evaluates dozens of signals in real time: device (is it your usual phone?), location (matches your home?), merchant (shopped here before?), amount (normal for you?), velocity (buying a lot right now?)</p>
-      <div class="box"><strong>Two outcomes:</strong> Frictionless (bank confident it's you, no interrupt) or Challenge (bank wants you to verify via OTP or app).</div>
-      <div class="quiz">
-        <div class="quiz-title">Quick Check</div>
-        <div class="quiz-subtitle">Understanding 3DS decisions</div>
-        <div class="question">You're in Japan, try to buy with UK Mastercard. What's likely?</div>
-        <div class="options" id="options-6-1">
-          <div class="option" onclick="answer('6-1', 0, 1)"><span class="option-letter">A</span><span class="option-text">Frictionless — under £100</span></div>
-          <div class="option" onclick="answer('6-1', 1, 1)"><span class="option-letter">B</span><span class="option-text">Challenge — unfamiliar country is high-risk</span></div>
-          <div class="option" onclick="answer('6-1', 2, 1)"><span class="option-letter">C</span><span class="option-text">Declined automatically</span></div>
-          <div class="option" onclick="answer('6-1', 3, 1)"><span class="option-letter">D</span><span class="option-text">Frictionless — only domestic transactions</span></div>
-        </div>
-        <div class="feedback" id="feedback-6-1"></div>
-      </div>
-      <div class="button-group">
-        <button class="btn btn-prev" onclick="goTo('5-2')">← Previous</button>
-        <button class="btn btn-next" id="btn-next-6-1" disabled onclick="goTo('6-2')">Next →</button>
-      </div>
-    </div>
-
-    <div class="lesson" id="lesson-6-2">
-      <div class="lesson-eyebrow">Module 2 · Chapter 6 · Lesson 14</div>
-      <h2>Liability shift — who pays for fraud?</h2>
-      <p class="lesson-lead">3DS does more than verify. It reassigns who's financially responsible when fraud happens.</p>
-      <h3>Before 3DS</h3>
-      <p>Merchant accepted payment with no verification. Fraud happened. Merchant loses.</p>
-      <h3>After 3DS</h3>
-      <p>Payment was authenticated. Fraud happened. Bank loses (they authenticated someone claiming to be the cardholder).</p>
-      <div class="box"><strong>The business reason merchants use 3DS:</strong> They shift fraud liability to the bank. It's risk protection, not just security.</div>
-      <div class="quiz">
-        <div class="quiz-title">Quick Check</div>
-        <div class="quiz-subtitle">Understanding liability</div>
-        <div class="question">Merchant skipped 3DS using "low value" exemption. Transaction turns out fraudulent. Who loses?</div>
-        <div class="options" id="options-6-2">
-          <div class="option" onclick="answer('6-2', 0, 0)"><span class="option-letter">A</span><span class="option-text">Merchant — they skipped it and kept liability</span></div>
-          <div class="option" onclick="answer('6-2', 1, 0)"><span class="option-letter">B</span><span class="option-text">Bank — low value = automatic responsibility</span></div>
-          <div class="option" onclick="answer('6-2', 2, 0)"><span class="option-letter">C</span><span class="option-text">Visa/Mastercard — they cover small fraud</span></div>
-          <div class="option" onclick="answer('6-2', 3, 0)"><span class="option-letter">D</span><span class="option-text">Cardholder — they should notice sooner</span></div>
-        </div>
-        <div class="feedback" id="feedback-6-2"></div>
-      </div>
-      <div class="button-group">
-        <button class="btn btn-prev" onclick="goTo('6-1')">← Previous</button>
-        <button class="btn btn-next" id="btn-next-6-2" disabled onclick="goTo('6-3')">Next →</button>
-      </div>
-    </div>
-
-    <div class="lesson" id="lesson-6-3">
-      <div class="lesson-eyebrow">Module 2 · Chapter 6 · Lesson 15</div>
-      <h2>SCA exemptions — when to skip verification</h2>
-      <p class="lesson-lead">Requiring 3DS for every transaction would be exhausting. So the rules include exemptions.</p>
-      <h3>Main exemptions</h3>
-      <p><strong>Low value:</strong> Under €30 per transaction. <strong>Trusted merchant:</strong> You've told your bank to trust them. <strong>Recurring billing:</strong> Netflix charges after you authenticated once. <strong>Corporate/B2B:</strong> Different rules for business cards.</p>
-      <div class="box"><strong>The trade-off:</strong> Less friction for you, but merchant retains fraud liability. No 3DS = no liability shift.</div>
-      <div class="quiz">
-        <div class="quiz-title">Quick Check</div>
-        <div class="quiz-subtitle">Understanding exemptions</div>
-        <div class="question">Netflix charges you monthly. After initial auth, no more 3DS prompts. Why allowed?</div>
-        <div class="options" id="options-6-3">
-          <div class="option" onclick="answer('6-3', 0, 0)"><span class="option-letter">A</span><span class="option-text">MIT exemption — merchant initiated after consent</span></div>
-          <div class="option" onclick="answer('6-3', 1, 0)"><span class="option-letter">B</span><span class="option-text">SCA required every time by law</span></div>
-          <div class="option" onclick="answer('6-3', 2, 0)"><span class="option-letter">C</span><span class="option-text">Only if amount under €30</span></div>
-          <div class="option" onclick="answer('6-3', 3, 0)"><span class="option-letter">D</span><span class="option-text">Outside EU only</span></div>
-        </div>
-        <div class="feedback" id="feedback-6-3"></div>
-      </div>
-      <div class="button-group">
-        <button class="btn btn-prev" onclick="goTo('6-2')">← Previous</button>
-        <button class="btn btn-next" id="btn-next-6-3" disabled onclick="goTo('7-1')">Next →</button>
-      </div>
-    </div>
-
-    <!-- Lessons 7-1 through 10-3 follow same pattern -->
-    <!-- For brevity, showing structure; full content would continue -->
-
-    <div class="lesson" id="lesson-7-1">
-      <div class="lesson-eyebrow">Module 2 · Chapter 7 · Lesson 16</div>
-      <h2>Why Apple Pay doesn't send your card number</h2>
-      <p class="lesson-lead">Tokenisation: your real card number stays at your bank. A substitute is used instead.</p>
-      <h3>The problem</h3>
-      <p>Every merchant you shop with sees your card number. Hack one merchant = card stolen. The solution: never send the real number.</p>
-      <h3>The solution: tokens</h3>
-      <p>Your phone gets a Device Primary Account Number (DPAN) — a substitute. Your real number (PAN) stays at the bank. Only the token is transmitted.</p>
-      <div class="box"><strong>Two security layers:</strong> (1) Token only works on your device. (2) Each transaction generates a unique cryptogram — captured tokens can't be replayed.</div>
-      <div class="quiz">
-        <div class="quiz-title">Quick Check</div>
-        <div class="quiz-subtitle">Understanding tokenisation</div>
-        <div class="question">Retailer's database hacked, tokens stolen. Why less damaging than real card numbers?</div>
-        <div class="options" id="options-7-1">
-          <div class="option" onclick="answer('7-1', 0, 2)"><span class="option-letter">A</span><span class="option-text">Tokens are encrypted</span></div>
-          <div class="option" onclick="answer('7-1', 1, 2)"><span class="option-letter">B</span><span class="option-text">Government insures tokens</span></div>
-          <div class="option" onclick="answer('7-1', 2, 2)"><span class="option-letter">C</span><span class="option-text">Tokens only work on specific device with cryptogram</span></div>
-          <div class="option" onclick="answer('7-1', 3, 2)"><span class="option-letter">D</span><span class="option-text">Tokens expire after 24h</span></div>
-        </div>
-        <div class="feedback" id="feedback-7-1"></div>
-      </div>
-      <div class="button-group">
-        <button class="btn btn-prev" onclick="goTo('6-3')">← Previous</button>
-        <button class="btn btn-next" id="btn-next-7-1" disabled onclick="goTo('7-2')">Next →</button>
-      </div>
-    </div>
-
-    <div class="lesson" id="lesson-7-2">
-      <div class="lesson-eyebrow">Module 2 · Chapter 7 · Lesson 17</div>
-      <h2>How cards get into digital wallets</h2>
-      <p class="lesson-lead">Adding a card to Apple Pay looks simple. Behind it: a six-party security handshake.</p>
-      <h3>The provisioning process</h3>
-      <p>1. You photograph card. 2. Apple sends to Token Service Provider. 3. TSP looks up which bank issued it. 4. Your bank is asked to approve. 5. You verify (text code or app). 6. DPAN token is generated and stored securely on your phone.</p>
-      <div class="box"><strong>Each wallet has a TRID:</strong> Apple Pay, Google Pay, Samsung Pay each have unique IDs. Banks know which wallet tokens came from.</div>
-      <div class="quiz">
-        <div class="quiz-title">Quick Check</div>
-        <div class="quiz-subtitle">Understanding provisioning</div>
-        <div class="question">You add card to Apple Pay and get a verification text. What is your bank approving?</div>
-        <div class="options" id="options-7-2">
-          <div class="option" onclick="answer('7-2', 0, 1)"><span class="option-letter">A</span><span class="option-text">A payment you're making now</span></div>
-          <div class="option" onclick="answer('7-2', 1, 1)"><span class="option-letter">B</span><span class="option-text">Token creation and storage on your device</span></div>
-          <div class="option" onclick="answer('7-2', 2, 1)"><span class="option-letter">C</span><span class="option-text">Apple managing your account</span></div>
-          <div class="option" onclick="answer('7-2', 3, 1)"><span class="option-letter">D</span><span class="option-text">Changes to contactless limit</span></div>
-        </div>
-        <div class="feedback" id="feedback-7-2"></div>
-      </div>
-      <div class="button-group">
-        <button class="btn btn-prev" onclick="goTo('7-1')">← Previous</button>
-        <button class="btn btn-next" id="btn-next-7-2" disabled onclick="goTo('8-1')">Next →</button>
-      </div>
-    </div>
-
-    <div class="lesson" id="lesson-8-1">
-      <div class="lesson-eyebrow">Module 2 · Chapter 8 · Lesson 18</div>
-      <h2>How banks score every transaction for risk</h2>
-      <p class="lesson-lead">In milliseconds, your bank scores each payment 0–100 for fraud likelihood.</p>
-      <h3>Key signals</h3>
-      <p><strong>Device:</strong> Your usual phone? <strong>IP:</strong> VPN or residential? <strong>Behaviour:</strong> Did you paste or type? <strong>History:</strong> Normal amount/merchant? <strong>Velocity:</strong> Many transactions suddenly? <strong>Merchant:</strong> High-fraud category?</p>
-      <div class="box"><strong>Context matters:</strong> Score of 40 on £10 pizza = nothing. Score of 40 on £3000 electronics = challenge likely. Amount + context = decision.</div>
-      <div class="quiz">
-        <div class="quiz-title">Quick Check</div>
-        <div class="quiz-subtitle">Understanding risk scoring</div>
-        <div class="question">Fraudster uses stolen card from VPN on new device at digital goods site (high-risk MCC). Signals triggered?</div>
-        <div class="options" id="options-8-1">
-          <div class="option" onclick="answer('8-1', 0, 2)"><span class="option-letter">A</span><span class="option-text">None — real card details</span></div>
-          <div class="option" onclick="answer('8-1', 1, 2)"><span class="option-letter">B</span><span class="option-text">Only amount matters</span></div>
-          <div class="option" onclick="answer('8-1', 2, 2)"><span class="option-letter">C</span><span class="option-text">Multiple: unrecognised device, VPN, high-risk MCC, no history</span></div>
-          <div class="option" onclick="answer('8-1', 3, 2)"><span class="option-letter">D</span><span class="option-text">Only VPN signal</span></div>
-        </div>
-        <div class="feedback" id="feedback-8-1"></div>
-      </div>
-      <div class="button-group">
-        <button class="btn btn-prev" onclick="goTo('7-2')">← Previous</button>
-        <button class="btn btn-next" id="btn-next-8-1" disabled onclick="goTo('8-2')">Next →</button>
-      </div>
-    </div>
-
-    <div class="lesson" id="lesson-8-2">
-      <div class="lesson-eyebrow">Module 2 · Chapter 8 · Lesson 19</div>
-      <h2>Velocity rules — catching fraud patterns</h2>
-      <p class="lesson-lead">Fast, simple rules: if X happens more than Y times in Z seconds, trigger action.</p>
-      <h3>Examples</h3>
-      <p><strong>Same card 4+ times in 1 hour:</strong> Rapid testing. <strong>Same IP 3+ cards in 24h:</strong> Bot attack. <strong>5+ charges under £1 in 10 min:</strong> Card enumeration. <strong>Same device 3+ cards in 48h:</strong> Account takeover.</p>
-      <div class="box"><strong>False positives happen:</strong> Someone buying multiple gifts triggers "same address" rule. Developers testing trigger "tiny charges" rule. Fraud teams manage exceptions.</div>
-      <div class="quiz">
-        <div class="quiz-title">Quick Check</div>
-        <div class="quiz-subtitle">Understanding velocity</div>
-        <div class="question">Criminal tests 500 stolen cards via 50p charges. Which velocity rule catches it?</div>
-        <div class="options" id="options-8-2">
-          <div class="option" onclick="answer('8-2', 0, 1)"><span class="option-letter">A</span><span class="option-text">Large amount threshold</span></div>
-          <div class="option" onclick="answer('8-2', 1, 1)"><span class="option-letter">B</span><span class="option-text">Multiple small charges from different cards on same IP</span></div>
-          <div class="option" onclick="answer('8-2', 2, 1)"><span class="option-letter">C</span><span class="option-text">Foreign IP</span></div>
-          <div class="option" onclick="answer('8-2', 3, 1)"><span class="option-letter">D</span><span class="option-text">Weekend rule</span></div>
-        </div>
-        <div class="feedback" id="feedback-8-2"></div>
-      </div>
-      <div class="button-group">
-        <button class="btn btn-prev" onclick="goTo('8-1')">← Previous</button>
-        <button class="btn btn-next" id="btn-next-8-2" disabled onclick="goTo('9-1')">Next →</button>
-      </div>
-    </div>
-
-    <div class="lesson" id="lesson-9-1">
-      <div class="lesson-eyebrow">Module 2 · Chapter 9 · Lesson 20</div>
-      <h2>Inside a chargeback — step by step</h2>
-      <p class="lesson-lead">What happens from dispute to resolution.</p>
-      <h3>The timeline</h3>
-      <p><strong>Day 0:</strong> Cardholder contacts bank. <strong>Day 1–30:</strong> Issuer files chargeback. <strong>Day 5–45:</strong> Merchant notified, has 20–45 days to respond. <strong>Day 75–180:</strong> If still disputed, goes to arbitration.</p>
-      <div class="box"><strong>Merchant costs per chargeback:</strong> Lost sale amount + goods/service already delivered + processing fees already paid + chargeback fee (£15–£35) + staff time. Real cost: 2–3× the transaction amount.</div>
-      <div class="quiz">
-        <div class="quiz-title">Quick Check</div>
-        <div class="quiz-subtitle">Understanding chargebacks</div>
-        <div class="question">Merchant receives chargeback notice and doesn't respond by deadline. What happens?</div>
-        <div class="options" id="options-9-1">
-          <div class="option" onclick="answer('9-1', 0, 2)"><span class="option-letter">A</span><span class="option-text">Chargeback cancelled — no obligation</span></div>
-          <div class="option" onclick="answer('9-1', 1, 2)"><span class="option-letter">B</span><span class="option-text">Scheme investigates for merchant</span></div>
-          <div class="option" onclick="answer('9-1', 2, 2)"><span class="option-letter">C</span><span class="option-text">Chargeback accepted by default — merchant loses</span></div>
-          <div class="option" onclick="answer('9-1', 3, 2)"><span class="option-letter">D</span><span class="option-text">6 months to respond</span></div>
-        </div>
-        <div class="feedback" id="feedback-9-1"></div>
-      </div>
-      <div class="button-group">
-        <button class="btn btn-prev" onclick="goTo('8-2')">← Previous</button>
-        <button class="btn btn-next" id="btn-next-9-1" disabled onclick="goTo('9-2')">Next →</button>
-      </div>
-    </div>
-
-    <div class="lesson" id="lesson-9-2">
-      <div class="lesson-eyebrow">Module 2 · Chapter 9 · Lesson 21</div>
-      <h2>Reason codes — why disputes get categorised</h2>
-      <p class="lesson-lead">Every chargeback has a code. Code determines what evidence merchant needs and odds of winning.</p>
-      <h3>Visa codes</h3>
-      <p><strong>10.4:</strong> Card-absent fraud (most common). <strong>13.1:</strong> Merchandise not received. <strong>13.3:</strong> Not as described.</p>
-      <h3>Mastercard codes</h3>
-      <p><strong>4853:</strong> Cardholder disputes. <strong>4863:</strong> Not recognised. <strong>4870/4871:</strong> Liability shift (didn't use chip/PIN).</p>
-      <div class="box"><strong>Allocation vs Collaboration:</strong> Fraud codes (10.4) auto-assign liability based on 3DS. Service codes (13.1, 13.3) require merchant to provide evidence.</div>
-      <div class="quiz">
-        <div class="quiz-title">Quick Check</div>
-        <div class="quiz-subtitle">Understanding reason codes</div>
-        <div class="question">Merchant gets Visa 10.4. They used 3DS. Likely outcome?</div>
-        <div class="options" id="options-9-2">
-          <div class="option" onclick="answer('9-2', 0, 0)"><span class="option-letter">A</span><span class="option-text">Liability shifts to issuer — merchant wins</span></div>
-          <div class="option" onclick="answer('9-2', 1, 0)"><span class="option-letter">B</span><span class="option-text">Merchant must provide proof anyway</span></div>
-          <div class="option" onclick="answer('9-2', 2, 0)"><span class="option-letter">C</span><span class="option-text">Immediate arbitration fees</span></div>
-          <div class="option" onclick="answer('9-2', 3, 0)"><span class="option-letter">D</span><span class="option-text">10.4 can't be disputed</span></div>
-        </div>
-        <div class="feedback" id="feedback-9-2"></div>
-      </div>
-      <div class="button-group">
-        <button class="btn btn-prev" onclick="goTo('9-1')">← Previous</button>
-        <button class="btn btn-next" id="btn-next-9-2" disabled onclick="goTo('10-1')">Next →</button>
-      </div>
-    </div>
-
-    <div class="lesson" id="lesson-10-1">
-      <div class="lesson-eyebrow">Module 2 · Chapter 10 · Lesson 22</div>
-      <h2>Interchange economics</h2>
-      <p class="lesson-lead">Interchange is the largest fee in every transaction. Who sets it? Why?</p>
-      <h3>What determines rates?</h3>
-      <p><strong>Debit vs credit:</strong> Credit = higher (0.3–1.5%), debit = lower (0.2%). <strong>Card tier:</strong> Standard < Gold < Platinum. <strong>Card present vs online:</strong> Online = higher (more fraud). <strong>Merchant type:</strong> Supermarkets lower, luxury goods higher. <strong>EU cap:</strong> 0.2% debit, 0.3% credit (post-Brexit: much higher for cross-border).</p>
-      <div class="box"><strong>Who pays:</strong> Shop pays to your bank (via acquirer). Your bank uses its share to fund your cashback, travel insurance, rewards.</div>
-      <div class="quiz">
-        <div class="quiz-title">Quick Check</div>
-        <div class="quiz-subtitle">Understanding interchange</div>
-        <div class="question">Restaurant's card fees higher with premium travel cards vs basic debit. Why?</div>
-        <div class="options" id="options-10-1">
-          <div class="option" onclick="answer('10-1', 0, 1)"><span class="option-letter">A</span><span class="option-text">Premium cards need more processing</span></div>
-          <div class="option" onclick="answer('10-1', 1, 1)"><span class="option-letter">B</span><span class="option-text">Premium cards have higher interchange to fund air miles</span></div>
-          <div class="option" onclick="answer('10-1', 2, 1)"><span class="option-letter">C</span><span class="option-text">Premium cards are more fraudulent</span></div>
-          <div class="option" onclick="answer('10-1', 3, 1)"><span class="option-letter">D</span><span class="option-text">Premium holders spend more percentage-wise</span></div>
-        </div>
-        <div class="feedback" id="feedback-10-1"></div>
-      </div>
-      <div class="button-group">
-        <button class="btn btn-prev" onclick="goTo('9-2')">← Previous</button>
-        <button class="btn btn-next" id="btn-next-10-1" disabled onclick="goTo('10-2')">Next →</button>
-      </div>
-    </div>
-
-    <div class="lesson" id="lesson-10-2">
-      <div class="lesson-eyebrow">Module 2 · Chapter 10 · Lesson 23</div>
-      <h2>PCI DSS — card security standards</h2>
-      <p class="lesson-lead">Not a law, but enforced by card schemes. Non-compliance = fines, termination.</p>
-      <h3>The 12 requirements (simplified)</h3>
-      <p><strong>1–2:</strong> Network & system security. <strong>3–4:</strong> Protect and encrypt card data. <strong>5–6:</strong> Malware & vulnerability protection. <strong>7–8:</strong> Access control & authentication. <strong>9:</strong> Physical security. <strong>10–11:</strong> Logging & monitoring. <strong>12:</strong> Written policies.</p>
-      <div class="box"><strong>Scope reduction:</strong> Use hosted payment pages (Stripe, Adyen) and card data never touches your servers. PCI scope drops from 12 requirements to SAQ A (short questionnaire).</div>
-      <div class="quiz">
-        <div class="quiz-title">Quick Check</div>
-        <div class="quiz-subtitle">Understanding PCI</div>
-        <div class="question">Shop uses Stripe hosted form (no card data touches their servers). PCI obligation?</div>
-        <div class="options" id="options-10-2">
-          <div class="option" onclick="answer('10-2', 0, 1)"><span class="option-letter">A</span><span class="option-text">Full 12 requirements + audit</span></div>
-          <div class="option" onclick="answer('10-2', 1, 1)"><span class="option-letter">B</span><span class="option-text">Minimal — SAQ A self-assessment</span></div>
-          <div class="option" onclick="answer('10-2', 2, 1)"><span class="option-letter">C</span><span class="option-text">None — only banks need PCI</span></div>
-          <div class="option" onclick="answer('10-2', 3, 1)"><span class="option-letter">D</span><span class="option-text">Must store encrypted card numbers</span></div>
-        </div>
-        <div class="feedback" id="feedback-10-2"></div>
-      </div>
-      <div class="button-group">
-        <button class="btn btn-prev" onclick="goTo('10-1')">← Previous</button>
-        <button class="btn btn-next" id="btn-next-10-2" disabled onclick="goTo('10-3')">Next →</button>
-      </div>
-    </div>
-
-    <div class="lesson" id="lesson-10-3">
-      <div class="lesson-eyebrow">Module 2 · Chapter 10 · Lesson 24</div>
-      <h2>How merchant risk is assessed</h2>
-      <p class="lesson-lead">Before a business gets card acceptance, acquirers perform due diligence. Ongoing monitoring continues.</p>
-      <h3>KYB checks</h3>
-      <p><strong>Legal entity & ownership:</strong> Verify UBOs (beneficial owners). <strong>Business model:</strong> What are they selling? <strong>Financial health:</strong> Can they cover chargebacks? <strong>Processing history:</strong> Chargeback & fraud rates at previous processors. <strong>Website & terms:</strong> Clear refund policies?</p>
-      <h3>High-risk categories</h3>
-      <p>Online gambling, adult content, crypto exchanges, pharma, travel (high chargebacks), subscriptions with free trials.</p>
-      <div class="box"><strong>Rolling reserves:</strong> New/risky merchants have 5–15% held for 90–180 days. This ties up working capital significantly.</div>
-      <div class="quiz">
-        <div class="quiz-title">Quick Check</div>
-        <div class="quiz-subtitle">Understanding merchant risk</div>
-        <div class="question">New travel agency told they need 10% rolling reserve for 180 days. Why?</div>
-        <div class="options" id="options-10-3">
-          <div class="option" onclick="answer('10-3', 0, 2)"><span class="option-letter">A</span><span class="option-text">Required by law</span></div>
-          <div class="option" onclick="answer('10-3', 1, 2)"><span class="option-letter">B</span><span class="option-text">Acquirer wants to invest the money</span></div>
-          <div class="option" onclick="answer('10-3', 2, 2)"><span class="option-letter">C</span><span class="option-text">Travel has high chargeback risk — reserve protects acquirer</span></div>
-          <div class="option" onclick="answer('10-3', 3, 2)"><span class="option-letter">D</span><span class="option-text">All new businesses get 180-day holds</span></div>
-        </div>
-        <div class="feedback" id="feedback-10-3"></div>
-      </div>
-      <div class="completion-banner" id="banner-intermediate">
-        <div class="completion-emoji">⚡</div>
-        <h3>Intermediate Module Complete!</h3>
-        <p>You understand the systems. Ready for advanced technical topics? Start Chapter 11.</p>
-      </div>
-      <div class="button-group">
-        <button class="btn btn-prev" onclick="goTo('10-2')">← Previous</button>
-        <button class="btn btn-next" id="btn-next-10-3" disabled onclick="goTo('11-1')">Next: Advanced →</button>
-      </div>
-    </div>
-
-    <!-- ADVANCED LESSONS 11-1 to 15-2 (10 lessons) -->
-    <div class="lesson" id="lesson-11-1">
-      <div class="lesson-eyebrow">Module 3 · Chapter 11 · Lesson 25</div>
-      <h2>Reading an ISO 8583 message</h2>
-      <p class="lesson-lead">ISO 8583 is the messaging standard for every card transaction on earth.</p>
-      <h3>Message structure</h3>
-      <p><strong>MTI (Message Type Indicator):</strong> Form number. 0100 = auth request, 0110 = response. <strong>Bitmap:</strong> Checklist of which fields present. <strong>Data elements:</strong> Actual data (card, amount, auth code).</p>
-      <h3>Key fields</h3>
-      <p><strong>DE 2:</strong> Card number. <strong>DE 4:</strong> Amount. <strong>DE 22:</strong> Entry mode (chip, tap, swipe). <strong>DE 39:</strong> Response code (00=approved, 51=insufficient funds). <strong>DE 55:</strong> EMV chip data with ARQC cryptogram.</p>
-      <div class="box"><strong>Why structure?</strong> Every bank uses the same form globally. No ambiguity about what Field 2 means.</div>
-      <div class="quiz">
-        <div class="quiz-title">Quick Check</div>
-        <div class="quiz-subtitle">Understanding ISO 8583</div>
-        <div class="question">Message returns MTI 0110, DE 39 = "51". Meaning?</div>
-        <div class="options" id="options-11-1">
-          <div class="option" onclick="answer('11-1', 0, 2)"><span class="option-letter">A</span><span class="option-text">Auth request sent, approved</span></div>
-          <div class="option" onclick="answer('11-1', 1, 2)"><span class="option-letter">B</span><span class="option-text">Reversal approved</span></div>
-          <div class="option" onclick="answer('11-1', 2, 2)"><span class="option-letter">C</span><span class="option-text">Response — declined, insufficient funds</span></div>
-          <div class="option" onclick="answer('11-1', 3, 2)"><span class="option-letter">D</span><span class="option-text">Debit request sent, approved</span></div>
-        </div>
-        <div class="feedback" id="feedback-11-1"></div>
-      </div>
-      <div class="button-group">
-        <button class="btn btn-prev" onclick="goTo('10-3')">← Previous</button>
-        <button class="btn btn-next" id="btn-next-11-1" disabled onclick="goTo('11-2')">Next →</button>
-      </div>
-    </div>
-
-    <div class="lesson" id="lesson-11-2">
-      <div class="lesson-eyebrow">Module 3 · Chapter 11 · Lesson 26</div>
-      <h2>SMS vs DMS — two settlement architectures</h2>
-      <p class="lesson-lead">Single Message vs Dual Message. Very different implications for operations.</p>
-      <h3>DMS (Dual Message) — Credit cards</h3>
-      <p><strong>Two messages:</strong> Auth (0100/0110) now, clearing message later. Merchant must "capture" to settle. Hotel pre-authorises £500, adjusts at checkout to £347, captures £347.</p>
-      <h3>SMS (Single Message) — Debit</h3>
-      <p><strong>One message (0200/0210):</strong> Auth = settlement. Capture isn't needed. Funds debit in real time.</p>
-      <h3>Operationally</h3>
-      <p>DMS: <strong>must capture</strong> or customer charged but you get no money. SMS: fire and forget.</p>
-      <div class="box"><strong>Critical difference:</strong> Not capturing a DMS auth = you lose money. Monitoring capture success is essential.</div>
-      <div class="quiz">
-        <div class="quiz-title">Quick Check</div>
-        <div class="quiz-subtitle">Understanding DMS/SMS</div>
-        <div class="question">Hotel pre-auths £500, bill is £347. Under DMS, what should they do?</div>
-        <div class="options" id="options-11-2">
-          <div class="option" onclick="answer('11-2', 0, 1)"><span class="option-letter">A</span><span class="option-text">Charge full £500</span></div>
-          <div class="option" onclick="answer('11-2', 1, 1)"><span class="option-letter">B</span><span class="option-text">Capture £347, £153 hold releases</span></div>
-          <div class="option" onclick="answer('11-2', 2, 1)"><span class="option-letter">C</span><span class="option-text">Refund £153 after charging £500</span></div>
-          <div class="option" onclick="answer('11-2', 3, 1)"><span class="option-letter">D</span><span class="option-text">Void and re-auth for £347</span></div>
-        </div>
-        <div class="feedback" id="feedback-11-2"></div>
-      </div>
-      <div class="button-group">
-        <button class="btn btn-prev" onclick="goTo('11-1')">← Previous</button>
-        <button class="btn btn-next" id="btn-next-11-2" disabled onclick="goTo('12-1')">Next →</button>
-      </div>
-    </div>
-
-    <div class="lesson" id="lesson-12-1">
-      <div class="lesson-eyebrow">Module 3 · Chapter 12 · Lesson 27</div>
-      <h2>3DS technical flows</h2>
-      <p class="lesson-lead">Inside the 3DS authentication protocol: five parties, JSON messages, real-time decisions.</p>
-      <h3>The AReq/ARes flow</h3>
-      <p><strong>1. Fingerprinting:</strong> JavaScript collects device data silently. <strong>2. AReq:</strong> Merchant sends to Directory Server, routed to ACS with full context. <strong>3. ACS decides:</strong> Frictionless (Y), challenge (C), or decline (N). <strong>4. ARes:</strong> Response to merchant. <strong>5. Challenge (if C):</strong> OTP, biometric, or push notification. <strong>6. CAVV:</strong> On success, cryptogram proves 3DS was completed.</p>
-      <div class="box"><strong>Frictionless rate depends on data quality:</strong> Rich AReq (account age, transaction history, device fingerprint) = higher frictionless. Minimal AReq = more challenges, more abandonment.</div>
-      <div class="quiz">
-        <div class="quiz-title">Quick Check</div>
-        <div class="quiz-subtitle">Understanding 3DS flows</div>
-        <div class="question">ACS responds "C". What happens next?</div>
-        <div class="options" id="options-12-1">
-          <div class="option" onclick="answer('12-1', 0, 1)"><span class="option-letter">A</span><span class="option-text">Declined (C = cancelled)</span></div>
-          <div class="option" onclick="answer('12-1', 1, 1)"><span class="option-letter">B</span><span class="option-text">Challenge presented to cardholder</span></div>
-          <div class="option" onclick="answer('12-1', 2, 1)"><span class="option-letter">C</span><span class="option-text">Merchant calls issuer</span></div>
-          <div class="option" onclick="answer('12-1', 3, 1)"><span class="option-letter">D</span><span class="option-text">Frictionless approval</span></div>
-        </div>
-        <div class="feedback" id="feedback-12-1"></div>
-      </div>
-      <div class="button-group">
-        <button class="btn btn-prev" onclick="goTo('11-2')">← Previous</button>
-        <button class="btn btn-next" id="btn-next-12-1" disabled onclick="goTo('12-2')">Next →</button>
-      </div>
-    </div>
-
-    <div class="lesson" id="lesson-12-2">
-      <div class="lesson-eyebrow">Module 3 · Chapter 12 · Lesson 28</div>
-      <h2>ECI values — authentication outcomes</h2>
-      <p class="lesson-lead">The Electronic Commerce Indicator (ECI) tells the issuer exactly what 3DS happened.</p>
-      <h3>Visa ECI</h3>
-      <p><strong>05:</strong> Fully authenticated. <strong>06:</strong> Authentication attempted (ACS returned unable). <strong>07:</strong> No authentication attempted.</p>
-      <h3>Liability</h3>
-      <p><strong>05 & 06:</strong> Shifts to issuer (attempted counts). <strong>07:</strong> Stays with merchant.</p>
-      <div class="box"><strong>Attempted = protected:</strong> Even if 3DS failed, attempting it shifts liability to issuer. Only ECI 07 (no attempt) means merchant keeps risk.</div>
-      <div class="quiz">
-        <div class="quiz-title">Quick Check</div>
-        <div class="quiz-subtitle">Understanding ECI</div>
-        <div class="question">Visa transaction completes ECI 06. Later disputed as fraud. Who bears chargeback?</div>
-        <div class="options" id="options-12-2">
-          <div class="option" onclick="answer('12-2', 0, 1)"><span class="option-letter">A</span><span class="option-text">Merchant — ECI 06 = failed</span></div>
-          <div class="option" onclick="answer('12-2', 1, 1)"><span class="option-letter">B</span><span class="option-text">Issuer — attempted = liability shift</span></div>
-          <div class="option" onclick="answer('12-2', 2, 1)"><span class="option-letter">C</span><span class="option-text">Visa</span></div>
-          <div class="option" onclick="answer('12-2', 3, 1)"><span class="option-letter">D</span><span class="option-text">50/50</span></div>
-        </div>
-        <div class="feedback" id="feedback-12-2"></div>
-      </div>
-      <div class="button-group">
-        <button class="btn btn-prev" onclick="goTo('12-1')">← Previous</button>
-        <button class="btn btn-next" id="btn-next-12-2" disabled onclick="goTo('13-1')">Next →</button>
-      </div>
-    </div>
-
-    <div class="lesson" id="lesson-13-1">
-      <div class="lesson-eyebrow">Module 3 · Chapter 13 · Lesson 29</div>
-      <h2>VTS, MDES and Token Service Providers</h2>
-      <p class="lesson-lead">Network tokenisation run by the card schemes themselves.</p>
-      <h3>Who they are</h3>
-      <p><strong>Visa Token Service (VTS):</strong> Manages Visa network tokens. <strong>Mastercard MDES:</strong> Manages Mastercard tokens. Each maintains a vault mapping DPANs to real PANs. Also manage lifecycle: provisioning, suspension, deletion.</p>
-      <h3>Token states</h3>
-      <p><strong>Inactive:</strong> Provisioning in progress. <strong>Active:</strong> Ready. <strong>Suspended:</strong> Temp unavailable (card lost/stolen). <strong>Deactivated:</strong> Permanently inactive.</p>
-      <div class="box"><strong>Account Updater:</strong> When physical card expires, issuer updates PAN mapping. DPAN on your phone keeps working automatically.</div>
-      <div class="quiz">
-        <div class="quiz-title">Quick Check</div>
-        <div class="quiz-subtitle">Understanding token management</div>
-        <div class="question">Cardholder reports card lost. What happens to Apple Pay tokens?</div>
-        <div class="options" id="options-13-1">
-          <div class="option" onclick="answer('13-1', 0, 1)"><span class="option-letter">A</span><span class="option-text">Nothing — tokens independent</span></div>
-          <div class="option" onclick="answer('13-1', 1, 1)"><span class="option-letter">B</span><span class="option-text">Tokens suspended as precaution</span></div>
-          <div class="option" onclick="answer('13-1', 2, 1)"><span class="option-letter">C</span><span class="option-text">Auto-deleted, must re-provision</span></div>
-          <div class="option" onclick="answer('13-1', 3, 1)"><span class="option-letter">D</span><span class="option-text">Merchants notified to reject</span></div>
-        </div>
-        <div class="feedback" id="feedback-13-1"></div>
-      </div>
-      <div class="button-group">
-        <button class="btn btn-prev" onclick="goTo('12-2')">← Previous</button>
-        <button class="btn btn-next" id="btn-next-13-1" disabled onclick="goTo('13-2')">Next →</button>
-      </div>
-    </div>
-
-    <div class="lesson" id="lesson-13-2">
-      <div class="lesson-eyebrow">Module 3 · Chapter 13 · Lesson 30</div>
-      <h2>Token provisioning — the six-step process</h2>
-      <p class="lesson-lead">Adding a card to a wallet: the technical handshake.</p>
-      <h3>The flow</h3>
-      <p><strong>1. Enrolment:</strong> You photo card. Apple sends to TSP. <strong>2. Lookup:</strong> TSP decrypts PAN, identifies issuer by BIN. <strong>3. Issuer approval:</strong> TSP asks issuer via API. <strong>4. ID&V:</strong> Issuer sends you verification text/app prompt. <strong>5. Token generation:</strong> DPAN + cryptographic keys generated. <strong>6. Delivery:</strong> Token stored securely on phone (SE or HCE).</p>
-      <div class="box"><strong>SE vs HCE:</strong> Secure Element (chip) = tamper-resistant hardware. Host Card Emulation (cloud) = software. SE slightly more secure, HCE more flexible.</div>
-      <div class="quiz">
-        <div class="quiz-title">Quick Check</div>
-        <div class="quiz-subtitle">Understanding provisioning</div>
-        <div class="question">During provisioning, who makes final decision to generate DPAN?</div>
-        <div class="options" id="options-13-2">
-          <div class="option" onclick="answer('13-2', 0, 1)"><span class="option-letter">A</span><span class="option-text">Apple/Google</span></div>
-          <div class="option" onclick="answer('13-2', 1, 1)"><span class="option-letter">B</span><span class="option-text">Cardholder's bank (issuer)</span></div>
-          <div class="option" onclick="answer('13-2', 2, 1)"><span class="option-letter">C</span><span class="option-text">Visa/Mastercard autonomously</span></div>
-          <div class="option" onclick="answer('13-2', 3, 1)"><span class="option-letter">D</span><span class="option-text">Mobile network provider</span></div>
-        </div>
-        <div class="feedback" id="feedback-13-2"></div>
-      </div>
-      <div class="button-group">
-        <button class="btn btn-prev" onclick="goTo('13-1')">← Previous</button>
-        <button class="btn btn-next" id="btn-next-13-2" disabled onclick="goTo('14-1')">Next →</button>
-      </div>
-    </div>
-
-    <div class="lesson" id="lesson-14-1">
-      <div class="lesson-eyebrow">Module 3 · Chapter 14 · Lesson 31</div>
-      <h2>Machine learning detects fraud in milliseconds</h2>
-      <p class="lesson-lead">Modern fraud detection goes beyond rules to find novel patterns.</p>
-      <h3>What ML adds</h3>
-      <p>Rules are reactive (written after seeing fraud pattern). ML is proactive (identifies patterns not yet in rules). ML finds non-linear feature combinations.</p>
-      <h3>Feature engineering</h3>
-      <p><strong>Card-level:</strong> Days since issued, historical decline rate, std dev of amounts. <strong>Behavioural:</strong> Typing speed, copy-paste detected. <strong>Network:</strong> IP reputation, cards per IP this hour. <strong>Temporal:</strong> Hour of day, transaction velocity. <strong>Graph:</strong> Device clustering, email patterns.</p>
-      <div class="box"><strong>Production reality:</strong> Gradient boosted trees (XGBoost) dominate over neural networks. Fast inference, good tabular data handling, interpretable.</div>
-      <div class="quiz">
-        <div class="quiz-title">Quick Check</div>
-        <div class="quiz-subtitle">Understanding ML fraud</div>
-        <div class="question">ML flags transaction high-risk, but no single rule triggered. ML advantage?</div>
-        <div class="options" id="options-14-1">
-          <div class="option" onclick="answer('14-1', 0, 2)"><span class="option-letter">A</span><span class="option-text">ML always more accurate</span></div>
-          <div class="option" onclick="answer('14-1', 1, 2)"><span class="option-letter">B</span><span class="option-text">ML cheaper</span></div>
-          <div class="option" onclick="answer('14-1', 2, 2)"><span class="option-letter">C</span><span class="option-text">ML finds non-obvious feature combinations</span></div>
-          <div class="option" onclick="answer('14-1', 3, 2)"><span class="option-letter">D</span><span class="option-text">ML accesses secret data</span></div>
-        </div>
-        <div class="feedback" id="feedback-14-1"></div>
-      </div>
-      <div class="button-group">
-        <button class="btn btn-prev" onclick="goTo('13-2')">← Previous</button>
-        <button class="btn btn-next" id="btn-next-14-1" disabled onclick="goTo('14-2')">Next →</button>
-      </div>
-    </div>
-
-    <div class="lesson" id="lesson-14-2">
-      <div class="lesson-eyebrow">Module 3 · Chapter 14 · Lesson 32</div>
-      <h2>Real-time risk orchestration</h2>
-      <p class="lesson-lead">Single score isn't enough. Production systems run multiple models, rules, and data sources in parallel under 300ms.</p>
-      <h3>The pipeline</h3>
-      <p><strong>1. Pre-screening rules:</strong> Hard blocks (known bad IPs). <strong>2. Feature extraction:</strong> Enrich with real-time lookups. <strong>3. Model ensemble:</strong> Run gradient boosted trees, neural networks, rules in parallel. <strong>4. Policy engine:</strong> Apply business rules. <strong>5. Decisioning:</strong> Approve / Challenge / Decline. <strong>6. Feedback loop:</strong> Chargebacks fed back into retraining.</p>
-      <div class="box"><strong>Metric obsession:</strong> Teams track both fraud rate AND false positive rate daily. Tight threshold catches fraud but loses revenue. Loose threshold keeps revenue but lets fraud through.</div>
-      <div class="quiz">
-        <div class="quiz-title">Quick Check</div>
-        <div class="quiz-subtitle">Understanding orchestration</div>
-        <div class="question">Team tightens ML threshold (block more). Trade-off?</div>
-        <div class="options" id="options-14-2">
-          <div class="option" onclick="answer('14-2', 0, 1)"><span class="option-letter">A</span><span class="option-text">Fraud improves with no downside</span></div>
-          <div class="option" onclick="answer('14-2', 1, 1)"><span class="option-letter">B</span><span class="option-text">More fraud blocked, but more legitimate also declined</span></div>
-          <div class="option" onclick="answer('14-2', 2, 1)"><span class="option-letter">C</span><span class="option-text">Model runs faster</span></div>
-          <div class="option" onclick="answer('14-2', 3, 1)"><span class="option-letter">D</span><span class="option-text">Interchange rates drop</span></div>
-        </div>
-        <div class="feedback" id="feedback-14-2"></div>
-      </div>
-      <div class="button-group">
-        <button class="btn btn-prev" onclick="goTo('14-1')">← Previous</button>
-        <button class="btn btn-next" id="btn-next-14-2" disabled onclick="goTo('15-1')">Next →</button>
-      </div>
-    </div>
-
-    <div class="lesson" id="lesson-15-1">
-      <div class="lesson-eyebrow">Module 3 · Chapter 15 · Lesson 33</div>
-      <h2>Scheme monitoring programmes</h2>
-      <p class="lesson-lead">Visa (VDMP), Mastercard (ECP) actively monitor and fine merchants exceeding fraud/chargeback thresholds.</p>
-      <h3>Visa</h3>
-      <p><strong>VDMP:</strong> Chargeback ratio ≥0.65% → fines from month 4, escalate each month. <strong>VFMP:</strong> Fraud ratio ≥0.65% → fines, liability shift changes.</p>
-      <h3>Mastercard</h3>
-      <p><strong>ECP:</strong> Ratio ≥1% AND count ≥100 → £1k–£100k monthly fines.</p>
-      <div class="box"><strong>Cumulative cost:</strong> Month 4–6 in programme: £50/excess chargeback. Spend a year in VDMP = hundreds of thousands in fines. Acquirers warn months before charges become critical.</div>
-      <div class="quiz">
-        <div class="quiz-title">Quick Check</div>
-        <div class="quiz-subtitle">Understanding scheme monitoring</div>
-        <div class="question">Merchant's chargeback ratio hits 1.2% for two months. Expect?</div>
-        <div class="options" id="options-15-1">
-          <div class="option" onclick="answer('15-1', 0, 2)"><span class="option-letter">A</span><span class="option-text">Nothing — only after 6 months</span></div>
-          <div class="option" onclick="answer('15-1', 1, 2)"><span class="option-letter">B</span><span class="option-text">Interchange increases</span></div>
-          <div class="option" onclick="answer('15-1', 2, 2)"><span class="option-letter">C</span><span class="option-text">Entry into VDMP/ECP, escalating monthly fines</span></div>
-          <div class="option" onclick="answer('15-1', 3, 2)"><span class="option-letter">D</span><span class="option-text">Schemes contact customers directly</span></div>
-        </div>
-        <div class="feedback" id="feedback-15-1"></div>
-      </div>
-      <div class="button-group">
-        <button class="btn btn-prev" onclick="goTo('14-2')">← Previous</button>
-        <button class="btn btn-next" id="btn-next-15-1" disabled onclick="goTo('15-2')">Next →</button>
-      </div>
-    </div>
-
-    <div class="lesson" id="lesson-15-2">
-      <div class="lesson-eyebrow">Module 3 · Chapter 15 · Lesson 34</div>
-      <h2>Compelling Evidence 3.0 (CE 3.0)</h2>
-      <p class="lesson-lead">Visa's tool for merchants to fight friendly fraud using transaction history.</p>
-      <h3>What it is</h3>
-      <p>Friendly fraud = legitimate cardholders disputing real transactions. Estimated 30–40% of all chargebacks. CE 3.0 lets merchants provide evidence of prior, undisputed transactions from same cardholder on same device = proof cardholder was known before.</p>
-      <h3>CE 3.0 requirements</h3>
-      <p>Provide 2+ prior transactions: completed 120–365 days before dispute, not themselves disputed, same device fingerprint AND IP as disputed transaction, account created 120+ days before dispute.</p>
-      <div class="box"><strong>Critical implication:</strong> Must collect and retain device fingerprint + IP for 13 months. Not collecting it = no CE 3.0 defence. Merchants need this data retention as compliance requirement now.</div>
-      <div class="quiz">
-        <div class="quiz-title">Quick Check</div>
-        <div class="quiz-subtitle">Understanding CE 3.0</div>
-        <div class="question">Merchant has prior purchase history but never stored device fingerprints. Can use CE 3.0?</div>
-        <div class="options" id="options-15-2">
-          <div class="option" onclick="answer('15-2', 0, 1)"><span class="option-letter">A</span><span class="option-text">Yes — purchase history sufficient</span></div>
-          <div class="option" onclick="answer('15-2', 1, 1)"><span class="option-letter">B</span><span class="option-text">No — device fingerprint matching is mandatory</span></div>
-          <div class="option" onclick="answer('15-2', 2, 1)"><span class="option-letter">C</span><span class="option-text">Yes — email history can substitute</span></div>
-          <div class="option" onclick="answer('15-2', 3, 1)"><span class="option-letter">D</span><span class="option-text">CE 3.0 is optional</span></div>
-        </div>
-        <div class="feedback" id="feedback-15-2"></div>
-      </div>
-      <div class="completion-banner" id="banner-advanced">
-        <div class="completion-emoji">🏆</div>
-        <h3>Advanced Module Complete!</h3>
-        <p>You've mastered all 34 lessons. You're now an expert on card payments.</p>
-      </div>
-      <div class="button-group">
-        <button class="btn btn-prev" onclick="goTo('15-1')">← Previous</button>
-        <button class="btn btn-next" id="btn-next-15-2" disabled onclick="goTo('certs')">View Certificates →</button>
-      </div>
-    </div>
-
-    <!-- CERTIFICATES PAGE -->
-    <div class="lesson" id="lesson-certs">
-      <h2>🏆 Your Certificates</h2>
-      <p>Complete all 34 lessons with 100% on each quiz to earn your certificates.</p>
-      
-      <div class="cert-grid">
-        <div class="cert-card" id="cert-beginner">
-          <div class="cert-emoji">📚</div>
-          <div class="cert-name">Payments 101 — Beginner</div>
-          <div class="cert-progress" id="prog-beginner">0 / 12 lessons</div>
-          <div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div>
-        </div>
-        <div class="cert-card" id="cert-intermediate">
-          <div class="cert-emoji">⚡</div>
-          <div class="cert-name">Intermediate Practitioner</div>
-          <div class="cert-progress" id="prog-intermediate">0 / 12 lessons</div>
-          <div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div>
-        </div>
-        <div class="cert-card" id="cert-advanced">
-          <div class="cert-emoji">🏆</div>
-          <div class="cert-name">Advanced Specialist</div>
-          <div class="cert-progress" id="prog-advanced">0 / 10 lessons</div>
-          <div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div>
-        </div>
-        <div class="cert-card" id="cert-all">
-          <div class="cert-emoji">🎓</div>
-          <div class="cert-name">Payments 101 Complete</div>
-          <div class="cert-progress" id="prog-all">0 / 34 lessons</div>
-          <div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div>
-        </div>
-      </div>
-    </div>
-
+<div class="hero-strip">
+  <h1>3DS <em>Interactive</em> Simulator</h1>
+  <p>Explore payment authentication flows: standard 3DS/SCA, FIDO2 passkey challenges, and agentic payment vetting. Manipulate risk signals in real time.</p>
+  <div class="hero-meta">
+    <div class="hero-badge">Protocol <strong>EMV® 3DS 2.3</strong></div>
+    <div class="hero-badge">Signals <strong>250+ factors</strong></div>
+    <div class="hero-badge">Latency <strong>&lt;80ms</strong></div>
   </div>
-
 </div>
 
-<!-- BOTTOM NAVIGATION -->
-<nav class="bottomnav">
-  <div class="nav-item active" id="nav-home" onclick="goTo('home')">
-    <div class="nav-item-icon">🏠</div>
-    <div class="nav-item-label">Home</div>
+<div class="scenario-bar">
+  <button class="scenario-btn active" id="scn-0" onclick="switchScenario(0,this)">
+    <div class="scenario-btn-icon">🔐</div>
+    <div class="scenario-btn-title">3DS / SCA</div>
+    <div class="scenario-btn-sub">Standard flow</div>
+  </button>
+  <button class="scenario-btn" id="scn-1" onclick="switchScenario(1,this)">
+    <div class="scenario-btn-icon">🔑</div>
+    <div class="scenario-btn-title">Passkey Auth</div>
+    <div class="scenario-btn-sub">FIDO2</div>
+  </button>
+  <button class="scenario-btn" id="scn-2" onclick="switchScenario(2,this)">
+    <div class="scenario-btn-icon">🤖</div>
+    <div class="scenario-btn-title">Agentic</div>
+    <div class="scenario-btn-sub">AI agent</div>
+  </button>
+</div>
+
+<div class="main">
+  <div class="sim-layout">
+
+    <div class="sim-controls">
+
+      <div class="control-section">
+        <div class="control-section-title"><span>⚡</span> Risk Score</div>
+        <div class="risk-score-display">
+          <div class="risk-score-num" id="riskNum">42</div>
+          <div class="risk-score-bar-wrap">
+            <div class="risk-score-label">Score (0–100)</div>
+            <div class="risk-score-bar"><div class="risk-score-fill" id="riskFill" style="width:42%;background:var(--amber)"></div></div>
+            <div class="risk-verdict" id="riskVerdict">⚡ MODERATE</div>
+          </div>
+        </div>
+
+        <div class="slider-row">
+          <div class="slider-header"><span class="slider-label">Device Trust</span><span class="slider-val" id="val-device">72</span></div>
+          <input type="range" min="0" max="100" value="72" oninput="updateSignal('device',this.value)"/>
+        </div>
+        <div class="slider-row">
+          <div class="slider-header"><span class="slider-label">Geo Risk</span><span class="slider-val" id="val-geo">30</span></div>
+          <input type="range" min="0" max="100" value="30" oninput="updateSignal('geo',this.value)"/>
+        </div>
+        <div class="slider-row">
+          <div class="slider-header"><span class="slider-label">Velocity</span><span class="slider-val" id="val-velocity">45</span></div>
+          <input type="range" min="0" max="100" value="45" oninput="updateSignal('velocity',this.value)"/>
+        </div>
+        <div class="slider-row">
+          <div class="slider-header"><span class="slider-label">Behaviour</span><span class="slider-val" id="val-behaviour">65</span></div>
+          <input type="range" min="0" max="100" value="65" oninput="updateSignal('behaviour',this.value)"/>
+        </div>
+        <div class="slider-row">
+          <div class="slider-header"><span class="slider-label">Card History</span><span class="slider-val" id="val-history">20</span></div>
+          <input type="range" min="0" max="100" value="20" oninput="updateSignal('history',this.value)"/>
+        </div>
+        <div class="slider-row">
+          <div class="slider-header"><span class="slider-label">Amount Risk</span><span class="slider-val" id="val-amount">35</span></div>
+          <input type="range" min="0" max="100" value="35" oninput="updateSignal('amount',this.value)"/>
+        </div>
+      </div>
+
+      <div class="control-section">
+        <div class="control-section-title"><span>🧾</span> Context</div>
+        <div class="slider-row" style="margin-bottom:0">
+          <div class="slider-label" style="margin-bottom:4px;display:block;">Amount</div>
+          <select class="sim-select" id="sel-amount" onchange="updateContext()">
+            <option value="low">£0–£30</option>
+            <option value="mid" selected>£31–£250</option>
+            <option value="high">£251–£2,000</option>
+            <option value="vhigh">£2,001+</option>
+          </select>
+        </div>
+        <div class="slider-row" style="margin: 12px 0 0">
+          <div class="slider-label" style="margin-bottom:4px;display:block;">Merchant</div>
+          <select class="sim-select" id="sel-mcc" onchange="updateContext()">
+            <option value="retail">Retail</option>
+            <option value="travel" selected>Travel</option>
+            <option value="gambling">Gambling</option>
+            <option value="crypto">Crypto</option>
+            <option value="luxury">Luxury</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="control-section" id="ctrl-agent" style="display:none">
+        <div class="control-section-title"><span>🤖</span> Agent</div>
+        <div class="toggle-row">
+          <div class="toggle-label"><strong>Registered</strong></div>
+          <button class="toggle on" id="tog-agent-reg" onclick="toggleAgent('reg',this)"></button>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-label"><strong>In Scope</strong></div>
+          <button class="toggle on" id="tog-agent-scope" onclick="toggleAgent('scope',this)"></button>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-label"><strong>Signature OK</strong></div>
+          <button class="toggle on" id="tog-agent-sig" onclick="toggleAgent('sig',this)"></button>
+        </div>
+      </div>
+
+      <div class="control-section" style="border-bottom:none">
+        <button class="run-btn" id="runBtn" onclick="runSimulation()">
+          <span>▶</span> Run Simulation
+        </button>
+      </div>
+
+    </div>
+
+    <div class="sim-canvas" id="simCanvas">
+
+      <div class="flow-header">
+        <div>
+          <div class="flow-title" id="flowTitle">3DS Standard Flow</div>
+          <div class="flow-subtitle" id="flowSubtitle">EMV® 3DS 2.3 · Frictionless / Challenge</div>
+        </div>
+        <div class="flow-decision-badge" id="decisionBadge" style="border-color:var(--amber);color:var(--amber);background:rgba(245,158,11,0.08)">
+          <span>⚡</span> <span id="decisionText">Ready</span>
+        </div>
+      </div>
+
+      <div id="scene-0" class="sim-section visible">
+        <div class="flow-lanes" id="lanes-0">
+          <div class="flow-lane">
+            <div class="lane-header">Cardholder</div>
+            <div class="lane-body">
+              <div class="fnode" id="n0-0"><div class="fnode-icon">🛒</div><div class="fnode-label">Checkout</div></div>
+              <div class="connector"><div class="connector-line" id="c0-0"></div></div>
+              <div class="fnode" id="n0-1"><div class="fnode-icon">📤</div><div class="fnode-label">AReq</div></div>
+              <div class="connector"><div class="connector-line" id="c0-1"></div></div>
+              <div class="fnode" id="n0-result-frictionless"><div class="fnode-icon">✅</div><div class="fnode-label">Approved</div></div>
+              <div class="fnode" id="n0-result-challenge" style="display:none"><div class="fnode-icon">📲</div><div class="fnode-label">Challenge</div></div>
+              <div class="fnode" id="n0-result-deny" style="display:none"><div class="fnode-icon">🚫</div><div class="fnode-label">Denied</div></div>
+            </div>
+          </div>
+          <div class="flow-lane">
+            <div class="lane-header">3DS Server</div>
+            <div class="lane-body">
+              <div class="fnode" id="n0-2"><div class="fnode-icon">🔀</div><div class="fnode-label">Route</div></div>
+              <div class="connector"><div class="connector-line" id="c0-2"></div></div>
+              <div class="fnode" id="n0-3"><div class="fnode-icon">📨</div><div class="fnode-label">Forward</div></div>
+              <div class="connector"><div class="connector-line" id="c0-3"></div></div>
+              <div class="fnode" id="n0-4"><div class="fnode-icon">📩</div><div class="fnode-label">ARes</div></div>
+            </div>
+          </div>
+          <div class="flow-lane">
+            <div class="lane-header">ACS Engine</div>
+            <div class="lane-body">
+              <div class="fnode" id="n0-5"><div class="fnode-icon">⚡</div><div class="fnode-label">Signals</div></div>
+              <div class="connector"><div class="connector-line" id="c0-4"></div></div>
+              <div class="fnode" id="n0-6"><div class="fnode-icon">⚙️</div><div class="fnode-label">Rules</div></div>
+              <div class="connector"><div class="connector-line" id="c0-5"></div></div>
+              <div class="fnode" id="n0-7"><div class="fnode-icon">🧠</div><div class="fnode-label">Decision</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="detail-panel" id="detail-panel-0">
+          <div class="detail-panel-title">🔐 3DS Flow</div>
+          <div class="detail-panel-body">Adjust risk signals on the left and click <strong>Run Simulation</strong> to animate the transaction flow.</div>
+          <div class="signal-matrix" id="signal-matrix-0"></div>
+        </div>
+
+        <div class="decision-trace" id="trace-0">
+          <div class="trace-line"><span class="trace-info">Ready for simulation...</span></div>
+        </div>
+      </div>
+
+      <div id="scene-1" class="sim-section">
+        <div class="flow-lanes">
+          <div class="flow-lane">
+            <div class="lane-header">Device</div>
+            <div class="lane-body">
+              <div class="fnode" id="n1-0"><div class="fnode-icon">🛒</div><div class="fnode-label">Checkout</div></div>
+              <div class="connector"><div class="connector-line" id="c1-0"></div></div>
+              <div class="fnode" id="n1-passkey"><div class="fnode-icon">🔑</div><div class="fnode-label">Passkey</div></div>
+              <div class="connector"><div class="connector-line" id="c1-1"></div></div>
+              <div class="fnode" id="n1-result"><div class="fnode-icon">✅</div><div class="fnode-label">Verified</div></div>
+            </div>
+          </div>
+          <div class="flow-lane">
+            <div class="lane-header">Authenticator</div>
+            <div class="lane-body">
+              <div class="fnode" id="n1-enclave"><div class="fnode-icon">🔐</div><div class="fnode-label">Enclave</div></div>
+              <div class="connector"><div class="connector-line" id="c1-2"></div></div>
+              <div class="fnode" id="n1-bio"><div class="fnode-icon">👆</div><div class="fnode-label">Biometric</div></div>
+              <div class="connector"><div class="connector-line" id="c1-3"></div></div>
+              <div class="fnode" id="n1-assert"><div class="fnode-icon">🖊️</div><div class="fnode-label">Sign</div></div>
+            </div>
+          </div>
+          <div class="flow-lane">
+            <div class="lane-header">ACS</div>
+            <div class="lane-body">
+              <div class="fnode" id="n1-risk"><div class="fnode-icon">⚡</div><div class="fnode-label">Risk</div></div>
+              <div class="connector"><div class="connector-line" id="c1-4"></div></div>
+              <div class="fnode" id="n1-creq"><div class="fnode-icon">📨</div><div class="fnode-label">CReq</div></div>
+              <div class="connector"><div class="connector-line" id="c1-5"></div></div>
+              <div class="fnode" id="n1-verify"><div class="fnode-icon">🔍</div><div class="fnode-label">Verify</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="detail-panel" id="detail-panel-1">
+          <div class="detail-panel-title">🔑 Passkey Flow</div>
+          <div class="detail-panel-body">FIDO2 WebAuthn challenge — biometric authentication with zero shared secrets.</div>
+          <div class="signal-matrix" id="signal-matrix-1"></div>
+        </div>
+        <div class="decision-trace" id="trace-1">
+          <div class="trace-line"><span class="trace-info">Ready for simulation...</span></div>
+        </div>
+      </div>
+
+      <div id="scene-2" class="sim-section">
+        <div class="flow-lanes">
+          <div class="flow-lane">
+            <div class="lane-header">AI Agent</div>
+            <div class="lane-body">
+              <div class="fnode" id="n2-0"><div class="fnode-icon">🤖</div><div class="fnode-label">Mandate</div></div>
+              <div class="connector"><div class="connector-line" id="c2-0"></div></div>
+              <div class="fnode" id="n2-pay"><div class="fnode-icon">💳</div><div class="fnode-label">Payment</div></div>
+              <div class="connector"><div class="connector-line" id="c2-1"></div></div>
+              <div class="fnode" id="n2-result-ok"><div class="fnode-icon">✅</div><div class="fnode-label">Approved</div></div>
+              <div class="fnode" id="n2-result-escalate" style="display:none"><div class="fnode-icon">📲</div><div class="fnode-label">Escalate</div></div>
+              <div class="fnode" id="n2-result-block" style="display:none"><div class="fnode-icon">🚫</div><div class="fnode-label">Blocked</div></div>
+            </div>
+          </div>
+          <div class="flow-lane">
+            <div class="lane-header">Agent Vetting</div>
+            <div class="lane-body">
+              <div class="fnode" id="n2-reg"><div class="fnode-icon">📋</div><div class="fnode-label">Registry</div></div>
+              <div class="connector"><div class="connector-line" id="c2-2"></div></div>
+              <div class="fnode" id="n2-scope"><div class="fnode-icon">🎯</div><div class="fnode-label">Scope</div></div>
+              <div class="connector"><div class="connector-line" id="c2-3"></div></div>
+              <div class="fnode" id="n2-sig"><div class="fnode-icon">🔏</div><div class="fnode-label">Signature</div></div>
+            </div>
+          </div>
+          <div class="flow-lane">
+            <div class="lane-header">ACS Decision</div>
+            <div class="lane-body">
+              <div class="fnode" id="n2-risk"><div class="fnode-icon">⚡</div><div class="fnode-label">Risk</div></div>
+              <div class="connector"><div class="connector-line" id="c2-4"></div></div>
+              <div class="fnode" id="n2-rules"><div class="fnode-icon">⚙️</div><div class="fnode-label">Rules</div></div>
+              <div class="connector"><div class="connector-line" id="c2-5"></div></div>
+              <div class="fnode" id="n2-decide"><div class="fnode-icon">🧠</div><div class="fnode-label">Decision</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="agent-card" id="agentCard">
+          <div style="font-family:var(--font-h);font-size:0.8rem;font-weight:700;margin-bottom:10px;color:var(--teal)">🤖 Agent</div>
+          <div class="agent-card-row"><span class="agent-card-key">Registered</span><span class="agent-card-val valid" id="ag-reg-val">✓ Yes</span></div>
+          <div class="agent-card-row"><span class="agent-card-key">Scope</span><span class="agent-card-val valid" id="ag-scope-val">✓ In mandate</span></div>
+          <div class="agent-card-row"><span class="agent-card-key">Signature</span><span class="agent-card-val valid" id="ag-sig-val">✓ Valid</span></div>
+        </div>
+
+        <div class="detail-panel" id="detail-panel-2">
+          <div class="detail-panel-title">🤖 Agentic Flow</div>
+          <div class="detail-panel-body">AI agent payment with delegated authority. Toggle agent identity on the left.</div>
+          <div class="signal-matrix" id="signal-matrix-2"></div>
+        </div>
+        <div class="decision-trace" id="trace-2">
+          <div class="trace-line"><span class="trace-info">Ready for simulation...</span></div>
+        </div>
+      </div>
+
+    </div>
   </div>
-  <div class="nav-section-label" style="width:100%;text-align:center;margin:0;padding:0 10px">Module 1</div>
-  <div class="nav-item" id="nav-1-1" onclick="goTo('1-1')"><div class="nav-item-icon">1️⃣</div><div class="nav-item-label">L1</div></div>
-  <div class="nav-item" id="nav-1-2" onclick="goTo('1-2')"><div class="nav-item-icon">2️⃣</div><div class="nav-item-label">L2</div></div>
-  <div class="nav-item" id="nav-1-3" onclick="goTo('1-3')"><div class="nav-item-icon">3️⃣</div><div class="nav-item-label">L3</div></div>
-  <div class="nav-item" id="nav-2-1" onclick="goTo('2-1')"><div class="nav-item-icon">4️⃣</div><div class="nav-item-label">L4</div></div>
-  <div class="nav-item" id="nav-2-2" onclick="goTo('2-2')"><div class="nav-item-icon">5️⃣</div><div class="nav-item-label">L5</div></div>
-  <div class="nav-item" id="nav-2-3" onclick="goTo('2-3')"><div class="nav-item-icon">6️⃣</div><div class="nav-item-label">L6</div></div>
-  <div class="nav-item" id="nav-3-1" onclick="goTo('3-1')"><div class="nav-item-icon">7️⃣</div><div class="nav-item-label">L7</div></div>
-  <div class="nav-item" id="nav-3-2" onclick="goTo('3-2')"><div class="nav-item-icon">8️⃣</div><div class="nav-item-label">L8</div></div>
-  <div class="nav-item" id="nav-4-1" onclick="goTo('4-1')"><div class="nav-item-icon">9️⃣</div><div class="nav-item-label">L9</div></div>
-  <div class="nav-item" id="nav-4-2" onclick="goTo('4-2')"><div class="nav-item-icon">🔟</div><div class="nav-item-label">L10</div></div>
-  <div class="nav-item" id="nav-5-1" onclick="goTo('5-1')"><div class="nav-item-icon">1️⃣1️⃣</div><div class="nav-item-label">L11</div></div>
-  <div class="nav-item" id="nav-5-2" onclick="goTo('5-2')"><div class="nav-item-icon">1️⃣2️⃣</div><div class="nav-item-label">L12</div></div>
-  <div class="nav-section-label" style="width:100%;text-align:center;margin:0;padding:0 10px;font-size:0.65rem;color:#999">Module 2</div>
-  <div class="nav-item" id="nav-6-1" onclick="goTo('6-1')"><div class="nav-item-icon">1️⃣3️⃣</div><div class="nav-item-label">L13</div></div>
-  <div class="nav-item" id="nav-6-2" onclick="goTo('6-2')"><div class="nav-item-icon">1️⃣4️⃣</div><div class="nav-item-label">L14</div></div>
-  <div class="nav-item" id="nav-6-3" onclick="goTo('6-3')"><div class="nav-item-icon">1️⃣5️⃣</div><div class="nav-item-label">L15</div></div>
-  <div class="nav-item" id="nav-7-1" onclick="goTo('7-1')"><div class="nav-item-icon">1️⃣6️⃣</div><div class="nav-item-label">L16</div></div>
-  <div class="nav-item" id="nav-7-2" onclick="goTo('7-2')"><div class="nav-item-icon">1️⃣7️⃣</div><div class="nav-item-label">L17</div></div>
-  <div class="nav-item" id="nav-8-1" onclick="goTo('8-1')"><div class="nav-item-icon">1️⃣8️⃣</div><div class="nav-item-label">L18</div></div>
-  <div class="nav-item" id="nav-8-2" onclick="goTo('8-2')"><div class="nav-item-icon">1️⃣9️⃣</div><div class="nav-item-label">L19</div></div>
-  <div class="nav-item" id="nav-9-1" onclick="goTo('9-1')"><div class="nav-item-icon">2️⃣0️⃣</div><div class="nav-item-label">L20</div></div>
-  <div class="nav-item" id="nav-9-2" onclick="goTo('9-2')"><div class="nav-item-icon">2️⃣1️⃣</div><div class="nav-item-label">L21</div></div>
-  <div class="nav-item" id="nav-10-1" onclick="goTo('10-1')"><div class="nav-item-icon">2️⃣2️⃣</div><div class="nav-item-label">L22</div></div>
-  <div class="nav-item" id="nav-10-2" onclick="goTo('10-2')"><div class="nav-item-icon">2️⃣3️⃣</div><div class="nav-item-label">L23</div></div>
-  <div class="nav-item" id="nav-10-3" onclick="goTo('10-3')"><div class="nav-item-icon">2️⃣4️⃣</div><div class="nav-item-label">L24</div></div>
-  <div class="nav-section-label" style="width:100%;text-align:center;margin:0;padding:0 10px;font-size:0.65rem;color:#999">Module 3</div>
-  <div class="nav-item" id="nav-11-1" onclick="goTo('11-1')"><div class="nav-item-icon">2️⃣5️⃣</div><div class="nav-item-label">L25</div></div>
-  <div class="nav-item" id="nav-11-2" onclick="goTo('11-2')"><div class="nav-item-icon">2️⃣6️⃣</div><div class="nav-item-label">L26</div></div>
-  <div class="nav-item" id="nav-12-1" onclick="goTo('12-1')"><div class="nav-item-icon">2️⃣7️⃣</div><div class="nav-item-label">L27</div></div>
-  <div class="nav-item" id="nav-12-2" onclick="goTo('12-2')"><div class="nav-item-icon">2️⃣8️⃣</div><div class="nav-item-label">L28</div></div>
-  <div class="nav-item" id="nav-13-1" onclick="goTo('13-1')"><div class="nav-item-icon">2️⃣9️⃣</div><div class="nav-item-label">L29</div></div>
-  <div class="nav-item" id="nav-13-2" onclick="goTo('13-2')"><div class="nav-item-icon">3️⃣0️⃣</div><div class="nav-item-label">L30</div></div>
-  <div class="nav-item" id="nav-14-1" onclick="goTo('14-1')"><div class="nav-item-icon">3️⃣1️⃣</div><div class="nav-item-label">L31</div></div>
-  <div class="nav-item" id="nav-14-2" onclick="goTo('14-2')"><div class="nav-item-icon">3️⃣2️⃣</div><div class="nav-item-label">L32</div></div>
-  <div class="nav-item" id="nav-15-1" onclick="goTo('15-1')"><div class="nav-item-icon">3️⃣3️⃣</div><div class="nav-item-label">L33</div></div>
-  <div class="nav-item" id="nav-15-2" onclick="goTo('15-2')"><div class="nav-item-icon">3️⃣4️⃣</div><div class="nav-item-label">L34</div></div>
-  <div class="nav-item" id="nav-certs" onclick="goTo('certs')"><div class="nav-item-icon">🏆</div><div class="nav-item-label">Certs</div></div>
-</nav>
+</div>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="modal-otp">
+  <div class="modal-window">
+    <div class="modal-topbar">
+      <div>
+        <div class="modal-topbar-logo">3DS</div>
+        <div style="margin-left:8px"><div class="modal-topbar-title">OTP Challenge</div><div class="modal-topbar-sub">3DS 2.3 · CReq</div></div>
+      </div>
+      <button class="modal-close" onclick="closeModal('otp')">✕</button>
+    </div>
+    <div class="modal-merchant">
+      <div class="modal-merchant-info">
+        <div class="modal-merchant-icon" id="otp-merchant-icon">✈️</div>
+        <div>
+          <div class="modal-merchant-name" id="otp-merchant-name">British Airways</div>
+          <div class="modal-merchant-desc" id="otp-merchant-desc">Travel · Visa Debit · ****4821</div>
+        </div>
+      </div>
+      <div class="modal-amount">
+        <div class="modal-amount-num" id="otp-amount">£147.00</div>
+        <div class="modal-amount-label">Amount</div>
+      </div>
+    </div>
+    <div class="modal-body">
+      <div class="otp-prompt">
+        <div class="otp-prompt-icon">📱</div>
+        <div class="otp-prompt-title">Enter Code</div>
+        <div class="otp-prompt-sub">6-digit code sent to <span class="otp-prompt-phone">••••7392</span></div>
+      </div>
+      <div class="otp-inputs" id="otp-input-row">
+        <input class="otp-input" maxlength="1" type="text" inputmode="numeric" id="otp-0" oninput="otpNext(0,this)" onkeydown="otpBack(0,event)"/>
+        <input class="otp-input" maxlength="1" type="text" inputmode="numeric" id="otp-1" oninput="otpNext(1,this)" onkeydown="otpBack(1,event)"/>
+        <input class="otp-input" maxlength="1" type="text" inputmode="numeric" id="otp-2" oninput="otpNext(2,this)" onkeydown="otpBack(2,event)"/>
+        <input class="otp-input" maxlength="1" type="text" inputmode="numeric" id="otp-3" oninput="otpNext(3,this)" onkeydown="otpBack(3,event)"/>
+        <input class="otp-input" maxlength="1" type="text" inputmode="numeric" id="otp-4" oninput="otpNext(4,this)" onkeydown="otpBack(4,event)"/>
+        <input class="otp-input" maxlength="1" type="text" inputmode="numeric" id="otp-5" oninput="otpNext(5,this)" onkeydown="otpBack(5,event)"/>
+      </div>
+      <div id="otp-result-msg" style="text-align:center;font-size:0.75rem;margin-bottom:12px;color:var(--muted)"></div>
+      <div class="modal-actions">
+        <button class="modal-btn-secondary" onclick="closeModal('otp')">Cancel</button>
+        <button class="modal-btn-primary" id="otp-submit-btn" onclick="submitOTP()">Verify →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-passkey">
+  <div class="modal-window">
+    <div class="modal-topbar">
+      <div>
+        <div class="modal-topbar-logo">3DS</div>
+        <div style="margin-left:8px"><div class="modal-topbar-title">Passkey Auth</div><div class="modal-topbar-sub">FIDO2 · CReq</div></div>
+      </div>
+      <button class="modal-close" onclick="closeModal('passkey')">✕</button>
+    </div>
+    <div class="modal-merchant">
+      <div class="modal-merchant-info">
+        <div class="modal-merchant-icon" id="pk-merchant-icon">✈️</div>
+        <div>
+          <div class="modal-merchant-name" id="pk-merchant-name">British Airways</div>
+          <div class="modal-merchant-desc" id="pk-merchant-desc">Travel · Visa Debit · ****4821</div>
+        </div>
+      </div>
+      <div class="modal-amount">
+        <div class="modal-amount-num" id="pk-amount">£147.00</div>
+        <div class="modal-amount-label">Amount</div>
+      </div>
+    </div>
+    <div class="modal-body">
+      <div style="text-align:center;margin-bottom:16px">
+        <div style="font-size:2rem;margin-bottom:10px">🔑</div>
+        <div style="font-family:var(--font-h);font-size:0.9rem;font-weight:700;color:var(--white);margin-bottom:5px">Verify with Passkey</div>
+        <div style="font-size:0.75rem;color:var(--muted);line-height:1.5">Use your device biometric to authorize this payment.</div>
+      </div>
+      <div class="modal-actions">
+        <button class="modal-btn-secondary" onclick="closeModal('passkey')">Cancel</button>
+        <button class="modal-btn-primary" id="pk-auth-btn" onclick="doPasskeyAuth()">🔑 Authenticate</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <script>
 const state = {
-  current: 'home',
-  done: JSON.parse(localStorage.getItem('p101-done') || '{}'),
-  answers: JSON.parse(localStorage.getItem('p101-answers') || '{}')
+  scenario: 0,
+  signals: { device: 72, geo: 30, velocity: 45, behaviour: 65, history: 20, amount: 35 },
+  context: { amount: 'mid', mcc: 'travel' },
+  agent: { reg: true, scope: true, sig: true },
+  running: false,
+  riskScore: 42,
 };
 
-const lessons = ['1-1','1-2','1-3','2-1','2-2','2-3','3-1','3-2','4-1','4-2','5-1','5-2',
-                 '6-1','6-2','6-3','7-1','7-2','8-1','8-2','9-1','9-2','10-1','10-2','10-3',
-                 '11-1','11-2','12-1','12-2','13-1','13-2','14-1','14-2','15-1','15-2'];
-const beginner = ['1-1','1-2','1-3','2-1','2-2','2-3','3-1','3-2','4-1','4-2','5-1','5-2'];
-const intermediate = ['6-1','6-2','6-3','7-1','7-2','8-1','8-2','9-1','9-2','10-1','10-2','10-3'];
-const advanced = ['11-1','11-2','12-1','12-2','13-1','13-2','14-1','14-2','15-1','15-2'];
-const correctAnswers = {
-  '1-1':2,'1-2':1,'1-3':2,'2-1':1,'2-2':1,'2-3':1,'3-1':2,'3-2':1,'4-1':2,'4-2':2,'5-1':2,'5-2':2,
-  '6-1':1,'6-2':0,'6-3':0,'7-1':2,'7-2':1,'8-1':2,'8-2':1,'9-1':2,'9-2':0,'10-1':1,'10-2':1,'10-3':2,
-  '11-1':2,'11-2':1,'12-1':1,'12-2':1,'13-1':1,'13-2':1,'14-1':2,'14-2':1,'15-1':2,'15-2':1
-};
-
-function goTo(lesson) {
-  document.querySelectorAll('.lesson').forEach(l => l.classList.remove('active'));
-  document.getElementById('lesson-' + lesson).classList.add('active');
-  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
-  document.getElementById('nav-' + lesson)?.classList.add('active');
-  state.current = lesson;
-  window.scrollTo(0, 0);
-  if (lesson === 'home') updateHome();
-  if (lesson === 'certs') updateCerts();
+function calcRisk() {
+  const s = state.signals;
+  const c = state.context;
+  let score = 0;
+  score += (100 - s.device) * 0.25 + s.geo * 0.20 + s.velocity * 0.18 + (100 - s.behaviour) * 0.15 + s.history * 0.12 + s.amount * 0.10;
+  const amountBonus = { low: -8, mid: 0, high: 15, vhigh: 28 };
+  const mccBonus = { retail: -5, travel: 5, gambling: 25, crypto: 30, luxury: 12 };
+  score += (amountBonus[c.amount] || 0) + (mccBonus[c.mcc] || 0);
+  score = Math.max(0, Math.min(100, Math.round(score)));
+  state.riskScore = score;
+  return score;
 }
 
-function updateHome() { updateProgress(); }
+function riskColor(score) {
+  return score < 30 ? 'var(--green)' : score < 60 ? 'var(--amber)' : 'var(--red)';
+}
 
-function answer(lessonId, chosenIdx, correctIdx) {
-  const optionsDiv = document.getElementById('options-' + lessonId);
-  const feedbackDiv = document.getElementById('feedback-' + lessonId);
-  const nextBtn = document.getElementById('btn-next-' + lessonId);
-  
-  optionsDiv.querySelectorAll('.option').forEach(opt => opt.style.pointerEvents = 'none');
-  optionsDiv.children[chosenIdx].classList.add(chosenIdx === correctIdx ? 'correct' : 'wrong');
-  if (chosenIdx !== correctIdx) optionsDiv.children[correctIdx].classList.add('correct');
-  
-  feedbackDiv.classList.add('show');
-  if (chosenIdx === correctIdx) {
-    feedbackDiv.classList.add('correct');
-    feedbackDiv.classList.remove('wrong');
-    feedbackDiv.innerHTML = '<strong>✓ Correct!</strong> Well done.';
-    nextBtn.disabled = false;
-    state.done[lessonId] = true;
-    state.answers[lessonId] = chosenIdx;
-    localStorage.setItem('p101-done', JSON.stringify(state.done));
-    localStorage.setItem('p101-answers', JSON.stringify(state.answers));
-    updateProgress();
-    if (lessons.filter(l => state.done[l]).length === lessons.length) {
-      setTimeout(() => {document.getElementById('banner-advanced')?.classList.add('show')}, 500);
-    }
+function riskLabel(score) {
+  return score < 30 ? '✅ LOW' : score < 60 ? '⚡ MODERATE' : score < 80 ? '⚠️ HIGH' : '🚫 CRITICAL';
+}
+
+function decision(score) {
+  if (state.scenario === 2) {
+    const a = state.agent;
+    if (!a.sig || !a.reg) return 'BLOCK';
+    if (score >= 75) return 'BLOCK';
+    if (!a.scope || score >= 45) return 'ESCALATE';
+    return 'APPROVE';
+  }
+  return score < 30 ? 'FRICTIONLESS' : score < 65 ? (state.scenario === 1 ? 'PASSKEY' : 'CHALLENGE') : 'BLOCK';
+}
+
+function updateRiskDisplay() {
+  const score = calcRisk();
+  const col = riskColor(score);
+  document.getElementById('riskNum').textContent = score;
+  document.getElementById('riskNum').style.color = col;
+  document.getElementById('riskFill').style.width = score + '%';
+  document.getElementById('riskFill').style.background = col;
+  document.getElementById('riskVerdict').textContent = riskLabel(score);
+  document.getElementById('riskVerdict').style.color = col;
+  updateSignalMatrices();
+}
+
+function updateSignal(key, val) {
+  state.signals[key] = parseInt(val);
+  document.getElementById('val-' + key).textContent = val;
+  updateRiskDisplay();
+}
+
+function updateContext() {
+  state.context.amount = document.getElementById('sel-amount').value;
+  state.context.mcc = document.getElementById('sel-mcc').value;
+  updateRiskDisplay();
+}
+
+function toggleAgent(key, btn) {
+  state.agent[key] = !state.agent[key];
+  btn.classList.toggle('on');
+  updateAgentCard();
+  updateRiskDisplay();
+}
+
+function updateAgentCard() {
+  const a = state.agent;
+  document.getElementById('ag-reg-val').textContent = a.reg ? '✓ Yes' : '✗ Not registered';
+  document.getElementById('ag-reg-val').className = 'agent-card-val ' + (a.reg ? 'valid' : 'invalid');
+  document.getElementById('ag-scope-val').textContent = a.scope ? '✓ In mandate' : '✗ Out of scope';
+  document.getElementById('ag-scope-val').className = 'agent-card-val ' + (a.scope ? 'valid' : 'invalid');
+  document.getElementById('ag-sig-val').textContent = a.sig ? '✓ Valid' : '✗ Invalid';
+  document.getElementById('ag-sig-val').className = 'agent-card-val ' + (a.sig ? 'valid' : 'invalid');
+}
+
+function updateSignalMatrices() {
+  const s = state.signals;
+  const cells = [
+    { label: 'Device', val: s.device > 60 ? 'Trusted' : s.device > 30 ? 'Partial' : 'Unknown', level: s.device > 60 ? 'low' : s.device > 30 ? 'med' : 'high' },
+    { label: 'Geo', val: s.geo < 30 ? 'Normal' : s.geo < 70 ? 'Elevated' : 'Critical', level: s.geo < 30 ? 'low' : s.geo < 70 ? 'med' : 'high' },
+    { label: 'Velocity', val: s.velocity < 30 ? 'Normal' : s.velocity < 65 ? 'Elevated' : 'Spike', level: s.velocity < 30 ? 'low' : s.velocity < 65 ? 'med' : 'high' },
+    { label: 'Behaviour', val: s.behaviour > 60 ? 'Familiar' : s.behaviour > 30 ? 'Mixed' : 'Anomaly', level: s.behaviour > 60 ? 'low' : s.behaviour > 30 ? 'med' : 'high' },
+    { label: 'History', val: s.history < 30 ? 'Clean' : s.history < 60 ? 'Flagged' : 'Risky', level: s.history < 30 ? 'low' : s.history < 60 ? 'med' : 'high' },
+    { label: 'Score', val: state.riskScore, level: state.riskScore < 30 ? 'low' : state.riskScore < 65 ? 'med' : 'high' },
+  ];
+  [0,1,2].forEach(i => {
+    const m = document.getElementById('signal-matrix-' + i);
+    if (!m) return;
+    m.innerHTML = cells.map(c => `<div class="signal-cell ${c.level}"><div class="signal-cell-label">${c.label}</div><div class="signal-cell-val">${c.val}</div></div>`).join('');
+  });
+}
+
+function switchScenario(idx, el) {
+  state.scenario = idx;
+  document.querySelectorAll('.scenario-btn').forEach((b,i) => b.classList.toggle('active', i===idx));
+  document.querySelectorAll('.sim-section[id^="scene-"]').forEach((s,i) => s.classList.toggle('visible', i===idx));
+  document.getElementById('ctrl-agent').style.display = idx === 2 ? 'block' : 'none';
+  const titles = [['3DS Standard Flow', 'EMV® 3DS 2.3 · Frictionless / Challenge'], ['3DS + Passkey', 'FIDO2 WebAuthn · Biometric auth'], ['Agentic Payment', 'AI agent vetting · Composite risk']];
+  document.getElementById('flowTitle').textContent = titles[idx][0];
+  document.getElementById('flowSubtitle').textContent = titles[idx][1];
+  resetDecisionBadge();
+}
+
+function resetDecisionBadge() {
+  document.getElementById('decisionBadge').style.borderColor = 'var(--amber)';
+  document.getElementById('decisionBadge').style.color = 'var(--amber)';
+  document.getElementById('decisionBadge').style.background = 'rgba(245,158,11,0.08)';
+  document.getElementById('decisionText').textContent = 'Ready';
+}
+
+async function runSimulation() {
+  if (state.running) return;
+  state.running = true;
+  const btn = document.getElementById('runBtn');
+  btn.textContent = '⟳ Running...';
+  resetAllNodes();
+  const score = calcRisk();
+  const dec = decision(score);
+  const traceId = 'trace-' + state.scenario;
+  clearTrace(traceId);
+  await sleep(100);
+  addTrace(traceId, 'info', 'Transaction request received');
+  await sleep(100);
+  addTrace(traceId, 'info', 'Risk engine processing ' + score + '/100');
+  await sleep(300);
+  if (state.scenario === 0) await runStandard3DS(dec, score, traceId);
+  else if (state.scenario === 1) await runPasskey3DS(dec, score, traceId);
+  else await runAgentic(dec, score, traceId);
+  updateDecisionBadge(dec);
+  state.running = false;
+  btn.innerHTML = '<span>▶</span> Run Simulation';
+}
+
+async function runStandard3DS(dec, score, traceId) {
+  await activateNode('n0-0');
+  await sleep(150); await activateConnector('c0-0');
+  await activateNode('n0-1');
+  await sleep(150); await activateConnector('c0-2');
+  await activateNode('n0-2');
+  await sleep(150); await activateConnector('c0-3');
+  await activateNode('n0-3');
+  await sleep(150); await activateConnector('c0-4');
+  await activateNode('n0-5');
+  addTrace(traceId, 'info', 'Signals ingested');
+  await sleep(150); await activateConnector('c0-5');
+  await activateNode('n0-6');
+  addTrace(traceId, 'info', 'Rules evaluated');
+  await sleep(150);
+  await activateNode('n0-7', dec === 'FRICTIONLESS' ? 'complete' : dec === 'BLOCK' ? 'blocked' : 'active');
+  if (dec === 'FRICTIONLESS') {
+    addTrace(traceId, 'pass', 'ARes: transStatus=Y — Frictionless');
+    showResult('n0-result-frictionless', 'complete');
+    await activateConnector('c0-1'); await activateNode('n0-4', 'complete');
+  } else if (dec === 'BLOCK') {
+    addTrace(traceId, 'fail', 'ARes: transStatus=N — Blocked');
+    showResult('n0-result-deny', 'blocked');
   } else {
-    feedbackDiv.classList.add('wrong');
-    feedbackDiv.classList.remove('correct');
-    feedbackDiv.innerHTML = '<strong>✗ Not quite.</strong> Read the lesson again.';
+    addTrace(traceId, 'warn', 'ARes: transStatus=C — Challenge issued');
+    showResult('n0-result-challenge', 'active');
+    await sleep(400);
+    openModal('otp');
   }
 }
 
-function updateProgress() {
-  const completed = lessons.filter(l => state.done[l]).length;
-  document.getElementById('topbar-progress').textContent = completed + ' / 34';
-  document.getElementById('stat-done').textContent = completed;
-  
-  lessons.forEach(l => {
-    const navItem = document.getElementById('nav-' + l);
-    if (state.done[l]) navItem?.classList.add('done');
+async function runPasskey3DS(dec, score, traceId) {
+  await activateNode('n1-0');
+  await sleep(150); await activateConnector('c1-4');
+  await activateNode('n1-risk');
+  addTrace(traceId, 'info', 'Risk threshold check');
+  if (dec === 'FRICTIONLESS') {
+    addTrace(traceId, 'pass', 'Below threshold — frictionless');
+    await activateNode('n1-result', 'complete');
+  } else {
+    await sleep(150); await activateConnector('c1-5');
+    await activateNode('n1-creq');
+    addTrace(traceId, 'warn', 'Passkey challenge issued');
+    await sleep(150); await activateConnector('c1-0');
+    await activateNode('n1-passkey', 'active');
+    await sleep(150); await activateConnector('c1-2');
+    await activateNode('n1-enclave');
+    await sleep(150); await activateConnector('c1-3');
+    await activateNode('n1-bio');
+    addTrace(traceId, 'info', 'Awaiting biometric...');
+    await sleep(400);
+    openModal('passkey');
+  }
+}
+
+async function runAgentic(dec, score, traceId) {
+  await activateNode('n2-0');
+  await sleep(150); await activateConnector('c2-0');
+  await activateNode('n2-pay');
+  await sleep(150); await activateConnector('c2-2');
+  await activateNode('n2-reg', state.agent.reg ? 'active' : 'blocked');
+  addTrace(traceId, state.agent.reg ? 'pass' : 'fail', 'Registry: ' + (state.agent.reg ? 'FOUND' : 'NOT FOUND'));
+  await sleep(150); await activateConnector('c2-3');
+  await activateNode('n2-scope', state.agent.scope ? 'active' : 'active');
+  addTrace(traceId, state.agent.scope ? 'pass' : 'warn', 'Scope: ' + (state.agent.scope ? 'OK' : 'MISMATCH'));
+  await sleep(150); await activateConnector('c2-4');
+  await activateNode('n2-sig', state.agent.sig ? 'active' : 'blocked');
+  addTrace(traceId, state.agent.sig ? 'pass' : 'fail', 'Signature: ' + (state.agent.sig ? 'VALID' : 'INVALID'));
+  await sleep(150); await activateConnector('c2-5');
+  await activateNode('n2-risk');
+  addTrace(traceId, 'info', 'Composite score: ' + score + '/100');
+  if (dec === 'APPROVE') {
+    showResult('n2-result-ok', 'complete');
+    addTrace(traceId, 'pass', 'Agent APPROVED');
+  } else if (dec === 'BLOCK') {
+    showResult('n2-result-block', 'blocked');
+    addTrace(traceId, 'fail', 'Agent BLOCKED');
+  } else {
+    showResult('n2-result-escalate', 'active');
+    addTrace(traceId, 'warn', 'Escalated to user');
+  }
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+async function activateNode(id, state2 = 'active') {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.classList.remove('active','complete','blocked');
+  el.classList.add(state2);
+  await sleep(200);
+}
+
+async function activateConnector(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.classList.add('active');
+  await sleep(150);
+}
+
+function resetAllNodes() {
+  document.querySelectorAll('.fnode').forEach(n => n.classList.remove('active','complete','blocked'));
+  document.querySelectorAll('.connector-line').forEach(c => c.classList.remove('active'));
+  ['n0-result-challenge','n0-result-deny','n2-result-escalate','n2-result-block'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
   });
-  
-  updateCertProgress();
-  
-  // Show completion banners
-  if (beginner.every(l => state.done[l])) document.getElementById('banner-beginner')?.classList.add('show');
-  if (intermediate.every(l => state.done[l])) document.getElementById('banner-intermediate')?.classList.add('show');
 }
 
-function updateCertProgress() {
-  const beg = beginner.filter(l => state.done[l]).length;
-  const inter = intermediate.filter(l => state.done[l]).length;
-  const adv = advanced.filter(l => state.done[l]).length;
-  const all = lessons.filter(l => state.done[l]).length;
-  
-  document.getElementById('prog-beginner').textContent = beg + ' / 12';
-  document.getElementById('prog-intermediate').textContent = inter + ' / 12';
-  document.getElementById('prog-advanced').textContent = adv + ' / 10';
-  document.getElementById('prog-all').textContent = all + ' / 34';
-  
-  document.getElementById('cert-beginner').querySelector('.progress-fill').style.width = (beg / 12 * 100) + '%';
-  document.getElementById('cert-intermediate').querySelector('.progress-fill').style.width = (inter / 12 * 100) + '%';
-  document.getElementById('cert-advanced').querySelector('.progress-fill').style.width = (adv / 10 * 100) + '%';
-  document.getElementById('cert-all').querySelector('.progress-fill').style.width = (all / 34 * 100) + '%';
-  
-  if (beg === 12) document.getElementById('cert-beginner').classList.add('earned');
-  if (inter === 12) document.getElementById('cert-intermediate').classList.add('earned');
-  if (adv === 10) document.getElementById('cert-advanced').classList.add('earned');
-  if (all === 34) document.getElementById('cert-all').classList.add('earned');
-  
-  document.getElementById('stat-certs').textContent = (beg === 12 ? 1 : 0) + (inter === 12 ? 1 : 0) + (adv === 10 ? 1 : 0) + (all === 34 ? 1 : 0);
+function showResult(id, cls) {
+  ['n0-result-frictionless','n0-result-challenge','n0-result-deny'].forEach(x => {
+    const el = document.getElementById(x);
+    if (el) el.style.display = x === id ? '' : 'none';
+  });
+  ['n2-result-ok','n2-result-escalate','n2-result-block'].forEach(x => {
+    const el = document.getElementById(x);
+    if (el) el.style.display = x === id ? '' : 'none';
+  });
+  const el = document.getElementById(id);
+  if (el) { el.classList.remove('active','complete','blocked'); el.classList.add(cls); }
 }
 
-function updateCerts() { updateCertProgress(); }
+function updateDecisionBadge(dec) {
+  const badge = document.getElementById('decisionBadge');
+  const configs = {
+    FRICTIONLESS: { color: 'var(--green)', bg: 'rgba(34,197,94,0.08)', text: '✅ Approved', border: 'var(--green)' },
+    CHALLENGE: { color: 'var(--amber)', bg: 'rgba(245,158,11,0.08)', text: '⚠️ Challenge', border: 'var(--amber)' },
+    PASSKEY: { color: 'var(--teal)', bg: 'rgba(0,196,188,0.08)', text: '🔑 Passkey', border: 'var(--teal)' },
+    BLOCK: { color: 'var(--red)', bg: 'rgba(239,68,68,0.08)', text: '🚫 Blocked', border: 'var(--red)' },
+    APPROVE: { color: 'var(--green)', bg: 'rgba(34,197,94,0.08)', text: '✅ Approved', border: 'var(--green)' },
+    ESCALATE: { color: 'var(--amber)', bg: 'rgba(245,158,11,0.08)', text: '📲 Escalate', border: 'var(--amber)' },
+  };
+  const cfg = configs[dec] || configs.CHALLENGE;
+  badge.style.color = cfg.color;
+  badge.style.background = cfg.bg;
+  badge.style.borderColor = cfg.border;
+  document.getElementById('decisionText').textContent = cfg.text;
+}
 
-updateProgress();
+function clearTrace(id) {
+  document.getElementById(id).innerHTML = '';
+}
+
+function addTrace(id, type, msg) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const line = document.createElement('div');
+  line.className = 'trace-line';
+  line.innerHTML = `<span class="trace-${type}">${msg}</span>`;
+  el.appendChild(line);
+  el.scrollTop = el.scrollHeight;
+}
+
+// MODALS
+const merchantData = {
+  low:   { retail: { icon:'🛍️', name:'ASOS', desc:'Retail · Visa Debit · ****4821' },   travel: { icon:'🚌', name:'Rail', desc:'Travel · Visa Debit · ****4821' } },
+  mid:   { retail: { icon:'📦', name:'Amazon', desc:'Retail · Mastercard Debit · ****4821' }, travel: { icon:'✈️', name:'British Airways', desc:'Travel · Visa Debit · ****4821' } },
+  high:  { retail: { icon:'🖥️', name:'Apple', desc:'Electronics · Visa Credit · ****4821' }, travel: { icon:'🏨', name:'Marriott', desc:'Hotels · Amex · ****4821' } },
+  vhigh: { retail: { icon:'🏠', name:'IKEA Business', desc:'Retail · Corporate · ****4821' }, travel: { icon:'🛩️', name:'NetJets', desc:'Aviation · Amex Platinum · ****4821' } }
+};
+const amountValues = { low: '£18.50', mid: '£147.00', high: '£789.00', vhigh: '£3,450.00' };
+
+function getMerchant() {
+  const amt = state.context.amount || 'mid';
+  const mcc = state.context.mcc || 'travel';
+  return merchantData[amt]?.[mcc] || merchantData.mid.travel;
+}
+
+function openModal(type) {
+  const m = getMerchant();
+  const amt = amountValues[state.context.amount] || '£147.00';
+  if (type === 'otp') {
+    document.getElementById('otp-merchant-icon').textContent = m.icon;
+    document.getElementById('otp-merchant-name').textContent = m.name;
+    document.getElementById('otp-merchant-desc').textContent = m.desc;
+    document.getElementById('otp-amount').textContent = amt;
+    resetOTP();
+  } else if (type === 'passkey') {
+    document.getElementById('pk-merchant-icon').textContent = m.icon;
+    document.getElementById('pk-merchant-name').textContent = m.name;
+    document.getElementById('pk-merchant-desc').textContent = m.desc;
+    document.getElementById('pk-amount').textContent = amt;
+  }
+  document.getElementById('modal-' + type).classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal(type) {
+  document.getElementById('modal-' + type).classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+['otp','passkey'].forEach(t => {
+  document.getElementById('modal-' + t).addEventListener('click', function(e) {
+    if (e.target === this) closeModal(t);
+  });
+});
+
+// OTP
+function resetOTP() {
+  for (let i = 0; i < 6; i++) {
+    const el = document.getElementById('otp-' + i);
+    el.value = ''; el.className = 'otp-input'; el.disabled = false;
+  }
+  document.getElementById('otp-0').focus();
+  document.getElementById('otp-result-msg').textContent = '';
+  document.getElementById('otp-submit-btn').disabled = false;
+}
+
+function otpNext(idx, el) {
+  el.value = el.value.replace(/\D/g,'');
+  if (el.value && idx < 5) document.getElementById('otp-' + (idx+1)).focus();
+}
+
+function otpBack(idx, e) {
+  if (e.key === 'Backspace' && !document.getElementById('otp-'+idx).value && idx > 0) {
+    document.getElementById('otp-' + (idx-1)).focus();
+  }
+}
+
+function getOTPValue() {
+  return [0,1,2,3,4,5].map(i => document.getElementById('otp-'+i).value).join('');
+}
+
+async function submitOTP() {
+  const val = getOTPValue();
+  if (val.length < 6) { document.getElementById('otp-result-msg').textContent = 'Enter all digits'; return; }
+  const btn = document.getElementById('otp-submit-btn');
+  btn.disabled = true; btn.textContent = '⟳ Verifying...';
+  await sleep(800);
+  if (val === '123456' || val === '483921') {
+    btn.textContent = '✓ Verified';
+    btn.style.background = 'var(--green)';
+    document.getElementById('otp-result-msg').textContent = '✅ Code verified';
+    document.getElementById('otp-result-msg').style.color = 'var(--green)';
+    addTrace('trace-0', 'pass', 'OTP verified — transStatus=Y');
+    updateDecisionBadge('FRICTIONLESS');
+    showResult('n0-result-challenge', 'complete');
+    await sleep(1500); closeModal('otp');
+  } else {
+    btn.disabled = false; btn.textContent = 'Verify →';
+    document.getElementById('otp-result-msg').textContent = '✗ Incorrect code';
+    document.getElementById('otp-result-msg').style.color = 'var(--red)';
+  }
+}
+
+async function doPasskeyAuth() {
+  const btn = document.getElementById('pk-auth-btn');
+  btn.disabled = true; btn.textContent = '⟳ Verifying...';
+  await sleep(1000);
+  btn.textContent = '✓ Verified';
+  btn.style.background = 'var(--green)';
+  addTrace('trace-1', 'pass', 'Passkey verified — transStatus=Y');
+  updateDecisionBadge('PASSKEY');
+  await sleep(1500); closeModal('passkey');
+}
+
+updateRiskDisplay();
+updateAgentCard();
 </script>
 </body>
 </html>
