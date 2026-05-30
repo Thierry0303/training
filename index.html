@@ -1,1289 +1,499 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
-<title>3DS Interactive Simulator</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<title>Payments 101</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@300;500;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-:root {
-  --navy: #08182e;
-  --navy-1: #0d2240;
-  --navy-2: #152f52;
-  --navy-3: #1c3d68;
-  --teal: #00c4bc;
-  --teal-d: #008f89;
-  --teal-glow: rgba(0,196,188,0.15);
-  --amber: #f59e0b;
-  --red: #ef4444;
-  --green: #22c55e;
-  --white: #f0f6ff;
-  --muted: #7a9bbf;
-  --border: rgba(0,196,188,0.15);
-  --card: rgba(13,34,64,0.7);
-  --font-h: 'Syne', sans-serif;
-  --font-m: 'IBM Plex Mono', monospace;
-  --font-b: 'DM Sans', sans-serif;
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --cream:#fdf8f2;
+  --cream2:#f5ede0;
+  --ink:#1c1410;
+  --ink2:#3d2f24;
+  --ink3:#6b5744;
+  --rust:#c4522a;
+  --gold:#b8860b;
+  --green:#2d6a4f;
+  --border:#e8d9c7;
+  --sans:'DM Sans',sans-serif;
+  --serif:'Fraunces',Georgia,serif
 }
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
-body {
-  background: var(--navy);
-  color: var(--white);
-  font-family: var(--font-b);
-  overflow-x: hidden;
-  min-height: 100vh;
+html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
+body{font-family:var(--sans);background:var(--cream);color:var(--ink);font-size:16px;line-height:1.65;padding-bottom:80px}
+.app{width:100%;min-height:100vh}
+.topbar{position:fixed;top:0;left:0;right:0;background:var(--ink);color:#f5ede0;padding:14px 16px;z-index:200;display:flex;justify-content:space-between;align-items:center;height:56px}
+.topbar-title{font-family:var(--serif);font-size:1.1rem;font-weight:500}
+.topbar-progress{font-size:0.75rem;color:#c8b8a8;background:rgba(255,255,255,0.08);padding:4px 10px;border-radius:12px}
+.content{padding:16px;padding-top:72px;max-width:100%;margin:0 auto}
+.lesson{display:none}
+.lesson.active{display:block;animation:fadeIn 0.3s}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)};to{opacity:1;transform:translateY(0)}}
+.hero{background:linear-gradient(135deg,var(--ink),#3d2015);border-radius:12px;padding:24px;color:#f5ede0;margin-bottom:24px}
+.hero h1{font-family:var(--serif);font-size:1.8rem;font-weight:300;line-height:1.2;margin-bottom:12px}
+.hero p{font-size:0.9rem;line-height:1.6;color:#c8b8a8;margin-bottom:20px}
+.hero-btn{background:var(--rust);color:#fff;border:none;padding:14px 24px;border-radius:8px;font-weight:600;cursor:pointer;font-family:var(--sans);font-size:0.95rem;width:100%;touch-action:manipulation}
+.hero-btn:active{opacity:0.9}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:24px}
+.stat{background:#fff;border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center}
+.stat-val{font-family:var(--serif);font-size:1.8rem;color:var(--rust);font-weight:500}
+.stat-label{font-size:0.7rem;color:var(--ink3);margin-top:4px;text-transform:uppercase;letter-spacing:0.5px}
+h2{font-family:var(--serif);font-size:1.6rem;font-weight:300;margin-bottom:12px;margin-top:0;line-height:1.2}
+h3{font-family:var(--serif);font-size:1.1rem;font-weight:400;margin-top:18px;margin-bottom:8px;color:var(--ink2)}
+p{margin-bottom:12px;color:var(--ink2);line-height:1.7}
+strong{color:var(--ink);font-weight:600}
+.box{border-left:3px solid var(--rust);background:var(--cream2);padding:12px;border-radius:6px;margin:16px 0;font-size:0.9rem}
+.quiz{background:#fff;border:1.5px solid var(--border);border-radius:12px;padding:20px;margin-top:24px;margin-bottom:20px}
+.quiz-title{font-family:var(--serif);font-size:1rem;color:var(--ink);margin-bottom:3px;font-weight:500}
+.quiz-subtitle{font-size:0.75rem;color:var(--ink3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:14px}
+.question{font-family:var(--serif);font-size:1.2rem;font-weight:400;color:var(--ink);margin-bottom:16px;line-height:1.3}
+.options{display:flex;flex-direction:column;gap:10px;margin-bottom:12px}
+.option{background:var(--cream);border:1.5px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;font-size:0.95rem;transition:all 0.2s;display:flex;gap:12px;align-items:flex-start;touch-action:manipulation;user-select:none;min-height:56px}
+.option:active{transform:scale(0.98)}
+.option:hover{border-color:var(--rust);background:#f5e6df}
+.option.selected{border-color:var(--rust);background:rgba(196,82,42,0.08)}
+.option.correct{border-color:var(--green);background:#d8f3dc;color:var(--green)}
+.option.wrong{border-color:#dc2626;background:#fef2f2;color:#991b1b}
+.option-letter{font-weight:700;color:var(--rust);min-width:24px;font-size:1rem}
+.option-text{flex:1}
+.feedback{display:none;padding:12px;border-radius:8px;margin-bottom:16px;font-size:0.9rem;margin-top:8px}
+.feedback.show{display:block}
+.feedback.correct{background:#d8f3dc;color:var(--green);border:1px solid #a7f3d0}
+.feedback.wrong{background:#fef2f2;color:#991b1b;border:1px solid #fecaca}
+.button-group{display:flex;flex-direction:column;gap:10px;margin-top:20px;margin-bottom:40px}
+.btn{border:none;padding:14px;border-radius:8px;font-weight:600;font-family:var(--sans);font-size:0.95rem;cursor:pointer;touch-action:manipulation;min-height:48px;display:flex;align-items:center;justify-content:center}
+.btn-prev{background:var(--cream2);color:var(--ink);border:1.5px solid var(--border)}
+.btn-prev:active{opacity:0.9}
+.btn-next{background:var(--rust);color:#fff}
+.btn-next:disabled{opacity:0.5;cursor:not-allowed}
+.btn-next:active:not(:disabled){opacity:0.9}
+.bottomnav{position:fixed;bottom:0;left:0;right:0;height:80px;background:#fff;border-top:1px solid var(--border);display:flex;justify-content:space-around;align-items:flex-start;padding-top:10px;z-index:300;overflow-x:auto;overflow-y:hidden}
+.bottomnav::-webkit-scrollbar{height:3px}
+.bottomnav::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.nav-item{display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 12px;color:var(--ink3);cursor:pointer;transition:all 0.2s;text-decoration:none;font-size:0.75rem;user-select:none;touch-action:manipulation;min-width:70px}
+.nav-item:active{opacity:0.7}
+.nav-item.active{color:var(--rust)}
+.nav-item-icon{font-size:1.4rem}
+.nav-item-label{font-weight:500;text-align:center;line-height:1.2}
+.nav-item.done .nav-item-icon::after{content:'✓';font-size:0.8rem;position:relative;left:-8px;top:-8px;color:var(--green)}
+.cert-grid{display:grid;grid-template-columns:1fr;gap:12px;margin:20px 0}
+.cert-card{background:#fff;border:1.5px solid var(--border);border-radius:12px;padding:16px;text-align:center}
+.cert-card.earned{border-color:var(--green);background:#d8f3dc}
+.cert-emoji{font-size:2rem;margin-bottom:8px}
+.cert-name{font-family:var(--serif);font-size:0.95rem;font-weight:500;color:var(--ink);margin-bottom:4px}
+.cert-progress{font-size:0.8rem;color:var(--ink3)}
+.progress-bar{height:3px;background:var(--border);border-radius:2px;margin-top:12px;overflow:hidden}
+.progress-fill{height:100%;background:var(--rust);transition:width 0.3s}
+@supports (padding: max(0px)) {
+  body { padding-bottom: max(80px, env(safe-area-inset-bottom)); }
+  .bottomnav { padding-bottom: env(safe-area-inset-bottom); }
 }
-
-body::before {
-  content: '';
-  position: fixed; inset: 0; z-index: 0;
-  background-image: linear-gradient(rgba(0,196,188,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,196,188,0.03) 1px, transparent 1px);
-  background-size: 40px 40px;
-  pointer-events: none;
-}
-
-.orb { position: fixed; border-radius: 50%; filter: blur(100px); pointer-events: none; z-index: 0; }
-.orb-1 { width: 500px; height: 500px; background: radial-gradient(circle, rgba(0,196,188,0.1), transparent 70%); top: -100px; right: -100px; }
-.orb-2 { width: 400px; height: 400px; background: radial-gradient(circle, rgba(0,100,200,0.08), transparent 70%); bottom: 10%; left: -100px; }
-
-nav {
-  position: sticky; top: 0; z-index: 200;
-  background: rgba(8,24,46,0.95);
-  backdrop-filter: blur(20px);
-  border-bottom: 1px solid var(--border);
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 0 16px; height: 56px;
-}
-.nav-brand {
-  display: flex; align-items: center; gap: 8px;
-  font-family: var(--font-h); font-weight: 800; font-size: 0.9rem;
-  color: var(--white); text-decoration: none;
-}
-.nav-logo { width: 24px; height: 24px; background: linear-gradient(135deg, var(--teal), var(--teal-d)); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.55rem; font-weight: 800; color: var(--navy); }
-.nav-pill {
-  background: rgba(0,196,188,0.1); border: 1px solid var(--teal);
-  border-radius: 100px; padding: 4px 12px;
-  font-size: 0.65rem; font-family: var(--font-m); color: var(--teal);
-}
-
-.hero-strip {
-  position: relative; z-index: 1;
-  padding: 32px 16px 24px;
-  border-bottom: 1px solid var(--border);
-}
-.hero-strip h1 {
-  font-family: var(--font-h); font-weight: 800;
-  font-size: clamp(1.4rem, 5vw, 2.4rem);
-  line-height: 1.1; color: var(--white);
-}
-.hero-strip h1 em { font-style: normal; color: var(--teal); }
-.hero-strip p { color: var(--muted); margin-top: 8px; font-size: 0.9rem; line-height: 1.5; }
-.hero-meta { display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
-.hero-badge {
-  display: flex; align-items: center; gap: 6px;
-  background: var(--card); border: 1px solid var(--border); border-radius: 6px;
-  padding: 6px 10px; font-size: 0.7rem; color: var(--muted);
-}
-.hero-badge strong { color: var(--teal); font-family: var(--font-m); }
-
-.main { position: relative; z-index: 1; padding: 0; }
-
-.scenario-bar {
-  display: flex; gap: 0; border-bottom: 1px solid var(--border);
-  overflow-x: auto; background: rgba(8,24,46,0.8);
-  position: sticky; top: 56px; z-index: 100;
-}
-.scenario-btn {
-  flex: 1; min-width: 140px;
-  display: flex; flex-direction: column; align-items: center; gap: 3px;
-  padding: 12px 10px;
-  background: transparent; border: none; border-right: 1px solid var(--border);
-  color: var(--muted); font-family: var(--font-b); cursor: pointer;
-  transition: all 0.25s; position: relative; font-size: 0.75rem;
-}
-.scenario-btn::after {
-  content: ''; position: absolute; bottom: 0; left: 0; right: 0;
-  height: 2px; background: var(--teal);
-  transform: scaleX(0); transition: transform 0.25s;
-}
-.scenario-btn:hover { background: rgba(0,196,188,0.04); color: var(--white); }
-.scenario-btn.active { color: var(--white); background: rgba(0,196,188,0.06); }
-.scenario-btn.active::after { transform: scaleX(1); }
-.scenario-btn-icon { font-size: 1.2rem; }
-.scenario-btn-title { font-size: 0.7rem; font-weight: 600; line-height: 1.2; }
-.scenario-btn-sub { font-size: 0.6rem; color: var(--muted); }
-
-.sim-layout {
-  display: grid;
-  grid-template-columns: 1fr;
-  min-height: auto;
-}
-
-.sim-controls {
-  border-right: none;
-  overflow-y: auto;
-  background: rgba(8,24,46,0.5);
-  max-height: 45vh;
-  border-bottom: 1px solid var(--border);
-}
-
-.control-section {
-  border-bottom: 1px solid var(--border);
-  padding: 16px;
-}
-.control-section-title {
-  font-family: var(--font-h); font-size: 0.75rem; font-weight: 700;
-  text-transform: uppercase; letter-spacing: 0.1em;
-  color: var(--teal); margin-bottom: 12px;
-  display: flex; align-items: center; gap: 6px;
-}
-
-.risk-score-display {
-  display: flex; align-items: center; gap: 12px;
-  background: var(--card); border: 1px solid var(--border);
-  border-radius: 10px; padding: 12px; margin-bottom: 16px;
-}
-.risk-score-num {
-  font-family: var(--font-m); font-size: 2rem; font-weight: 500;
-  line-height: 1; min-width: 56px; text-align: center;
-  transition: color 0.4s;
-}
-.risk-score-bar-wrap { flex: 1; }
-.risk-score-label { font-size: 0.65rem; color: var(--muted); margin-bottom: 4px; }
-.risk-score-bar {
-  height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden;
-}
-.risk-score-fill {
-  height: 100%; border-radius: 3px;
-  transition: width 0.5s cubic-bezier(.4,0,.2,1), background 0.4s;
-}
-.risk-verdict {
-  font-size: 0.65rem; font-family: var(--font-m);
-  font-weight: 500; margin-top: 3px;
-}
-
-.slider-row {
-  margin-bottom: 12px;
-}
-.slider-header {
-  display: flex; justify-content: space-between;
-  font-size: 0.7rem; margin-bottom: 4px;
-}
-.slider-label { color: var(--muted); }
-.slider-val { font-family: var(--font-m); color: var(--white); font-size: 0.7rem; }
-input[type=range] {
-  width: 100%; height: 4px;
-  -webkit-appearance: none; appearance: none;
-  background: rgba(255,255,255,0.1); border-radius: 2px; cursor: pointer;
-  outline: none;
-}
-input[type=range]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 12px; height: 12px; border-radius: 50%;
-  background: var(--teal); border: 2px solid var(--navy);
-  cursor: pointer; transition: transform 0.15s;
-}
-input[type=range]::-webkit-slider-thumb:active { transform: scale(1.2); }
-
-.toggle-row {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
-  font-size: 0.75rem;
-}
-.toggle-row:last-child { border-bottom: none; }
-.toggle-label { color: var(--muted); }
-.toggle-label strong { color: var(--white); display: block; font-size: 0.75rem; }
-.toggle {
-  width: 32px; height: 18px; border-radius: 9px;
-  background: rgba(255,255,255,0.1); border: none; cursor: pointer;
-  position: relative; transition: background 0.25s; flex-shrink: 0;
-}
-.toggle::after {
-  content: ''; position: absolute; top: 2px; left: 2px;
-  width: 12px; height: 12px; border-radius: 50%;
-  background: var(--white); transition: transform 0.25s;
-}
-.toggle.on { background: var(--teal); }
-.toggle.on::after { transform: translateX(14px); }
-
-.sim-select {
-  width: 100%; background: var(--card); border: 1px solid var(--border);
-  color: var(--white); font-family: var(--font-b); font-size: 0.75rem;
-  padding: 6px 10px; border-radius: 6px; cursor: pointer; outline: none;
-}
-
-.rule-card {
-  background: var(--card); border: 1px solid var(--border); border-radius: 8px;
-  padding: 10px; margin-bottom: 8px;
-  display: flex; align-items: center; gap: 10px;
-  cursor: pointer; transition: all 0.2s; font-size: 0.75rem;
-}
-.rule-card:hover { border-color: rgba(0,196,188,0.35); }
-.rule-icon { font-size: 1rem; flex-shrink: 0; }
-.rule-name { font-size: 0.75rem; font-weight: 600; color: var(--white); }
-.rule-desc { font-size: 0.65rem; color: var(--muted); margin-top: 1px; }
-
-.sim-canvas {
-  overflow-y: auto;
-  padding: 20px 16px;
-  min-height: calc(100vh - 56px);
-}
-
-.flow-header {
-  display: flex; align-items: flex-start; justify-content: space-between;
-  margin-bottom: 20px; flex-wrap: wrap; gap: 12px;
-  flex-direction: column;
-}
-.flow-title { font-family: var(--font-h); font-size: 1.1rem; font-weight: 700; }
-.flow-subtitle { color: var(--muted); font-size: 0.75rem; margin-top: 3px; }
-.flow-decision-badge {
-  display: flex; align-items: center; gap: 6px;
-  padding: 8px 14px; border-radius: 8px; border: 1px solid;
-  font-family: var(--font-m); font-size: 0.75rem; font-weight: 500;
-  transition: all 0.4s;
-  width: 100%;
-  justify-content: center;
-}
-
-.flow-lanes {
-  display: flex; flex-direction: column; gap: 0;
-  border: 1px solid var(--border); border-radius: 12px; overflow: hidden;
-  margin-bottom: 16px;
-}
-.flow-lane {
-  flex: 1; border-bottom: 1px solid var(--border);
-  padding: 0;
-}
-.flow-lane:last-child { border-bottom: none; }
-.lane-header {
-  background: rgba(255,255,255,0.03);
-  border-bottom: 1px solid var(--border);
-  padding: 8px 10px;
-  font-size: 0.65rem; font-weight: 600;
-  text-transform: uppercase; letter-spacing: 0.08em;
-  color: var(--muted); text-align: center;
-}
-.lane-body {
-  padding: 12px 8px;
-  display: flex; flex-direction: column; align-items: center;
-  gap: 6px; min-height: 200px;
-}
-
-.fnode {
-  width: 100%; max-width: 120px;
-  background: var(--card); border: 1px solid var(--border);
-  border-radius: 8px; padding: 8px 10px;
-  text-align: center; position: relative;
-  transition: all 0.4s; cursor: pointer; font-size: 0.7rem;
-}
-.fnode:hover { border-color: rgba(0,196,188,0.4); }
-.fnode.active {
-  border-color: var(--teal);
-  background: rgba(0,196,188,0.1);
-  box-shadow: 0 0 16px rgba(0,196,188,0.2);
-}
-.fnode.complete { border-color: var(--green); background: rgba(34,197,94,0.08); }
-.fnode.blocked { border-color: var(--red); background: rgba(239,68,68,0.08); }
-.fnode-icon { font-size: 1.2rem; margin-bottom: 2px; }
-.fnode-label { font-size: 0.65rem; font-weight: 600; color: var(--white); line-height: 1.2; }
-.fnode-sub { font-size: 0.6rem; color: var(--muted); margin-top: 2px; line-height: 1.3; }
-
-.connector {
-  display: flex; align-items: center; justify-content: center;
-  height: 20px; width: 100%;
-}
-.connector-line {
-  width: 2px; height: 100%;
-  background: var(--border);
-  position: relative; margin: 0 auto;
-  transition: background 0.4s;
-}
-.connector-line.active { background: var(--teal); }
-
-.detail-panel {
-  background: var(--card); border: 1px solid var(--border);
-  border-radius: 10px; padding: 14px;
-  margin-bottom: 16px;
-  transition: all 0.3s; font-size: 0.8rem;
-}
-.detail-panel-title {
-  font-family: var(--font-h); font-size: 0.8rem; font-weight: 700;
-  color: var(--teal); margin-bottom: 6px;
-  display: flex; align-items: center; gap: 6px;
-}
-.detail-panel-body { font-size: 0.75rem; color: var(--muted); line-height: 1.6; }
-.detail-panel-body strong { color: var(--white); }
-
-.signal-matrix {
-  display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;
-  margin-top: 12px;
-}
-.signal-cell {
-  background: rgba(255,255,255,0.03); border: 1px solid var(--border);
-  border-radius: 6px; padding: 8px;
-  transition: border-color 0.3s; font-size: 0.7rem;
-}
-.signal-cell-label { font-size: 0.6rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
-.signal-cell-val { font-family: var(--font-m); font-size: 0.75rem; margin-top: 2px; }
-
-.decision-trace {
-  background: rgba(0,0,0,0.3); border: 1px solid var(--border);
-  border-radius: 10px; padding: 12px;
-  font-family: var(--font-m); font-size: 0.65rem;
-  line-height: 1.6; color: var(--muted);
-  margin-bottom: 16px; max-height: 150px; overflow-y: auto;
-}
-.trace-line { display: flex; gap: 8px; align-items: flex-start; margin-bottom: 4px; }
-.trace-time { color: var(--teal-d); flex-shrink: 0; }
-.trace-pass { color: var(--green); }
-.trace-fail { color: var(--red); }
-.trace-warn { color: var(--amber); }
-.trace-info { color: var(--muted); }
-
-.run-btn {
-  width: 100%;
-  background: linear-gradient(135deg, var(--teal), var(--teal-d));
-  border: none; border-radius: 8px;
-  color: var(--navy); font-family: var(--font-h); font-size: 0.85rem; font-weight: 700;
-  padding: 12px; cursor: pointer;
-  display: flex; align-items: center; justify-content: center; gap: 6px;
-  transition: opacity 0.2s;
-}
-.run-btn:active { opacity: 0.85; }
-
-.passkey-widget {
-  background: var(--card); border: 1px solid var(--border);
-  border-radius: 12px; padding: 18px; text-align: center;
-  margin-bottom: 14px;
-}
-.passkey-icon { font-size: 2rem; margin-bottom: 10px; }
-.passkey-title { font-family: var(--font-h); font-size: 0.9rem; font-weight: 700; margin-bottom: 5px; }
-.passkey-sub { font-size: 0.7rem; color: var(--muted); margin-bottom: 14px; }
-.passkey-btn {
-  background: var(--teal); color: var(--navy);
-  border: none; border-radius: 8px;
-  font-family: var(--font-h); font-size: 0.8rem; font-weight: 700;
-  padding: 10px 16px; cursor: pointer; transition: all 0.2s;
-  display: inline-flex; align-items: center; gap: 6px;
-}
-.passkey-btn:active { opacity: 0.85; }
-
-.agent-card {
-  background: var(--card); border: 1px solid var(--border);
-  border-radius: 12px; padding: 14px;
-  margin-bottom: 12px; font-size: 0.75rem;
-}
-.agent-card-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
-.agent-card-row:last-child { border-bottom: none; }
-.agent-card-key { font-size: 0.7rem; color: var(--muted); }
-.agent-card-val { font-size: 0.7rem; font-family: var(--font-m); color: var(--white); }
-.agent-card-val.valid { color: var(--green); }
-.agent-card-val.invalid { color: var(--red); }
-
-.modal-overlay {
-  position: fixed; inset: 0; z-index: 9000;
-  background: rgba(4, 12, 24, 0.82);
-  backdrop-filter: blur(8px);
-  display: flex; align-items: center; justify-content: center;
-  opacity: 0; pointer-events: none;
-  transition: opacity 0.3s ease;
-  padding: 16px;
-}
-.modal-overlay.open { opacity: 1; pointer-events: all; }
-
-.modal-window {
-  width: 100%; max-width: 400px;
-  background: linear-gradient(160deg, #0f2344 0%, #0a1c36 100%);
-  border: 1px solid rgba(0,196,188,0.25);
-  border-radius: 16px;
-  box-shadow: 0 40px 80px rgba(0,0,0,0.6);
-  overflow: hidden;
-  transform: translateY(20px) scale(0.97);
-  transition: transform 0.35s cubic-bezier(.34,1.56,.64,1);
-}
-.modal-overlay.open .modal-window { transform: translateY(0) scale(1); }
-
-.modal-topbar {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 12px 14px;
-  background: rgba(0,196,188,0.06);
-  border-bottom: 1px solid rgba(0,196,188,0.12);
-}
-.modal-topbar-logo {
-  width: 20px; height: 20px;
-  background: linear-gradient(135deg, var(--teal), var(--teal-d));
-  border-radius: 4px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 0.5rem; font-weight: 800; color: var(--navy);
-}
-.modal-topbar-title { font-family: var(--font-h); font-size: 0.75rem; font-weight: 700; color: var(--white); margin-left: 8px; }
-.modal-topbar-sub { font-size: 0.6rem; color: var(--muted); font-family: var(--font-m); }
-.modal-close {
-  width: 24px; height: 24px; border-radius: 6px;
-  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08);
-  color: var(--muted); cursor: pointer; font-size: 0.75rem;
-  display: flex; align-items: center; justify-content: center;
-  transition: all 0.2s;
-}
-
-.modal-merchant {
-  padding: 12px 14px;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
-  display: flex; align-items: center; justify-content: space-between;
-}
-.modal-merchant-info { display: flex; align-items: center; gap: 10px; }
-.modal-merchant-icon {
-  width: 36px; height: 36px; border-radius: 8px;
-  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08);
-  display: flex; align-items: center; justify-content: center; font-size: 1.1rem;
-}
-.modal-merchant-name { font-size: 0.8rem; font-weight: 600; color: var(--white); }
-.modal-merchant-desc { font-size: 0.65rem; color: var(--muted); margin-top: 1px; }
-.modal-amount { text-align: right; }
-.modal-amount-num { font-family: var(--font-h); font-size: 1.1rem; font-weight: 800; color: var(--white); }
-.modal-amount-label { font-size: 0.6rem; color: var(--muted); text-transform: uppercase; }
-
-.modal-body { padding: 16px; }
-
-.otp-prompt { text-align: center; margin-bottom: 16px; }
-.otp-prompt-icon { font-size: 2rem; margin-bottom: 10px; }
-.otp-prompt-title { font-family: var(--font-h); font-size: 0.9rem; font-weight: 700; color: var(--white); margin-bottom: 5px; }
-.otp-prompt-sub { font-size: 0.75rem; color: var(--muted); line-height: 1.5; }
-.otp-prompt-phone { color: var(--white); font-weight: 600; }
-
-.otp-inputs { display: flex; gap: 6px; justify-content: center; margin-bottom: 16px; }
-.otp-input {
-  width: 38px; height: 46px;
-  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12);
-  border-radius: 8px; color: var(--white);
-  font-family: var(--font-m); font-size: 1.2rem; font-weight: 600;
-  text-align: center; outline: none;
-  transition: border-color 0.2s;
-}
-.otp-input:focus { border-color: var(--teal); background: rgba(0,196,188,0.06); }
-
-.modal-actions { display: flex; gap: 8px; }
-.modal-btn-primary {
-  flex: 1; padding: 11px;
-  background: linear-gradient(135deg, var(--teal), var(--teal-d));
-  border: none; border-radius: 8px;
-  color: var(--navy); font-family: var(--font-h); font-size: 0.8rem; font-weight: 700;
-  cursor: pointer; transition: opacity 0.2s;
-  display: flex; align-items: center; justify-content: center; gap: 5px;
-}
-.modal-btn-primary:active { opacity: 0.85; }
-.modal-btn-secondary {
-  padding: 11px 14px;
-  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 8px; color: var(--muted);
-  font-family: var(--font-b); font-size: 0.8rem;
-  cursor: pointer; transition: all 0.2s;
-}
-
-.sim-section { display: none; }
-.sim-section.visible { display: block; }
-
-@media (min-width: 900px) {
-  .sim-layout { grid-template-columns: 320px 1fr; }
-  .sim-controls { border-right: 1px solid var(--border); border-bottom: none; max-height: none; }
-  nav { padding: 0 32px; height: 60px; }
-  .nav-brand { font-size: 1rem; }
-  .nav-logo { width: 28px; height: 28px; }
-  .hero-strip { padding: 48px 32px 32px; }
-  .hero-strip h1 { font-size: clamp(1.8rem, 4vw, 3rem); }
-  .hero-meta { gap: 24px; }
-  .scenario-btn { min-width: 200px; padding: 16px 20px; font-size: 0.82rem; }
-  .scenario-btn-icon { font-size: 1.4rem; }
-  .scenario-btn-title { font-size: 0.82rem; }
-  .sim-controls { max-height: calc(100vh - 120px); }
-  .flow-lanes { flex-direction: row; }
-  .lane-body { min-height: 400px; }
-  .fnode { max-width: 140px; }
-  .signal-matrix { grid-template-columns: repeat(3, 1fr); }
-  .sim-canvas { padding: 32px; }
-  .flow-header { flex-direction: row; }
-  .flow-decision-badge { width: auto; }
-  .modal-window { width: 420px; }
-}
-
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(0,196,188,0.2); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(0,196,188,0.4); }
 </style>
 </head>
 <body>
 
-<div class="orb orb-1"></div>
-<div class="orb orb-2"></div>
+<div class="app">
 
-<nav>
-  <a href="https://thierry0303.github.io/training/" class="nav-brand">
-    <div class="nav-logo">3DS</div>
-    3DS Simulator
-  </a>
-  <div class="nav-pill">Interactive</div>
+  <header class="topbar">
+    <div class="topbar-title">💳 Payments 101</div>
+    <div class="topbar-progress" id="topbar-progress">0 / 6</div>
+  </header>
+
+  <div class="content">
+
+    <!-- HOME -->
+    <div class="lesson active" id="lesson-home">
+      <div class="hero">
+        <h1>You tap your card</h1>
+        <p>What actually happens in those two seconds? Learn the complete story of card payments — from tap to bank account.</p>
+        <button class="hero-btn" onclick="goTo('1-1')">Start Learning →</button>
+      </div>
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-val" id="stat-done">0</div>
+          <div class="stat-label">Completed</div>
+        </div>
+        <div class="stat">
+          <div class="stat-val">6</div>
+          <div class="stat-label">Lessons</div>
+        </div>
+        <div class="stat">
+          <div class="stat-val" id="stat-certs">0</div>
+          <div class="stat-label">Certificates</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LESSON 1-1 -->
+    <div class="lesson" id="lesson-1-1">
+      <h2>What happens when you tap?</h2>
+      
+      <p>You tap your card and the screen says "Approved" in under two seconds. But in those two seconds, your card information has crossed the globe.</p>
+
+      <h3>It starts with a question</h3>
+      <p>When your card touches the reader, the payment terminal sends a message to your bank: <strong>"This person wants to spend £49.99. Do you allow it?"</strong></p>
+
+      <h3>The message travels through four places</h3>
+      <p>That question doesn't go straight to your bank. It travels: Your tap → Shop's bank → Visa/Mastercard network → Your bank.</p>
+      <p>Your bank checks your account, says yes or no, and the answer travels back.</p>
+
+      <div class="box"><strong>Key point:</strong> Visa and Mastercard don't hold your money. They're like telephone exchanges connecting your bank to the shop's bank.</div>
+
+      <div class="quiz">
+        <div class="quiz-title">Quick Check</div>
+        <div class="quiz-subtitle">Understanding the flow</div>
+        <div class="question">When your card is approved, who makes the final decision?</div>
+        <div class="options" id="options-1-1">
+          <div class="option" onclick="answer('1-1', 0, 2)"><span class="option-letter">A</span><span class="option-text">The shop's till machine</span></div>
+          <div class="option" onclick="answer('1-1', 1, 2)"><span class="option-letter">B</span><span class="option-text">Visa or Mastercard</span></div>
+          <div class="option" onclick="answer('1-1', 2, 2)"><span class="option-letter">C</span><span class="option-text">Your bank — they check your balance</span></div>
+          <div class="option" onclick="answer('1-1', 3, 2)"><span class="option-letter">D</span><span class="option-text">The government</span></div>
+        </div>
+        <div class="feedback" id="feedback-1-1"></div>
+      </div>
+
+      <div class="button-group">
+        <button class="btn btn-prev" onclick="goTo('home')">← Home</button>
+        <button class="btn btn-next" id="btn-next-1-1" disabled onclick="goTo('1-2')">Next Lesson →</button>
+      </div>
+    </div>
+
+    <!-- LESSON 1-2 -->
+    <div class="lesson" id="lesson-1-2">
+      <h2>Four people in every payment</h2>
+      
+      <p>Every card payment has four different parties working together: the cardholder (you), the merchant (shop), the acquirer (shop's bank), and the issuer (your bank).</p>
+
+      <h3>Who they are</h3>
+      <p><strong>Cardholder:</strong> You, the person paying</p>
+      <p><strong>Merchant:</strong> The business being paid (the coffee shop)</p>
+      <p><strong>Acquirer:</strong> The merchant's bank (Stripe, Barclays)</p>
+      <p><strong>Issuer:</strong> Your bank (Monzo, HSBC, Chase)</p>
+
+      <div class="box"><strong>Why four?</strong> Each bank needs to verify independently. The issuer checks you have the money. The acquirer checks the transaction is real. Visa connects them and makes sure everyone trusts each other.</div>
+
+      <div class="quiz">
+        <div class="quiz-title">Quick Check</div>
+        <div class="quiz-subtitle">Understanding the parties</div>
+        <div class="question">Your friend uses Monzo. Which bank is the issuer?</div>
+        <div class="options" id="options-1-2">
+          <div class="option" onclick="answer('1-2', 0, 1)"><span class="option-letter">A</span><span class="option-text">The coffee shop's bank</span></div>
+          <div class="option" onclick="answer('1-2', 1, 1)"><span class="option-letter">B</span><span class="option-text">Monzo — they gave the card</span></div>
+          <div class="option" onclick="answer('1-2', 2, 1)"><span class="option-letter">C</span><span class="option-text">Mastercard</span></div>
+          <div class="option" onclick="answer('1-2', 3, 1)"><span class="option-letter">D</span><span class="option-text">The shop's processor</span></div>
+        </div>
+        <div class="feedback" id="feedback-1-2"></div>
+      </div>
+
+      <div class="button-group">
+        <button class="btn btn-prev" onclick="goTo('1-1')">← Previous</button>
+        <button class="btn btn-next" id="btn-next-1-2" disabled onclick="goTo('1-3')">Next Lesson →</button>
+      </div>
+    </div>
+
+    <!-- LESSON 1-3 -->
+    <div class="lesson" id="lesson-1-3">
+      <h2>Does money move instantly?</h2>
+      
+      <p>Your card is approved instantly. But money? That moves 1-2 days later in a batch.</p>
+
+      <h3>Approval vs Settlement</h3>
+      <p>When you tap, your bank puts a <strong>hold</strong> on your money. This is approval. But the actual money movement (<strong>settlement</strong>) happens later.</p>
+
+      <h3>The timeline</h3>
+      <p><strong>Moment of tap:</strong> Card approved instantly</p>
+      <p><strong>End of day:</strong> Shop sends all its transactions to its bank</p>
+      <p><strong>Overnight:</strong> Banks calculate who owes whom</p>
+      <p><strong>Next 1-2 days:</strong> Money actually moves</p>
+
+      <div class="box"><strong>Why wait?</strong> Processing trillions of payments one-by-one would be slow and expensive. Batching is efficient.</div>
+
+      <div class="quiz">
+        <div class="quiz-title">Quick Check</div>
+        <div class="quiz-subtitle">Understanding settlement</div>
+        <div class="question">You buy a jumper on Saturday. When does the shop get paid?</div>
+        <div class="options" id="options-1-3">
+          <div class="option" onclick="answer('1-3', 0, 2)"><span class="option-letter">A</span><span class="option-text">Immediately</span></div>
+          <div class="option" onclick="answer('1-3', 1, 2)"><span class="option-letter">B</span><span class="option-text">Midnight the same day</span></div>
+          <div class="option" onclick="answer('1-3', 2, 2)"><span class="option-letter">C</span><span class="option-text">Monday or Tuesday</span></div>
+          <div class="option" onclick="answer('1-3', 3, 2)"><span class="option-letter">D</span><span class="option-text">End of month</span></div>
+        </div>
+        <div class="feedback" id="feedback-1-3"></div>
+      </div>
+
+      <div class="button-group">
+        <button class="btn btn-prev" onclick="goTo('1-2')">← Previous</button>
+        <button class="btn btn-next" id="btn-next-1-3" disabled onclick="goTo('2-1')">Next Lesson →</button>
+      </div>
+    </div>
+
+    <!-- LESSON 2-1 -->
+    <div class="lesson" id="lesson-2-1">
+      <h2>What those 16 numbers mean</h2>
+      
+      <p>Your card number isn't random. Every digit tells the payment system something important.</p>
+
+      <h3>Breaking it down</h3>
+      <p>Take: <strong style="font-family:monospace;font-size:0.9em">4532 0151 1283 0366</strong></p>
+      <p><strong>1st digit (4):</strong> The network. "4" = Visa. "5" = Mastercard.</p>
+      <p><strong>1st–6th digits:</strong> Your bank code. Tells the network which bank issued it.</p>
+      <p><strong>7th–15th:</strong> Your account number inside that bank.</p>
+      <p><strong>16th:</strong> A check digit that catches typos.</p>
+
+      <div class="box"><strong>Why structure matters:</strong> The first 6 digits are crucial. The terminal reads these first to know which bank to contact.</div>
+
+      <div class="quiz">
+        <div class="quiz-title">Quick Check</div>
+        <div class="quiz-subtitle">Understanding card numbers</div>
+        <div class="question">A card starts with "5412...". Which network?</div>
+        <div class="options" id="options-2-1">
+          <div class="option" onclick="answer('2-1', 0, 1)"><span class="option-letter">A</span><span class="option-text">Visa — all start with 5</span></div>
+          <div class="option" onclick="answer('2-1', 1, 1)"><span class="option-letter">B</span><span class="option-text">Mastercard — 51–55 are Mastercard</span></div>
+          <div class="option" onclick="answer('2-1', 2, 1)"><span class="option-letter">C</span><span class="option-text">American Express</span></div>
+          <div class="option" onclick="answer('2-1', 3, 1)"><span class="option-letter">D</span><span class="option-text">Impossible to tell</span></div>
+        </div>
+        <div class="feedback" id="feedback-2-1"></div>
+      </div>
+
+      <div class="button-group">
+        <button class="btn btn-prev" onclick="goTo('1-3')">← Previous</button>
+        <button class="btn btn-next" id="btn-next-2-1" disabled onclick="goTo('2-2')">Next Lesson →</button>
+      </div>
+    </div>
+
+    <!-- LESSON 2-2 -->
+    <div class="lesson" id="lesson-2-2">
+      <h2>Chip vs swipe vs tap</h2>
+      
+      <p>Three ways to use a card. Very different security.</p>
+
+      <h3>Magnetic stripe (swipe)</h3>
+      <p>The black stripe stores your data. When you swipe, it's read. Problem: <strong>same data every time</strong>. A criminal copies it once = unlimited use.</p>
+
+      <h3>Chip (insert)</h3>
+      <p>The gold chip is a tiny computer. Every tap generates a <strong>unique secret code</strong> for that one transaction only. Even if captured, it's useless. Chip cloning is nearly impossible.</p>
+
+      <h3>Contactless (tap)</h3>
+      <p>Radio waves instead of physical contact. Same unique-per-transaction code as chip. Capped at £100 because above that, you need to prove it's you with a PIN.</p>
+
+      <div class="quiz">
+        <div class="quiz-title">Quick Check</div>
+        <div class="quiz-subtitle">Understanding security</div>
+        <div class="question">Why is chip more secure than stripe?</div>
+        <div class="options" id="options-2-2">
+          <div class="option" onclick="answer('2-2', 0, 1)"><span class="option-letter">A</span><span class="option-text">Data in external database</span></div>
+          <div class="option" onclick="answer('2-2', 1, 1)"><span class="option-letter">B</span><span class="option-text">Unique one-time code per transaction</span></div>
+          <div class="option" onclick="answer('2-2', 2, 1)"><span class="option-letter">C</span><span class="option-text">Encrypted with fingerprint</span></div>
+          <div class="option" onclick="answer('2-2', 3, 1)"><span class="option-letter">D</span><span class="option-text">Doesn't store any info</span></div>
+        </div>
+        <div class="feedback" id="feedback-2-2"></div>
+      </div>
+
+      <div class="button-group">
+        <button class="btn btn-prev" onclick="goTo('2-1')">← Previous</button>
+        <button class="btn btn-next" id="btn-next-2-2" disabled onclick="goTo('2-3')">Next Lesson →</button>
+      </div>
+    </div>
+
+    <!-- LESSON 2-3 -->
+    <div class="lesson" id="lesson-2-3">
+      <h2>Why cards get declined</h2>
+      
+      <p>It's almost never the shop's fault. Your bank said no.</p>
+
+      <h3>Your bank decides</h3>
+      <p>When declined, your bank said no. The shop can't see why — they just get a code.</p>
+
+      <h3>Common reasons</h3>
+      <p><strong>Not enough funds:</strong> Balance too low</p>
+      <p><strong>Card expired:</strong> Date passed</p>
+      <p><strong>Bank suspects fraud:</strong> Unusual transaction</p>
+      <p><strong>Daily limit:</strong> Already spent limit</p>
+      <p><strong>Wrong PIN:</strong> Too many failed tries</p>
+
+      <div class="box"><strong>What to do:</strong> Check your banking app. Try another payment method. Call the number on your card if unsure.</div>
+
+      <div class="quiz">
+        <div class="quiz-title">Quick Check</div>
+        <div class="quiz-subtitle">Understanding declines</div>
+        <div class="question">Card declined. Balance fine, not expired. Most likely?</div>
+        <div class="options" id="options-2-3">
+          <div class="option" onclick="answer('2-3', 0, 1)"><span class="option-letter">A</span><span class="option-text">Shop reader broken</span></div>
+          <div class="option" onclick="answer('2-3', 1, 1)"><span class="option-letter">B</span><span class="option-text">Bank flagged as unusual activity</span></div>
+          <div class="option" onclick="answer('2-3', 2, 1)"><span class="option-letter">C</span><span class="option-text">Visa network down</span></div>
+          <div class="option" onclick="answer('2-3', 3, 1)"><span class="option-letter">D</span><span class="option-text">Update your banking app</span></div>
+        </div>
+        <div class="feedback" id="feedback-2-3"></div>
+      </div>
+
+      <div class="button-group">
+        <button class="btn btn-prev" onclick="goTo('2-2')">← Previous</button>
+        <button class="btn btn-next" id="btn-next-2-3" onclick="goTo('certs')">View Certificates →</button>
+      </div>
+    </div>
+
+    <!-- CERTIFICATES -->
+    <div class="lesson" id="lesson-certs">
+      <h2>🏆 Your Certificates</h2>
+      <p>Complete all 6 lessons with 100% on each quiz to earn your certificates.</p>
+      
+      <div class="cert-grid">
+        <div class="cert-card" id="cert-ch1">
+          <div class="cert-emoji">📚</div>
+          <div class="cert-name">Chapter 1: The Basics</div>
+          <div class="cert-progress" id="prog-ch1">0 / 3 lessons</div>
+          <div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div>
+        </div>
+        <div class="cert-card" id="cert-ch2">
+          <div class="cert-emoji">💳</div>
+          <div class="cert-name">Chapter 2: Your Card</div>
+          <div class="cert-progress" id="prog-ch2">0 / 3 lessons</div>
+          <div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div>
+        </div>
+        <div class="cert-card" id="cert-all">
+          <div class="cert-emoji">🎓</div>
+          <div class="cert-name">Payments 101 Complete</div>
+          <div class="cert-progress" id="prog-all">0 / 6 lessons</div>
+          <div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- BOTTOM NAVIGATION -->
+<nav class="bottomnav">
+  <div class="nav-item active" id="nav-home" onclick="goTo('home')">
+    <div class="nav-item-icon">🏠</div>
+    <div class="nav-item-label">Home</div>
+  </div>
+  <div class="nav-item" id="nav-1-1" onclick="goTo('1-1')">
+    <div class="nav-item-icon">1️⃣</div>
+    <div class="nav-item-label">Lesson 1</div>
+  </div>
+  <div class="nav-item" id="nav-1-2" onclick="goTo('1-2')">
+    <div class="nav-item-icon">2️⃣</div>
+    <div class="nav-item-label">Lesson 2</div>
+  </div>
+  <div class="nav-item" id="nav-1-3" onclick="goTo('1-3')">
+    <div class="nav-item-icon">3️⃣</div>
+    <div class="nav-item-label">Lesson 3</div>
+  </div>
+  <div class="nav-item" id="nav-2-1" onclick="goTo('2-1')">
+    <div class="nav-item-icon">4️⃣</div>
+    <div class="nav-item-label">Lesson 4</div>
+  </div>
+  <div class="nav-item" id="nav-2-2" onclick="goTo('2-2')">
+    <div class="nav-item-icon">5️⃣</div>
+    <div class="nav-item-label">Lesson 5</div>
+  </div>
+  <div class="nav-item" id="nav-2-3" onclick="goTo('2-3')">
+    <div class="nav-item-icon">6️⃣</div>
+    <div class="nav-item-label">Lesson 6</div>
+  </div>
+  <div class="nav-item" id="nav-certs" onclick="goTo('certs')">
+    <div class="nav-item-icon">🏆</div>
+    <div class="nav-item-label">Certs</div>
+  </div>
 </nav>
-
-<div class="hero-strip">
-  <h1>3DS <em>Interactive</em> Simulator</h1>
-  <p>Explore payment authentication flows: standard 3DS/SCA, FIDO2 passkey challenges, and agentic payment vetting. Manipulate risk signals in real time.</p>
-  <div class="hero-meta">
-    <div class="hero-badge">Protocol <strong>EMV® 3DS 2.3</strong></div>
-    <div class="hero-badge">Signals <strong>250+ factors</strong></div>
-    <div class="hero-badge">Latency <strong>&lt;80ms</strong></div>
-  </div>
-</div>
-
-<div class="scenario-bar">
-  <button class="scenario-btn active" id="scn-0" onclick="switchScenario(0,this)">
-    <div class="scenario-btn-icon">🔐</div>
-    <div class="scenario-btn-title">3DS / SCA</div>
-    <div class="scenario-btn-sub">Standard flow</div>
-  </button>
-  <button class="scenario-btn" id="scn-1" onclick="switchScenario(1,this)">
-    <div class="scenario-btn-icon">🔑</div>
-    <div class="scenario-btn-title">Passkey Auth</div>
-    <div class="scenario-btn-sub">FIDO2</div>
-  </button>
-  <button class="scenario-btn" id="scn-2" onclick="switchScenario(2,this)">
-    <div class="scenario-btn-icon">🤖</div>
-    <div class="scenario-btn-title">Agentic</div>
-    <div class="scenario-btn-sub">AI agent</div>
-  </button>
-</div>
-
-<div class="main">
-  <div class="sim-layout">
-
-    <div class="sim-controls">
-
-      <div class="control-section">
-        <div class="control-section-title"><span>⚡</span> Risk Score</div>
-        <div class="risk-score-display">
-          <div class="risk-score-num" id="riskNum">42</div>
-          <div class="risk-score-bar-wrap">
-            <div class="risk-score-label">Score (0–100)</div>
-            <div class="risk-score-bar"><div class="risk-score-fill" id="riskFill" style="width:42%;background:var(--amber)"></div></div>
-            <div class="risk-verdict" id="riskVerdict">⚡ MODERATE</div>
-          </div>
-        </div>
-
-        <div class="slider-row">
-          <div class="slider-header"><span class="slider-label">Device Trust</span><span class="slider-val" id="val-device">72</span></div>
-          <input type="range" min="0" max="100" value="72" oninput="updateSignal('device',this.value)"/>
-        </div>
-        <div class="slider-row">
-          <div class="slider-header"><span class="slider-label">Geo Risk</span><span class="slider-val" id="val-geo">30</span></div>
-          <input type="range" min="0" max="100" value="30" oninput="updateSignal('geo',this.value)"/>
-        </div>
-        <div class="slider-row">
-          <div class="slider-header"><span class="slider-label">Velocity</span><span class="slider-val" id="val-velocity">45</span></div>
-          <input type="range" min="0" max="100" value="45" oninput="updateSignal('velocity',this.value)"/>
-        </div>
-        <div class="slider-row">
-          <div class="slider-header"><span class="slider-label">Behaviour</span><span class="slider-val" id="val-behaviour">65</span></div>
-          <input type="range" min="0" max="100" value="65" oninput="updateSignal('behaviour',this.value)"/>
-        </div>
-        <div class="slider-row">
-          <div class="slider-header"><span class="slider-label">Card History</span><span class="slider-val" id="val-history">20</span></div>
-          <input type="range" min="0" max="100" value="20" oninput="updateSignal('history',this.value)"/>
-        </div>
-        <div class="slider-row">
-          <div class="slider-header"><span class="slider-label">Amount Risk</span><span class="slider-val" id="val-amount">35</span></div>
-          <input type="range" min="0" max="100" value="35" oninput="updateSignal('amount',this.value)"/>
-        </div>
-      </div>
-
-      <div class="control-section">
-        <div class="control-section-title"><span>🧾</span> Context</div>
-        <div class="slider-row" style="margin-bottom:0">
-          <div class="slider-label" style="margin-bottom:4px;display:block;">Amount</div>
-          <select class="sim-select" id="sel-amount" onchange="updateContext()">
-            <option value="low">£0–£30</option>
-            <option value="mid" selected>£31–£250</option>
-            <option value="high">£251–£2,000</option>
-            <option value="vhigh">£2,001+</option>
-          </select>
-        </div>
-        <div class="slider-row" style="margin: 12px 0 0">
-          <div class="slider-label" style="margin-bottom:4px;display:block;">Merchant</div>
-          <select class="sim-select" id="sel-mcc" onchange="updateContext()">
-            <option value="retail">Retail</option>
-            <option value="travel" selected>Travel</option>
-            <option value="gambling">Gambling</option>
-            <option value="crypto">Crypto</option>
-            <option value="luxury">Luxury</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="control-section" id="ctrl-agent" style="display:none">
-        <div class="control-section-title"><span>🤖</span> Agent</div>
-        <div class="toggle-row">
-          <div class="toggle-label"><strong>Registered</strong></div>
-          <button class="toggle on" id="tog-agent-reg" onclick="toggleAgent('reg',this)"></button>
-        </div>
-        <div class="toggle-row">
-          <div class="toggle-label"><strong>In Scope</strong></div>
-          <button class="toggle on" id="tog-agent-scope" onclick="toggleAgent('scope',this)"></button>
-        </div>
-        <div class="toggle-row">
-          <div class="toggle-label"><strong>Signature OK</strong></div>
-          <button class="toggle on" id="tog-agent-sig" onclick="toggleAgent('sig',this)"></button>
-        </div>
-      </div>
-
-      <div class="control-section" style="border-bottom:none">
-        <button class="run-btn" id="runBtn" onclick="runSimulation()">
-          <span>▶</span> Run Simulation
-        </button>
-      </div>
-
-    </div>
-
-    <div class="sim-canvas" id="simCanvas">
-
-      <div class="flow-header">
-        <div>
-          <div class="flow-title" id="flowTitle">3DS Standard Flow</div>
-          <div class="flow-subtitle" id="flowSubtitle">EMV® 3DS 2.3 · Frictionless / Challenge</div>
-        </div>
-        <div class="flow-decision-badge" id="decisionBadge" style="border-color:var(--amber);color:var(--amber);background:rgba(245,158,11,0.08)">
-          <span>⚡</span> <span id="decisionText">Ready</span>
-        </div>
-      </div>
-
-      <div id="scene-0" class="sim-section visible">
-        <div class="flow-lanes" id="lanes-0">
-          <div class="flow-lane">
-            <div class="lane-header">Cardholder</div>
-            <div class="lane-body">
-              <div class="fnode" id="n0-0"><div class="fnode-icon">🛒</div><div class="fnode-label">Checkout</div></div>
-              <div class="connector"><div class="connector-line" id="c0-0"></div></div>
-              <div class="fnode" id="n0-1"><div class="fnode-icon">📤</div><div class="fnode-label">AReq</div></div>
-              <div class="connector"><div class="connector-line" id="c0-1"></div></div>
-              <div class="fnode" id="n0-result-frictionless"><div class="fnode-icon">✅</div><div class="fnode-label">Approved</div></div>
-              <div class="fnode" id="n0-result-challenge" style="display:none"><div class="fnode-icon">📲</div><div class="fnode-label">Challenge</div></div>
-              <div class="fnode" id="n0-result-deny" style="display:none"><div class="fnode-icon">🚫</div><div class="fnode-label">Denied</div></div>
-            </div>
-          </div>
-          <div class="flow-lane">
-            <div class="lane-header">3DS Server</div>
-            <div class="lane-body">
-              <div class="fnode" id="n0-2"><div class="fnode-icon">🔀</div><div class="fnode-label">Route</div></div>
-              <div class="connector"><div class="connector-line" id="c0-2"></div></div>
-              <div class="fnode" id="n0-3"><div class="fnode-icon">📨</div><div class="fnode-label">Forward</div></div>
-              <div class="connector"><div class="connector-line" id="c0-3"></div></div>
-              <div class="fnode" id="n0-4"><div class="fnode-icon">📩</div><div class="fnode-label">ARes</div></div>
-            </div>
-          </div>
-          <div class="flow-lane">
-            <div class="lane-header">ACS Engine</div>
-            <div class="lane-body">
-              <div class="fnode" id="n0-5"><div class="fnode-icon">⚡</div><div class="fnode-label">Signals</div></div>
-              <div class="connector"><div class="connector-line" id="c0-4"></div></div>
-              <div class="fnode" id="n0-6"><div class="fnode-icon">⚙️</div><div class="fnode-label">Rules</div></div>
-              <div class="connector"><div class="connector-line" id="c0-5"></div></div>
-              <div class="fnode" id="n0-7"><div class="fnode-icon">🧠</div><div class="fnode-label">Decision</div></div>
-            </div>
-          </div>
-        </div>
-
-        <div class="detail-panel" id="detail-panel-0">
-          <div class="detail-panel-title">🔐 3DS Flow</div>
-          <div class="detail-panel-body">Adjust risk signals on the left and click <strong>Run Simulation</strong> to animate the transaction flow.</div>
-          <div class="signal-matrix" id="signal-matrix-0"></div>
-        </div>
-
-        <div class="decision-trace" id="trace-0">
-          <div class="trace-line"><span class="trace-info">Ready for simulation...</span></div>
-        </div>
-      </div>
-
-      <div id="scene-1" class="sim-section">
-        <div class="flow-lanes">
-          <div class="flow-lane">
-            <div class="lane-header">Device</div>
-            <div class="lane-body">
-              <div class="fnode" id="n1-0"><div class="fnode-icon">🛒</div><div class="fnode-label">Checkout</div></div>
-              <div class="connector"><div class="connector-line" id="c1-0"></div></div>
-              <div class="fnode" id="n1-passkey"><div class="fnode-icon">🔑</div><div class="fnode-label">Passkey</div></div>
-              <div class="connector"><div class="connector-line" id="c1-1"></div></div>
-              <div class="fnode" id="n1-result"><div class="fnode-icon">✅</div><div class="fnode-label">Verified</div></div>
-            </div>
-          </div>
-          <div class="flow-lane">
-            <div class="lane-header">Authenticator</div>
-            <div class="lane-body">
-              <div class="fnode" id="n1-enclave"><div class="fnode-icon">🔐</div><div class="fnode-label">Enclave</div></div>
-              <div class="connector"><div class="connector-line" id="c1-2"></div></div>
-              <div class="fnode" id="n1-bio"><div class="fnode-icon">👆</div><div class="fnode-label">Biometric</div></div>
-              <div class="connector"><div class="connector-line" id="c1-3"></div></div>
-              <div class="fnode" id="n1-assert"><div class="fnode-icon">🖊️</div><div class="fnode-label">Sign</div></div>
-            </div>
-          </div>
-          <div class="flow-lane">
-            <div class="lane-header">ACS</div>
-            <div class="lane-body">
-              <div class="fnode" id="n1-risk"><div class="fnode-icon">⚡</div><div class="fnode-label">Risk</div></div>
-              <div class="connector"><div class="connector-line" id="c1-4"></div></div>
-              <div class="fnode" id="n1-creq"><div class="fnode-icon">📨</div><div class="fnode-label">CReq</div></div>
-              <div class="connector"><div class="connector-line" id="c1-5"></div></div>
-              <div class="fnode" id="n1-verify"><div class="fnode-icon">🔍</div><div class="fnode-label">Verify</div></div>
-            </div>
-          </div>
-        </div>
-        <div class="detail-panel" id="detail-panel-1">
-          <div class="detail-panel-title">🔑 Passkey Flow</div>
-          <div class="detail-panel-body">FIDO2 WebAuthn challenge — biometric authentication with zero shared secrets.</div>
-          <div class="signal-matrix" id="signal-matrix-1"></div>
-        </div>
-        <div class="decision-trace" id="trace-1">
-          <div class="trace-line"><span class="trace-info">Ready for simulation...</span></div>
-        </div>
-      </div>
-
-      <div id="scene-2" class="sim-section">
-        <div class="flow-lanes">
-          <div class="flow-lane">
-            <div class="lane-header">AI Agent</div>
-            <div class="lane-body">
-              <div class="fnode" id="n2-0"><div class="fnode-icon">🤖</div><div class="fnode-label">Mandate</div></div>
-              <div class="connector"><div class="connector-line" id="c2-0"></div></div>
-              <div class="fnode" id="n2-pay"><div class="fnode-icon">💳</div><div class="fnode-label">Payment</div></div>
-              <div class="connector"><div class="connector-line" id="c2-1"></div></div>
-              <div class="fnode" id="n2-result-ok"><div class="fnode-icon">✅</div><div class="fnode-label">Approved</div></div>
-              <div class="fnode" id="n2-result-escalate" style="display:none"><div class="fnode-icon">📲</div><div class="fnode-label">Escalate</div></div>
-              <div class="fnode" id="n2-result-block" style="display:none"><div class="fnode-icon">🚫</div><div class="fnode-label">Blocked</div></div>
-            </div>
-          </div>
-          <div class="flow-lane">
-            <div class="lane-header">Agent Vetting</div>
-            <div class="lane-body">
-              <div class="fnode" id="n2-reg"><div class="fnode-icon">📋</div><div class="fnode-label">Registry</div></div>
-              <div class="connector"><div class="connector-line" id="c2-2"></div></div>
-              <div class="fnode" id="n2-scope"><div class="fnode-icon">🎯</div><div class="fnode-label">Scope</div></div>
-              <div class="connector"><div class="connector-line" id="c2-3"></div></div>
-              <div class="fnode" id="n2-sig"><div class="fnode-icon">🔏</div><div class="fnode-label">Signature</div></div>
-            </div>
-          </div>
-          <div class="flow-lane">
-            <div class="lane-header">ACS Decision</div>
-            <div class="lane-body">
-              <div class="fnode" id="n2-risk"><div class="fnode-icon">⚡</div><div class="fnode-label">Risk</div></div>
-              <div class="connector"><div class="connector-line" id="c2-4"></div></div>
-              <div class="fnode" id="n2-rules"><div class="fnode-icon">⚙️</div><div class="fnode-label">Rules</div></div>
-              <div class="connector"><div class="connector-line" id="c2-5"></div></div>
-              <div class="fnode" id="n2-decide"><div class="fnode-icon">🧠</div><div class="fnode-label">Decision</div></div>
-            </div>
-          </div>
-        </div>
-
-        <div class="agent-card" id="agentCard">
-          <div style="font-family:var(--font-h);font-size:0.8rem;font-weight:700;margin-bottom:10px;color:var(--teal)">🤖 Agent</div>
-          <div class="agent-card-row"><span class="agent-card-key">Registered</span><span class="agent-card-val valid" id="ag-reg-val">✓ Yes</span></div>
-          <div class="agent-card-row"><span class="agent-card-key">Scope</span><span class="agent-card-val valid" id="ag-scope-val">✓ In mandate</span></div>
-          <div class="agent-card-row"><span class="agent-card-key">Signature</span><span class="agent-card-val valid" id="ag-sig-val">✓ Valid</span></div>
-        </div>
-
-        <div class="detail-panel" id="detail-panel-2">
-          <div class="detail-panel-title">🤖 Agentic Flow</div>
-          <div class="detail-panel-body">AI agent payment with delegated authority. Toggle agent identity on the left.</div>
-          <div class="signal-matrix" id="signal-matrix-2"></div>
-        </div>
-        <div class="decision-trace" id="trace-2">
-          <div class="trace-line"><span class="trace-info">Ready for simulation...</span></div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-</div>
-
-<!-- MODALS -->
-<div class="modal-overlay" id="modal-otp">
-  <div class="modal-window">
-    <div class="modal-topbar">
-      <div>
-        <div class="modal-topbar-logo">3DS</div>
-        <div style="margin-left:8px"><div class="modal-topbar-title">OTP Challenge</div><div class="modal-topbar-sub">3DS 2.3 · CReq</div></div>
-      </div>
-      <button class="modal-close" onclick="closeModal('otp')">✕</button>
-    </div>
-    <div class="modal-merchant">
-      <div class="modal-merchant-info">
-        <div class="modal-merchant-icon" id="otp-merchant-icon">✈️</div>
-        <div>
-          <div class="modal-merchant-name" id="otp-merchant-name">British Airways</div>
-          <div class="modal-merchant-desc" id="otp-merchant-desc">Travel · Visa Debit · ****4821</div>
-        </div>
-      </div>
-      <div class="modal-amount">
-        <div class="modal-amount-num" id="otp-amount">£147.00</div>
-        <div class="modal-amount-label">Amount</div>
-      </div>
-    </div>
-    <div class="modal-body">
-      <div class="otp-prompt">
-        <div class="otp-prompt-icon">📱</div>
-        <div class="otp-prompt-title">Enter Code</div>
-        <div class="otp-prompt-sub">6-digit code sent to <span class="otp-prompt-phone">••••7392</span></div>
-      </div>
-      <div class="otp-inputs" id="otp-input-row">
-        <input class="otp-input" maxlength="1" type="text" inputmode="numeric" id="otp-0" oninput="otpNext(0,this)" onkeydown="otpBack(0,event)"/>
-        <input class="otp-input" maxlength="1" type="text" inputmode="numeric" id="otp-1" oninput="otpNext(1,this)" onkeydown="otpBack(1,event)"/>
-        <input class="otp-input" maxlength="1" type="text" inputmode="numeric" id="otp-2" oninput="otpNext(2,this)" onkeydown="otpBack(2,event)"/>
-        <input class="otp-input" maxlength="1" type="text" inputmode="numeric" id="otp-3" oninput="otpNext(3,this)" onkeydown="otpBack(3,event)"/>
-        <input class="otp-input" maxlength="1" type="text" inputmode="numeric" id="otp-4" oninput="otpNext(4,this)" onkeydown="otpBack(4,event)"/>
-        <input class="otp-input" maxlength="1" type="text" inputmode="numeric" id="otp-5" oninput="otpNext(5,this)" onkeydown="otpBack(5,event)"/>
-      </div>
-      <div id="otp-result-msg" style="text-align:center;font-size:0.75rem;margin-bottom:12px;color:var(--muted)"></div>
-      <div class="modal-actions">
-        <button class="modal-btn-secondary" onclick="closeModal('otp')">Cancel</button>
-        <button class="modal-btn-primary" id="otp-submit-btn" onclick="submitOTP()">Verify →</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="modal-overlay" id="modal-passkey">
-  <div class="modal-window">
-    <div class="modal-topbar">
-      <div>
-        <div class="modal-topbar-logo">3DS</div>
-        <div style="margin-left:8px"><div class="modal-topbar-title">Passkey Auth</div><div class="modal-topbar-sub">FIDO2 · CReq</div></div>
-      </div>
-      <button class="modal-close" onclick="closeModal('passkey')">✕</button>
-    </div>
-    <div class="modal-merchant">
-      <div class="modal-merchant-info">
-        <div class="modal-merchant-icon" id="pk-merchant-icon">✈️</div>
-        <div>
-          <div class="modal-merchant-name" id="pk-merchant-name">British Airways</div>
-          <div class="modal-merchant-desc" id="pk-merchant-desc">Travel · Visa Debit · ****4821</div>
-        </div>
-      </div>
-      <div class="modal-amount">
-        <div class="modal-amount-num" id="pk-amount">£147.00</div>
-        <div class="modal-amount-label">Amount</div>
-      </div>
-    </div>
-    <div class="modal-body">
-      <div style="text-align:center;margin-bottom:16px">
-        <div style="font-size:2rem;margin-bottom:10px">🔑</div>
-        <div style="font-family:var(--font-h);font-size:0.9rem;font-weight:700;color:var(--white);margin-bottom:5px">Verify with Passkey</div>
-        <div style="font-size:0.75rem;color:var(--muted);line-height:1.5">Use your device biometric to authorize this payment.</div>
-      </div>
-      <div class="modal-actions">
-        <button class="modal-btn-secondary" onclick="closeModal('passkey')">Cancel</button>
-        <button class="modal-btn-primary" id="pk-auth-btn" onclick="doPasskeyAuth()">🔑 Authenticate</button>
-      </div>
-    </div>
-  </div>
-</div>
 
 <script>
 const state = {
-  scenario: 0,
-  signals: { device: 72, geo: 30, velocity: 45, behaviour: 65, history: 20, amount: 35 },
-  context: { amount: 'mid', mcc: 'travel' },
-  agent: { reg: true, scope: true, sig: true },
-  running: false,
-  riskScore: 42,
+  current: 'home',
+  done: JSON.parse(localStorage.getItem('p101-done') || '{}'),
+  answers: JSON.parse(localStorage.getItem('p101-answers') || '{}')
 };
 
-function calcRisk() {
-  const s = state.signals;
-  const c = state.context;
-  let score = 0;
-  score += (100 - s.device) * 0.25 + s.geo * 0.20 + s.velocity * 0.18 + (100 - s.behaviour) * 0.15 + s.history * 0.12 + s.amount * 0.10;
-  const amountBonus = { low: -8, mid: 0, high: 15, vhigh: 28 };
-  const mccBonus = { retail: -5, travel: 5, gambling: 25, crypto: 30, luxury: 12 };
-  score += (amountBonus[c.amount] || 0) + (mccBonus[c.mcc] || 0);
-  score = Math.max(0, Math.min(100, Math.round(score)));
-  state.riskScore = score;
-  return score;
+const lessons = ['1-1', '1-2', '1-3', '2-1', '2-2', '2-3'];
+const correctAnswers = { '1-1': 2, '1-2': 1, '1-3': 2, '2-1': 1, '2-2': 1, '2-3': 1 };
+
+function goTo(lesson) {
+  document.querySelectorAll('.lesson').forEach(l => l.classList.remove('active'));
+  document.getElementById('lesson-' + lesson).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  document.getElementById('nav-' + lesson).classList.add('active');
+  state.current = lesson;
+  window.scrollTo(0, 0);
+  if (lesson === 'home') updateHome();
+  if (lesson === 'certs') updateCerts();
 }
 
-function riskColor(score) {
-  return score < 30 ? 'var(--green)' : score < 60 ? 'var(--amber)' : 'var(--red)';
-}
-
-function riskLabel(score) {
-  return score < 30 ? '✅ LOW' : score < 60 ? '⚡ MODERATE' : score < 80 ? '⚠️ HIGH' : '🚫 CRITICAL';
-}
-
-function decision(score) {
-  if (state.scenario === 2) {
-    const a = state.agent;
-    if (!a.sig || !a.reg) return 'BLOCK';
-    if (score >= 75) return 'BLOCK';
-    if (!a.scope || score >= 45) return 'ESCALATE';
-    return 'APPROVE';
+function answer(lessonId, chosenIdx, correctIdx) {
+  const optionsDiv = document.getElementById('options-' + lessonId);
+  const feedbackDiv = document.getElementById('feedback-' + lessonId);
+  const nextBtn = document.getElementById('btn-next-' + lessonId);
+  
+  optionsDiv.querySelectorAll('.option').forEach(opt => opt.style.pointerEvents = 'none');
+  optionsDiv.children[chosenIdx].classList.add(chosenIdx === correctIdx ? 'correct' : 'wrong');
+  
+  if (chosenIdx !== correctIdx) {
+    optionsDiv.children[correctIdx].classList.add('correct');
   }
-  return score < 30 ? 'FRICTIONLESS' : score < 65 ? (state.scenario === 1 ? 'PASSKEY' : 'CHALLENGE') : 'BLOCK';
-}
-
-function updateRiskDisplay() {
-  const score = calcRisk();
-  const col = riskColor(score);
-  document.getElementById('riskNum').textContent = score;
-  document.getElementById('riskNum').style.color = col;
-  document.getElementById('riskFill').style.width = score + '%';
-  document.getElementById('riskFill').style.background = col;
-  document.getElementById('riskVerdict').textContent = riskLabel(score);
-  document.getElementById('riskVerdict').style.color = col;
-  updateSignalMatrices();
-}
-
-function updateSignal(key, val) {
-  state.signals[key] = parseInt(val);
-  document.getElementById('val-' + key).textContent = val;
-  updateRiskDisplay();
-}
-
-function updateContext() {
-  state.context.amount = document.getElementById('sel-amount').value;
-  state.context.mcc = document.getElementById('sel-mcc').value;
-  updateRiskDisplay();
-}
-
-function toggleAgent(key, btn) {
-  state.agent[key] = !state.agent[key];
-  btn.classList.toggle('on');
-  updateAgentCard();
-  updateRiskDisplay();
-}
-
-function updateAgentCard() {
-  const a = state.agent;
-  document.getElementById('ag-reg-val').textContent = a.reg ? '✓ Yes' : '✗ Not registered';
-  document.getElementById('ag-reg-val').className = 'agent-card-val ' + (a.reg ? 'valid' : 'invalid');
-  document.getElementById('ag-scope-val').textContent = a.scope ? '✓ In mandate' : '✗ Out of scope';
-  document.getElementById('ag-scope-val').className = 'agent-card-val ' + (a.scope ? 'valid' : 'invalid');
-  document.getElementById('ag-sig-val').textContent = a.sig ? '✓ Valid' : '✗ Invalid';
-  document.getElementById('ag-sig-val').className = 'agent-card-val ' + (a.sig ? 'valid' : 'invalid');
-}
-
-function updateSignalMatrices() {
-  const s = state.signals;
-  const cells = [
-    { label: 'Device', val: s.device > 60 ? 'Trusted' : s.device > 30 ? 'Partial' : 'Unknown', level: s.device > 60 ? 'low' : s.device > 30 ? 'med' : 'high' },
-    { label: 'Geo', val: s.geo < 30 ? 'Normal' : s.geo < 70 ? 'Elevated' : 'Critical', level: s.geo < 30 ? 'low' : s.geo < 70 ? 'med' : 'high' },
-    { label: 'Velocity', val: s.velocity < 30 ? 'Normal' : s.velocity < 65 ? 'Elevated' : 'Spike', level: s.velocity < 30 ? 'low' : s.velocity < 65 ? 'med' : 'high' },
-    { label: 'Behaviour', val: s.behaviour > 60 ? 'Familiar' : s.behaviour > 30 ? 'Mixed' : 'Anomaly', level: s.behaviour > 60 ? 'low' : s.behaviour > 30 ? 'med' : 'high' },
-    { label: 'History', val: s.history < 30 ? 'Clean' : s.history < 60 ? 'Flagged' : 'Risky', level: s.history < 30 ? 'low' : s.history < 60 ? 'med' : 'high' },
-    { label: 'Score', val: state.riskScore, level: state.riskScore < 30 ? 'low' : state.riskScore < 65 ? 'med' : 'high' },
-  ];
-  [0,1,2].forEach(i => {
-    const m = document.getElementById('signal-matrix-' + i);
-    if (!m) return;
-    m.innerHTML = cells.map(c => `<div class="signal-cell ${c.level}"><div class="signal-cell-label">${c.label}</div><div class="signal-cell-val">${c.val}</div></div>`).join('');
-  });
-}
-
-function switchScenario(idx, el) {
-  state.scenario = idx;
-  document.querySelectorAll('.scenario-btn').forEach((b,i) => b.classList.toggle('active', i===idx));
-  document.querySelectorAll('.sim-section[id^="scene-"]').forEach((s,i) => s.classList.toggle('visible', i===idx));
-  document.getElementById('ctrl-agent').style.display = idx === 2 ? 'block' : 'none';
-  const titles = [['3DS Standard Flow', 'EMV® 3DS 2.3 · Frictionless / Challenge'], ['3DS + Passkey', 'FIDO2 WebAuthn · Biometric auth'], ['Agentic Payment', 'AI agent vetting · Composite risk']];
-  document.getElementById('flowTitle').textContent = titles[idx][0];
-  document.getElementById('flowSubtitle').textContent = titles[idx][1];
-  resetDecisionBadge();
-}
-
-function resetDecisionBadge() {
-  document.getElementById('decisionBadge').style.borderColor = 'var(--amber)';
-  document.getElementById('decisionBadge').style.color = 'var(--amber)';
-  document.getElementById('decisionBadge').style.background = 'rgba(245,158,11,0.08)';
-  document.getElementById('decisionText').textContent = 'Ready';
-}
-
-async function runSimulation() {
-  if (state.running) return;
-  state.running = true;
-  const btn = document.getElementById('runBtn');
-  btn.textContent = '⟳ Running...';
-  resetAllNodes();
-  const score = calcRisk();
-  const dec = decision(score);
-  const traceId = 'trace-' + state.scenario;
-  clearTrace(traceId);
-  await sleep(100);
-  addTrace(traceId, 'info', 'Transaction request received');
-  await sleep(100);
-  addTrace(traceId, 'info', 'Risk engine processing ' + score + '/100');
-  await sleep(300);
-  if (state.scenario === 0) await runStandard3DS(dec, score, traceId);
-  else if (state.scenario === 1) await runPasskey3DS(dec, score, traceId);
-  else await runAgentic(dec, score, traceId);
-  updateDecisionBadge(dec);
-  state.running = false;
-  btn.innerHTML = '<span>▶</span> Run Simulation';
-}
-
-async function runStandard3DS(dec, score, traceId) {
-  await activateNode('n0-0');
-  await sleep(150); await activateConnector('c0-0');
-  await activateNode('n0-1');
-  await sleep(150); await activateConnector('c0-2');
-  await activateNode('n0-2');
-  await sleep(150); await activateConnector('c0-3');
-  await activateNode('n0-3');
-  await sleep(150); await activateConnector('c0-4');
-  await activateNode('n0-5');
-  addTrace(traceId, 'info', 'Signals ingested');
-  await sleep(150); await activateConnector('c0-5');
-  await activateNode('n0-6');
-  addTrace(traceId, 'info', 'Rules evaluated');
-  await sleep(150);
-  await activateNode('n0-7', dec === 'FRICTIONLESS' ? 'complete' : dec === 'BLOCK' ? 'blocked' : 'active');
-  if (dec === 'FRICTIONLESS') {
-    addTrace(traceId, 'pass', 'ARes: transStatus=Y — Frictionless');
-    showResult('n0-result-frictionless', 'complete');
-    await activateConnector('c0-1'); await activateNode('n0-4', 'complete');
-  } else if (dec === 'BLOCK') {
-    addTrace(traceId, 'fail', 'ARes: transStatus=N — Blocked');
-    showResult('n0-result-deny', 'blocked');
+  
+  feedbackDiv.classList.add('show');
+  if (chosenIdx === correctIdx) {
+    feedbackDiv.classList.add('correct');
+    feedbackDiv.classList.remove('wrong');
+    feedbackDiv.innerHTML = '<strong>✓ Correct!</strong> Well done.';
+    nextBtn.disabled = false;
+    state.done[lessonId] = true;
+    state.answers[lessonId] = chosenIdx;
+    localStorage.setItem('p101-done', JSON.stringify(state.done));
+    localStorage.setItem('p101-answers', JSON.stringify(state.answers));
+    updateProgress();
   } else {
-    addTrace(traceId, 'warn', 'ARes: transStatus=C — Challenge issued');
-    showResult('n0-result-challenge', 'active');
-    await sleep(400);
-    openModal('otp');
+    feedbackDiv.classList.add('wrong');
+    feedbackDiv.classList.remove('correct');
+    feedbackDiv.innerHTML = '<strong>✗ Not quite.</strong> Read the lesson again and try again.';
   }
 }
 
-async function runPasskey3DS(dec, score, traceId) {
-  await activateNode('n1-0');
-  await sleep(150); await activateConnector('c1-4');
-  await activateNode('n1-risk');
-  addTrace(traceId, 'info', 'Risk threshold check');
-  if (dec === 'FRICTIONLESS') {
-    addTrace(traceId, 'pass', 'Below threshold — frictionless');
-    await activateNode('n1-result', 'complete');
-  } else {
-    await sleep(150); await activateConnector('c1-5');
-    await activateNode('n1-creq');
-    addTrace(traceId, 'warn', 'Passkey challenge issued');
-    await sleep(150); await activateConnector('c1-0');
-    await activateNode('n1-passkey', 'active');
-    await sleep(150); await activateConnector('c1-2');
-    await activateNode('n1-enclave');
-    await sleep(150); await activateConnector('c1-3');
-    await activateNode('n1-bio');
-    addTrace(traceId, 'info', 'Awaiting biometric...');
-    await sleep(400);
-    openModal('passkey');
-  }
-}
-
-async function runAgentic(dec, score, traceId) {
-  await activateNode('n2-0');
-  await sleep(150); await activateConnector('c2-0');
-  await activateNode('n2-pay');
-  await sleep(150); await activateConnector('c2-2');
-  await activateNode('n2-reg', state.agent.reg ? 'active' : 'blocked');
-  addTrace(traceId, state.agent.reg ? 'pass' : 'fail', 'Registry: ' + (state.agent.reg ? 'FOUND' : 'NOT FOUND'));
-  await sleep(150); await activateConnector('c2-3');
-  await activateNode('n2-scope', state.agent.scope ? 'active' : 'active');
-  addTrace(traceId, state.agent.scope ? 'pass' : 'warn', 'Scope: ' + (state.agent.scope ? 'OK' : 'MISMATCH'));
-  await sleep(150); await activateConnector('c2-4');
-  await activateNode('n2-sig', state.agent.sig ? 'active' : 'blocked');
-  addTrace(traceId, state.agent.sig ? 'pass' : 'fail', 'Signature: ' + (state.agent.sig ? 'VALID' : 'INVALID'));
-  await sleep(150); await activateConnector('c2-5');
-  await activateNode('n2-risk');
-  addTrace(traceId, 'info', 'Composite score: ' + score + '/100');
-  if (dec === 'APPROVE') {
-    showResult('n2-result-ok', 'complete');
-    addTrace(traceId, 'pass', 'Agent APPROVED');
-  } else if (dec === 'BLOCK') {
-    showResult('n2-result-block', 'blocked');
-    addTrace(traceId, 'fail', 'Agent BLOCKED');
-  } else {
-    showResult('n2-result-escalate', 'active');
-    addTrace(traceId, 'warn', 'Escalated to user');
-  }
-}
-
-function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
-
-async function activateNode(id, state2 = 'active') {
-  const el = document.getElementById(id);
-  if (!el) return;
-  el.classList.remove('active','complete','blocked');
-  el.classList.add(state2);
-  await sleep(200);
-}
-
-async function activateConnector(id) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  el.classList.add('active');
-  await sleep(150);
-}
-
-function resetAllNodes() {
-  document.querySelectorAll('.fnode').forEach(n => n.classList.remove('active','complete','blocked'));
-  document.querySelectorAll('.connector-line').forEach(c => c.classList.remove('active'));
-  ['n0-result-challenge','n0-result-deny','n2-result-escalate','n2-result-block'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.style.display = 'none';
+function updateProgress() {
+  const completed = lessons.filter(l => state.done[l]).length;
+  const pct = Math.round(completed / lessons.length * 100);
+  document.getElementById('topbar-progress').textContent = completed + ' / 6';
+  document.getElementById('stat-done').textContent = completed;
+  
+  lessons.forEach(l => {
+    const navItem = document.getElementById('nav-' + l);
+    if (state.done[l]) navItem.classList.add('done');
   });
+  
+  updateCertProgress();
 }
 
-function showResult(id, cls) {
-  ['n0-result-frictionless','n0-result-challenge','n0-result-deny'].forEach(x => {
-    const el = document.getElementById(x);
-    if (el) el.style.display = x === id ? '' : 'none';
-  });
-  ['n2-result-ok','n2-result-escalate','n2-result-block'].forEach(x => {
-    const el = document.getElementById(x);
-    if (el) el.style.display = x === id ? '' : 'none';
-  });
-  const el = document.getElementById(id);
-  if (el) { el.classList.remove('active','complete','blocked'); el.classList.add(cls); }
+function updateCertProgress() {
+  const ch1 = ['1-1', '1-2', '1-3'].filter(l => state.done[l]).length;
+  const ch2 = ['2-1', '2-2', '2-3'].filter(l => state.done[l]).length;
+  const all = lessons.filter(l => state.done[l]).length;
+  
+  document.getElementById('prog-ch1').textContent = ch1 + ' / 3';
+  document.getElementById('prog-ch2').textContent = ch2 + ' / 3';
+  document.getElementById('prog-all').textContent = all + ' / 6';
+  
+  document.getElementById('cert-ch1').querySelector('.progress-fill').style.width = (ch1 / 3 * 100) + '%';
+  document.getElementById('cert-ch2').querySelector('.progress-fill').style.width = (ch2 / 3 * 100) + '%';
+  document.getElementById('cert-all').querySelector('.progress-fill').style.width = (all / 6 * 100) + '%';
+  
+  if (ch1 === 3) document.getElementById('cert-ch1').classList.add('earned');
+  if (ch2 === 3) document.getElementById('cert-ch2').classList.add('earned');
+  if (all === 6) document.getElementById('cert-all').classList.add('earned');
+  
+  document.getElementById('stat-certs').textContent = (ch1 === 3 ? 1 : 0) + (ch2 === 3 ? 1 : 0) + (all === 6 ? 1 : 0);
 }
 
-function updateDecisionBadge(dec) {
-  const badge = document.getElementById('decisionBadge');
-  const configs = {
-    FRICTIONLESS: { color: 'var(--green)', bg: 'rgba(34,197,94,0.08)', text: '✅ Approved', border: 'var(--green)' },
-    CHALLENGE: { color: 'var(--amber)', bg: 'rgba(245,158,11,0.08)', text: '⚠️ Challenge', border: 'var(--amber)' },
-    PASSKEY: { color: 'var(--teal)', bg: 'rgba(0,196,188,0.08)', text: '🔑 Passkey', border: 'var(--teal)' },
-    BLOCK: { color: 'var(--red)', bg: 'rgba(239,68,68,0.08)', text: '🚫 Blocked', border: 'var(--red)' },
-    APPROVE: { color: 'var(--green)', bg: 'rgba(34,197,94,0.08)', text: '✅ Approved', border: 'var(--green)' },
-    ESCALATE: { color: 'var(--amber)', bg: 'rgba(245,158,11,0.08)', text: '📲 Escalate', border: 'var(--amber)' },
-  };
-  const cfg = configs[dec] || configs.CHALLENGE;
-  badge.style.color = cfg.color;
-  badge.style.background = cfg.bg;
-  badge.style.borderColor = cfg.border;
-  document.getElementById('decisionText').textContent = cfg.text;
+function updateHome() {
+  updateProgress();
 }
 
-function clearTrace(id) {
-  document.getElementById(id).innerHTML = '';
+function updateCerts() {
+  updateCertProgress();
 }
 
-function addTrace(id, type, msg) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  const line = document.createElement('div');
-  line.className = 'trace-line';
-  line.innerHTML = `<span class="trace-${type}">${msg}</span>`;
-  el.appendChild(line);
-  el.scrollTop = el.scrollHeight;
-}
-
-// MODALS
-const merchantData = {
-  low:   { retail: { icon:'🛍️', name:'ASOS', desc:'Retail · Visa Debit · ****4821' },   travel: { icon:'🚌', name:'Rail', desc:'Travel · Visa Debit · ****4821' } },
-  mid:   { retail: { icon:'📦', name:'Amazon', desc:'Retail · Mastercard Debit · ****4821' }, travel: { icon:'✈️', name:'British Airways', desc:'Travel · Visa Debit · ****4821' } },
-  high:  { retail: { icon:'🖥️', name:'Apple', desc:'Electronics · Visa Credit · ****4821' }, travel: { icon:'🏨', name:'Marriott', desc:'Hotels · Amex · ****4821' } },
-  vhigh: { retail: { icon:'🏠', name:'IKEA Business', desc:'Retail · Corporate · ****4821' }, travel: { icon:'🛩️', name:'NetJets', desc:'Aviation · Amex Platinum · ****4821' } }
-};
-const amountValues = { low: '£18.50', mid: '£147.00', high: '£789.00', vhigh: '£3,450.00' };
-
-function getMerchant() {
-  const amt = state.context.amount || 'mid';
-  const mcc = state.context.mcc || 'travel';
-  return merchantData[amt]?.[mcc] || merchantData.mid.travel;
-}
-
-function openModal(type) {
-  const m = getMerchant();
-  const amt = amountValues[state.context.amount] || '£147.00';
-  if (type === 'otp') {
-    document.getElementById('otp-merchant-icon').textContent = m.icon;
-    document.getElementById('otp-merchant-name').textContent = m.name;
-    document.getElementById('otp-merchant-desc').textContent = m.desc;
-    document.getElementById('otp-amount').textContent = amt;
-    resetOTP();
-  } else if (type === 'passkey') {
-    document.getElementById('pk-merchant-icon').textContent = m.icon;
-    document.getElementById('pk-merchant-name').textContent = m.name;
-    document.getElementById('pk-merchant-desc').textContent = m.desc;
-    document.getElementById('pk-amount').textContent = amt;
-  }
-  document.getElementById('modal-' + type).classList.add('open');
-  document.body.style.overflow = 'hidden';
-}
-
-function closeModal(type) {
-  document.getElementById('modal-' + type).classList.remove('open');
-  document.body.style.overflow = '';
-}
-
-['otp','passkey'].forEach(t => {
-  document.getElementById('modal-' + t).addEventListener('click', function(e) {
-    if (e.target === this) closeModal(t);
-  });
-});
-
-// OTP
-function resetOTP() {
-  for (let i = 0; i < 6; i++) {
-    const el = document.getElementById('otp-' + i);
-    el.value = ''; el.className = 'otp-input'; el.disabled = false;
-  }
-  document.getElementById('otp-0').focus();
-  document.getElementById('otp-result-msg').textContent = '';
-  document.getElementById('otp-submit-btn').disabled = false;
-}
-
-function otpNext(idx, el) {
-  el.value = el.value.replace(/\D/g,'');
-  if (el.value && idx < 5) document.getElementById('otp-' + (idx+1)).focus();
-}
-
-function otpBack(idx, e) {
-  if (e.key === 'Backspace' && !document.getElementById('otp-'+idx).value && idx > 0) {
-    document.getElementById('otp-' + (idx-1)).focus();
-  }
-}
-
-function getOTPValue() {
-  return [0,1,2,3,4,5].map(i => document.getElementById('otp-'+i).value).join('');
-}
-
-async function submitOTP() {
-  const val = getOTPValue();
-  if (val.length < 6) { document.getElementById('otp-result-msg').textContent = 'Enter all digits'; return; }
-  const btn = document.getElementById('otp-submit-btn');
-  btn.disabled = true; btn.textContent = '⟳ Verifying...';
-  await sleep(800);
-  if (val === '123456' || val === '483921') {
-    btn.textContent = '✓ Verified';
-    btn.style.background = 'var(--green)';
-    document.getElementById('otp-result-msg').textContent = '✅ Code verified';
-    document.getElementById('otp-result-msg').style.color = 'var(--green)';
-    addTrace('trace-0', 'pass', 'OTP verified — transStatus=Y');
-    updateDecisionBadge('FRICTIONLESS');
-    showResult('n0-result-challenge', 'complete');
-    await sleep(1500); closeModal('otp');
-  } else {
-    btn.disabled = false; btn.textContent = 'Verify →';
-    document.getElementById('otp-result-msg').textContent = '✗ Incorrect code';
-    document.getElementById('otp-result-msg').style.color = 'var(--red)';
-  }
-}
-
-async function doPasskeyAuth() {
-  const btn = document.getElementById('pk-auth-btn');
-  btn.disabled = true; btn.textContent = '⟳ Verifying...';
-  await sleep(1000);
-  btn.textContent = '✓ Verified';
-  btn.style.background = 'var(--green)';
-  addTrace('trace-1', 'pass', 'Passkey verified — transStatus=Y');
-  updateDecisionBadge('PASSKEY');
-  await sleep(1500); closeModal('passkey');
-}
-
-updateRiskDisplay();
-updateAgentCard();
+updateProgress();
 </script>
 </body>
 </html>
