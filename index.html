@@ -300,7 +300,7 @@ input[type=range]::-moz-range-thumb { width: 13px; height: 13px; border-radius: 
 ════════════════════════════════════════════ */
 @media (max-width: 1024px) {
   .sim-layout { grid-template-columns: 1fr; }
-  .sim-controls { border-right: none; border-bottom: 1px solid var(--border); max-height: 50vh; overflow-y: auto; }
+  .sim-controls { border-right: none; border-bottom: 1px solid var(--border); overflow-y: auto; }
 }
 
 @media (max-width: 768px) {
@@ -319,7 +319,7 @@ input[type=range]::-moz-range-thumb { width: 13px; height: 13px; border-radius: 
   .scenario-btn-icon { font-size: 1rem; }
   .scenario-btn-title { font-size: 0.64rem; }
   
-  .sim-controls { max-height: 40vh; }
+  .sim-controls { overflow-y: auto; }
   .sim-controls-header { display: block; }
   .control-section { padding: 14px; }
   
@@ -1183,6 +1183,15 @@ document.addEventListener('keydown', e => {
 // ════════════════════════════════════════════════════════════════
 buildRuleCards();
 updateRiskDisplay();
+
+// Auto-expand controls on mobile on page load
+if (window.innerWidth <= 768) {
+  const ctrl = document.querySelector('.sim-controls');
+  if (ctrl && ctrl.classList.contains('collapsed')) {
+    ctrl.classList.remove('collapsed');
+    document.getElementById('mobile-toggle-icon').textContent = '▼';
+  }
+}
 </script>
 </body>
 </html>
