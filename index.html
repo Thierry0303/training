@@ -101,13 +101,14 @@ nav {
 .sim-layout { display: grid; grid-template-columns: 380px 1fr; min-height: auto; }
 
 /* CONTROLS */
-.sim-controls { border-right: 1px solid var(--border); overflow-y: auto; background: rgba(8,24,46,0.5); -webkit-overflow-scrolling: touch; }
+.sim-controls { border-right: 1px solid var(--border); overflow-y: auto; background: rgba(8,24,46,0.5); -webkit-overflow-scrolling: touch; max-height: none; transition: max-height 0.35s cubic-bezier(0.4,0,0.2,1); }
 .sim-controls-header { padding: 16px; background: rgba(0,196,188,0.06); border-bottom: 1px solid var(--border); display: none; }
 .sim-controls-header button { background: none; border: none; color: var(--teal); font-weight: 600; font-size: 0.9rem; display: flex; align-items: center; gap: 8px; width: 100%; justify-content: space-between; cursor: pointer; transition: all 0.2s; }
 
 .control-section { border-bottom: 1px solid var(--border); padding: 20px; }
 .control-section-title { font-family: var(--font-h); font-size: 0.76rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--teal); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; cursor: pointer; }
 .control-section.collapsed { max-height: 0; padding: 0; border: none; overflow: hidden; }
+.sim-controls.collapsed { max-height: 58px; }
 
 /* TABS */
 .control-tabs { display: flex; gap: 4px; margin-bottom: 14px; border-bottom: 1px solid var(--border); }
@@ -1108,8 +1109,18 @@ function closeHelp() {
 function toggleMobileControls() {
   const ctrl = document.querySelector('.sim-controls');
   if (window.innerWidth > 768) return;
-  ctrl.classList.toggle('collapsed');
-  document.getElementById('mobile-toggle-icon').textContent = ctrl.classList.contains('collapsed') ? '▶' : '▼';
+  
+  if (ctrl.classList.contains('collapsed')) {
+    // Expand
+    ctrl.classList.remove('collapsed');
+    ctrl.style.maxHeight = '1000px';
+    document.getElementById('mobile-toggle-icon').textContent = '▼';
+  } else {
+    // Collapse
+    ctrl.classList.add('collapsed');
+    ctrl.style.maxHeight = '58px';
+    document.getElementById('mobile-toggle-icon').textContent = '▶';
+  }
 }
 
 // ════════════════════════════════════════════════════════════════
